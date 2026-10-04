@@ -437,6 +437,8 @@
     <string name="clear_search_history_key">clear_search_history</string>
 
     <string name="last_used_download_type">@string/last_download_type_video_key</string>
+    <string name="last_download_location" translatable="false">last_dl_location</string>
+    <string name="download_location_app_value" translatable="false">app</string>
     <string name="last_download_type_video_key">last_dl_type_video</string>
     <string name="last_download_type_audio_key">last_dl_type_audio</string>
     <string name="last_download_type_subtitle_key">last_dl_type_subtitle</string>

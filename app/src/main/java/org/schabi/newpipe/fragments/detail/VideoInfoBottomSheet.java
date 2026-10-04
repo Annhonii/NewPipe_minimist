@@ -72,8 +72,10 @@ public class VideoInfoBottomSheet extends BottomSheetDialogFragment {
     public View onCreateView(@NonNull final LayoutInflater inflater,
                              @Nullable final ViewGroup container,
                              @Nullable final Bundle savedInstanceState) {
-        final View root = inflater.inflate(R.layout.bottom_sheet_video_info, container, false);
-        return root;
+        // The dialog has its own (always light) theme: inflate with the theme of the activity so
+        // the sheet gets the same colors as the rest of the app, also in dark mode.
+        return inflater.cloneInContext(requireActivity())
+                .inflate(R.layout.bottom_sheet_video_info, container, false);
     }
 
     @Override
@@ -144,6 +146,7 @@ public class VideoInfoBottomSheet extends BottomSheetDialogFragment {
             height = (int) (screenHeight * 0.8f);
         }
         window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, height);
+        keepBelowPlayer(window, topOffset, height);
         window.setGravity(Gravity.BOTTOM);
         window.clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
         window.addFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL);
@@ -155,6 +158,38 @@ public class VideoInfoBottomSheet extends BottomSheetDialogFragment {
             lp.height = ViewGroup.LayoutParams.MATCH_PARENT;
             sheet.setLayoutParams(lp);
         }
+    }
+
+    /**
+     * The window can be positioned differently than expected (e.g. because of the navigation bar),
+     * so measure where the sheet really starts and shrink it until it no longer covers the video.
+     */
+    private void keepBelowPlayer(@NonNull final Window window, final int topOffset,
+                                 final int height) {
+        final View content = getView();
+        if (content == null || topOffset <= 0) {
+            return;
+        }
+        final int gap = Math.round(getResources().getDisplayMetrics().density * 4);
+        content.getViewTreeObserver().addOnGlobalLayoutListener(
+                new android.view.ViewTreeObserver.OnGlobalLayoutListener() {
+                    private boolean adjusted;
+
+                    @Override
+                    public void onGlobalLayout() {
+                        if (adjusted || content.getHeight() == 0) {
+                            return;
+                        }
+                        adjusted = true;
+                        final int[] location = new int[2];
+                        content.getLocationOnScreen(location);
+                        final int overlap = topOffset + gap - location[1];
+                        if (overlap > 0) {
+                            window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT,
+                                    height - overlap);
+                        }
+                    }
+                });
     }
 
     @Override

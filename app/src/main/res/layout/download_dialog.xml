@@ -106,10 +106,44 @@
         android:textSize="12sp" />
 
     <org.schabi.newpipe.views.NewPipeTextView
-        android:id="@+id/threads_text_view"
+        android:id="@+id/save_location_text_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/audio_track_present_in_video_text"
+        android:layout_marginLeft="24dp"
+        android:layout_marginRight="24dp"
+        android:layout_marginBottom="6dp"
+        android:text="@string/download_save_to" />
+
+    <RadioGroup
+        android:id="@+id/save_location_group"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/save_location_text_view"
+        android:layout_marginLeft="20dp"
+        android:layout_marginBottom="12dp"
+        android:orientation="horizontal"
+        tools:ignore="RtlHardcoded">
+
+        <RadioButton
+            android:id="@+id/save_storage_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:text="@string/download_save_to_storage" />
+
+        <RadioButton
+            android:id="@+id/save_app_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/download_save_to_app" />
+    </RadioGroup>
+
+    <org.schabi.newpipe.views.NewPipeTextView
+        android:id="@+id/threads_text_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/save_location_group"
         android:layout_marginLeft="24dp"
         android:layout_marginRight="24dp"
         android:layout_marginBottom="6dp"

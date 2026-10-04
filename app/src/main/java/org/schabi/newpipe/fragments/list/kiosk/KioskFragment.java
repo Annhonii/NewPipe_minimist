@@ -41,6 +41,8 @@ import io.reactivex.rxjava3.core.Single;
 public class KioskFragment extends BaseListInfoFragment<StreamInfoItem, KioskInfo> {
     @State
     String kioskId = "";
+    @State
+    String titleOverride;
     String kioskTranslatedName;
     @State
     ContentCountry contentCountry;
@@ -66,6 +68,10 @@ public class KioskFragment extends BaseListInfoFragment<StreamInfoItem, KioskInf
         return instance;
     }
 
+    public void setTitleOverride(final String title) {
+        this.titleOverride = title;
+    }
+
     public KioskFragment() {
         super(UserAction.REQUESTED_KIOSK);
     }
@@ -78,7 +84,8 @@ public class KioskFragment extends BaseListInfoFragment<StreamInfoItem, KioskInf
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        kioskTranslatedName = KioskTranslator.getTranslatedKioskName(kioskId, activity);
+        kioskTranslatedName = titleOverride != null ? titleOverride
+                : KioskTranslator.getTranslatedKioskName(kioskId, activity);
         name = kioskTranslatedName;
         contentCountry = Localization.getPreferredContentCountry(requireContext());
     }

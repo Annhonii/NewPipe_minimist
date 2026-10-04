@@ -1,6 +1,7 @@
 package org.schabi.newpipe.fragments.list.kiosk;
 
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,16 +19,16 @@ import org.schabi.newpipe.fragments.BlankFragment;
 import org.schabi.newpipe.util.ServiceHelper;
 
 /**
- * YouTube Trending page with tabs inside it: Trending, Gaming, Movies and Podcasts.
+ * YouTube Trending page with tabs inside it: Live, Gaming, Movies and Podcasts.
  */
 public class TrendingFragment extends BaseFragment {
     private static final int[] TAB_TITLES = {
-            R.string.trending,
+            R.string.duration_live,
             R.string.trending_gaming,
             R.string.trending_movies,
             R.string.trending_podcasts
     };
-    // null = the real Trending kiosk of the service, the others are search based
+    // null = the default kiosk of the service, the others are search based
     private static final String[] TAB_QUERIES = {
             null,
             "gaming trending",
@@ -87,7 +88,10 @@ public class TrendingFragment extends BaseFragment {
             final BaseFragment fragment;
             try {
                 if (TAB_QUERIES[position] == null) {
-                    fragment = KioskFragment.getInstance(serviceId);
+                    final KioskFragment kiosk = KioskFragment.getInstance(serviceId);
+                    // the toolbar of this page always says "Trending"
+                    kiosk.setTitleOverride(host.getString(R.string.trending));
+                    fragment = kiosk;
                 } else {
                     fragment = TrendingSearchFragment.getInstance(serviceId,
                             TAB_QUERIES[position], host.getString(TAB_TITLES[position]));
@@ -103,6 +107,17 @@ public class TrendingFragment extends BaseFragment {
         @Override
         public int getCount() {
             return TAB_TITLES.length;
+        }
+
+        @Override
+        public void restoreState(@Nullable final Parcelable state,
+                                 @Nullable final ClassLoader loader) {
+            try {
+                super.restoreState(state, loader);
+            } catch (final IllegalStateException e) {
+                // a saved page fragment is gone (e.g. after back navigation or process death),
+                // the pages are simply recreated by getItem()
+            }
         }
 
         @Nullable

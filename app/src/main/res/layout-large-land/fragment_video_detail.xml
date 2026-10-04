@@ -15,7 +15,6 @@
         android:layout_marginHorizontal="@dimen/mini_player_margin"
         android:alpha="0"
         android:background="@drawable/bg_mini_player"
-        android:elevation="4dp"
         android:visibility="invisible" />
 
     <LinearLayout

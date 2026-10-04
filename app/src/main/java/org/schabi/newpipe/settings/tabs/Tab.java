@@ -522,20 +522,30 @@ public abstract class Tab {
 
         @Override
         public String getTabName(final Context context) {
+            if (isYoutubeSelected(context)) {
+                return context.getString(R.string.trending);
+            }
             return KioskTranslator.getTranslatedKioskName(getDefaultKioskId(context), context);
         }
 
         @DrawableRes
         @Override
         public int getTabIconRes(final Context context) {
+            if (isYoutubeSelected(context)) {
+                return R.drawable.ic_whatshot;
+            }
             return KioskTranslator.getKioskIcon(getDefaultKioskId(context));
+        }
+
+        private boolean isYoutubeSelected(final Context context) {
+            return ServiceHelper.getSelectedServiceId(context)
+                    == ServiceList.YouTube.getServiceId();
         }
 
         @Override
         public Fragment getFragment(final Context context) {
             // YouTube gets the Trending page with Gaming / Movies / Podcasts tabs inside it
-            if (ServiceHelper.getSelectedServiceId(context)
-                    == ServiceList.YouTube.getServiceId()) {
+            if (isYoutubeSelected(context)) {
                 return new TrendingFragment();
             }
             return new DefaultKioskFragment();

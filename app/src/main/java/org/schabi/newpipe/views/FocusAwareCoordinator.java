@@ -20,6 +20,7 @@ package org.schabi.newpipe.views;
 import android.content.Context;
 import android.graphics.Rect;
 import android.util.AttributeSet;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowInsets;
@@ -29,10 +30,13 @@ import androidx.annotation.Nullable;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
+
 import org.schabi.newpipe.R;
 
 public final class FocusAwareCoordinator extends CoordinatorLayout {
     private final Rect childFocus = new Rect();
+    private boolean routingToPage;
 
     public FocusAwareCoordinator(@NonNull final Context context) {
         super(context);
@@ -46,6 +50,55 @@ public final class FocusAwareCoordinator extends CoordinatorLayout {
     public FocusAwareCoordinator(@NonNull final Context context,
                                  @Nullable final AttributeSet attrs, final int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+    }
+
+    /**
+     * While the player is minimized, only its card (at the top of the collapsed sheet) belongs to
+     * the player. Touches below the card (the floating navigation pill) go to the page, so tabs
+     * can still be switched while the mini player is visible.
+     */
+    @Override
+    public boolean dispatchTouchEvent(final MotionEvent ev) {
+        final int action = ev.getActionMasked();
+        if (action == MotionEvent.ACTION_DOWN) {
+            routingToPage = isBelowMiniPlayerCard(ev);
+        }
+        if (!routingToPage) {
+            return super.dispatchTouchEvent(ev);
+        }
+
+        final View page = findViewById(R.id.fragment_holder);
+        boolean handled = false;
+        if (page != null) {
+            final MotionEvent copy = MotionEvent.obtain(ev);
+            copy.offsetLocation(-page.getLeft(), -page.getTop());
+            handled = page.dispatchTouchEvent(copy);
+            copy.recycle();
+        }
+        if (action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_CANCEL) {
+            routingToPage = false;
+        }
+        return handled;
+    }
+
+    private boolean isBelowMiniPlayerCard(final MotionEvent ev) {
+        final View sheet = findViewById(R.id.fragment_player_holder);
+        if (sheet == null || sheet.getVisibility() != View.VISIBLE) {
+            return false;
+        }
+        final var params = sheet.getLayoutParams();
+        if (!(params instanceof LayoutParams)
+                || !(((LayoutParams) params).getBehavior() instanceof BottomSheetBehavior)) {
+            return false;
+        }
+        final BottomSheetBehavior<?> behavior =
+                (BottomSheetBehavior<?>) ((LayoutParams) params).getBehavior();
+        if (behavior.getState() != BottomSheetBehavior.STATE_COLLAPSED) {
+            return false;
+        }
+        final int cardBottom = sheet.getTop()
+                + getResources().getDimensionPixelSize(R.dimen.mini_player_height);
+        return ev.getY() > cardBottom;
     }
 
     @Override

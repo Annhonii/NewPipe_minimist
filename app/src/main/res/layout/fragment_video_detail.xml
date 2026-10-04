@@ -9,7 +9,7 @@
     android:focusableInTouchMode="true">
 
     <!-- Background of the mini player card (only visible while minimised).
-         It is below the video, so the video shows on top of it. -->
+         It must not have an elevation: it has to stay below the video and the overlay. -->
     <View
         android:id="@+id/mini_player_card_bg"
         android:layout_width="match_parent"
@@ -17,7 +17,6 @@
         android:layout_marginHorizontal="@dimen/mini_player_margin"
         android:alpha="0"
         android:background="@drawable/bg_mini_player"
-        android:elevation="4dp"
         android:visibility="invisible" />
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout

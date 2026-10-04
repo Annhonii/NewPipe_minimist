@@ -658,6 +658,10 @@ public class DownloadDialog extends DialogFragment
                 ? View.VISIBLE : View.GONE);
 
         prefs = PreferenceManager.getDefaultSharedPreferences(requireContext());
+        if (getString(R.string.download_location_app_value).equals(
+                prefs.getString(getString(R.string.last_download_location), ""))) {
+            dialogBinding.saveAppButton.setChecked(true);
+        }
         final String defaultMedia = prefs.getString(getString(R.string.last_used_download_type),
                 getString(R.string.last_download_type_video_key));
 
@@ -800,6 +804,22 @@ public class DownloadDialog extends DialogFragment
             throw new RuntimeException("No stream selected");
         }
 
+        if (dialogBinding.saveLocationGroup.getCheckedRadioButtonId() == R.id.save_app_button) {
+            // "App": the file goes to the private folder of the app, no folder picker needed
+            final StoredDirectoryHelper appStorage = createAppStorage(
+                    checkedRadioButtonId == R.id.audio_button);
+            if (appStorage == null) {
+                Toast.makeText(context, R.string.download_save_to_app_error,
+                        Toast.LENGTH_LONG).show();
+                return;
+            }
+            prefs.edit().putString(getString(R.string.last_download_location),
+                    getString(R.string.download_location_app_value)).apply();
+            startChecksOnStorage(appStorage, size, selectedMediaType);
+            return;
+        }
+        prefs.edit().putString(getString(R.string.last_download_location), "").apply();
+
         if (!askForSavePath && (mainStorage == null
                 || mainStorage.isDirect() == NewPipeSettings.useStorageAccessFramework(context)
                 || mainStorage.isInvalidSafStorage())) {
@@ -841,6 +861,31 @@ public class DownloadDialog extends DialogFragment
             return;
         }
 
+        startChecksOnStorage(mainStorage, size, selectedMediaType);
+    }
+
+    /** The private download folder of the app (used by the "App" save location). */
+    @Nullable
+    private StoredDirectoryHelper createAppStorage(final boolean audio) {
+        File base = context.getExternalFilesDir(
+                audio ? Environment.DIRECTORY_MUSIC : Environment.DIRECTORY_MOVIES);
+        if (base == null) {
+            base = new File(context.getFilesDir(), audio ? "music" : "movies");
+        }
+        if (!base.isDirectory() && !base.mkdirs()) {
+            return null;
+        }
+        try {
+            return new StoredDirectoryHelper(context, Uri.fromFile(base),
+                    audio ? DownloadManager.TAG_AUDIO : DownloadManager.TAG_VIDEO);
+        } catch (final IOException e) {
+            Log.e(TAG, "Could not open the app download folder", e);
+            return null;
+        }
+    }
+
+    private void startChecksOnStorage(final StoredDirectoryHelper mainStorage, final long size,
+                                      final String selectedMediaType) {
         // Check for free storage space
         final long freeSpace = mainStorage.getFreeStorageSpace();
         if (freeSpace <= size) {

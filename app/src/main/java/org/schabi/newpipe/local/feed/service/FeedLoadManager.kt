@@ -238,7 +238,7 @@ class FeedLoadManager(private val context: Context) {
             return Notification.createOnNext(
                 FeedUpdateInfo(
                     subscriptionEntity,
-                    originalInfo!!,
+                    originalInfo,
                     streams!!,
                     errors
                 )

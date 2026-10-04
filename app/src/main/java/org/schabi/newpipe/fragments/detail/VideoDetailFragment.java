@@ -53,6 +53,7 @@ import androidx.appcompat.content.res.AppCompatResources;
 import androidx.appcompat.widget.Toolbar;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.content.ContextCompat;
+import androidx.core.text.HtmlCompat;
 import androidx.fragment.app.Fragment;
 import androidx.preference.PreferenceManager;
 
@@ -1102,9 +1103,9 @@ public final class VideoDetailFragment
                             top.getUploaderAvatars());
                     binding.detailCommentPreviewAvatar.setVisibility(View.VISIBLE);
                     final String text = top.getCommentText() == null ? ""
-                            : androidx.core.text.HtmlCompat.fromHtml(
+                            : HtmlCompat.fromHtml(
                                     top.getCommentText().content(),
-                                    androidx.core.text.HtmlCompat.FROM_HTML_MODE_LEGACY)
+                                    HtmlCompat.FROM_HTML_MODE_LEGACY)
                                     .toString().trim();
                     binding.detailCommentPreviewText.setText(text);
                 }, throwable -> {

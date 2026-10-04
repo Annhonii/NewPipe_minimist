@@ -132,6 +132,10 @@
     <string name="resume_on_audio_focus_gain_title">Resume playing</string>
     <string name="resume_on_audio_focus_gain_summary">Continue playing after interruptions (e.g. phonecalls)</string>
     <string name="download_dialog_title">Download</string>
+    <string name="download_save_to">Save to</string>
+    <string name="download_save_to_storage">Storage</string>
+    <string name="download_save_to_app">App</string>
+    <string name="download_save_to_app_error">The app download folder is not available</string>
     <string name="start_main_player_fullscreen_title">Start main player in fullscreen</string>
     <string name="start_main_player_fullscreen_summary">Do not start videos in the mini player, but turn to fullscreen mode directly, if auto rotation is locked. You can still access the mini player by exiting fullscreen</string>
     <string name="autoplay_title">Autoplay</string>

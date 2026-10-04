@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- Landscape: the pill has a fixed width and is centered, so the tabs are evenly spaced.
+         A rounded pill that floats at the bottom; the selected tab gets a soft pill behind it. -->
+    <org.schabi.newpipe.views.ScrollableTabLayout
+        android:id="@+id/main_tab_layout"
+        android:layout_width="420dp"
+        android:layout_height="56dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/bg_nav_pill"
+        android:elevation="6dp"
+        android:padding="4dp"
+        app:tabGravity="fill"
+        app:tabIconTint="@color/tab_icon_tint"
+        app:tabIndicator="@drawable/nav_pill_indicator"
+        app:tabIndicatorAnimationMode="elastic"
+        app:tabIndicatorColor="?attr/card_item_contrast_color"
+        app:tabIndicatorFullWidth="true"
+        app:tabIndicatorGravity="stretch"
+        app:tabMinWidth="60dp"
+        app:tabPaddingEnd="0dp"
+        app:tabPaddingStart="0dp"
+        app:tabRippleColor="@android:color/transparent" />
+
+    <androidx.viewpager.widget.ViewPager
+        android:id="@+id/pager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/main_tab_layout" />
+
+</RelativeLayout>
