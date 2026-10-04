@@ -171,6 +171,8 @@
 \nDue to new YouTube policies with age-restricted videos, NewPipe cannot access any of its video streams and thus is unable to play it.</string>
     <string name="duration_live">Live</string>
     <string name="downloads">Downloads</string>
+    <string name="downloads_empty">No downloaded videos yet</string>
+    <string name="downloads_cannot_open">Cannot open this file</string>
     <string name="downloads_title">Downloads</string>
     <string name="loading_metadata_title">Loading Metadata…</string>
     <string name="error_report_title">Error report</string>

@@ -11,9 +11,8 @@
         android:layout_height="56dp"
         android:layout_alignParentBottom="true"
         android:layout_marginStart="16dp"
-        android:layout_marginEnd="8dp"
+        android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
-        android:layout_toStartOf="@id/main_tab_add"
         android:background="@drawable/bg_nav_pill"
         android:elevation="6dp"
         android:padding="4dp"
@@ -26,21 +25,6 @@
         app:tabIndicatorGravity="stretch"
         app:tabMinWidth="60dp"
         app:tabRippleColor="@android:color/transparent" />
-
-    <!-- Round "+" next to the pill: add a tab to the navbar -->
-    <ImageButton
-        android:id="@+id/main_tab_add"
-        android:layout_width="56dp"
-        android:layout_height="56dp"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentBottom="true"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="16dp"
-        android:background="@drawable/bg_nav_pill_round"
-        android:contentDescription="@string/tab_choose"
-        android:elevation="6dp"
-        android:src="@drawable/ic_add"
-        app:tint="@color/contrastColor" />
 
     <androidx.viewpager.widget.ViewPager
         android:id="@+id/pager"

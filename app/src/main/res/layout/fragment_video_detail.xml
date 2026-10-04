@@ -8,6 +8,18 @@
     android:background="?attr/windowBackground"
     android:focusableInTouchMode="true">
 
+    <!-- Background of the mini player card (only visible while minimised).
+         It is below the video, so the video shows on top of it. -->
+    <View
+        android:id="@+id/mini_player_card_bg"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/mini_player_height"
+        android:layout_marginHorizontal="@dimen/mini_player_margin"
+        android:alpha="0"
+        android:background="@drawable/bg_mini_player"
+        android:elevation="4dp"
+        android:visibility="invisible" />
+
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:id="@+id/detail_main_content"
         android:layout_width="match_parent"
@@ -673,14 +685,14 @@
     <RelativeLayout
         android:id="@+id/overlay_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:alpha="0.9"
-        android:background="?attr/windowBackground">
+        android:layout_height="@dimen/mini_player_height"
+        android:layout_marginHorizontal="@dimen/mini_player_margin"
+        android:alpha="0.9">
 
         <ImageButton
             android:id="@+id/overlay_thumbnail"
-            android:layout_width="62dp"
-            android:layout_height="60dp"
+            android:layout_width="@dimen/mini_player_video_width"
+            android:layout_height="@dimen/mini_player_height"
             android:layout_alignParentStart="true"
             android:background="@color/transparent_background_color"
             android:gravity="center_vertical"

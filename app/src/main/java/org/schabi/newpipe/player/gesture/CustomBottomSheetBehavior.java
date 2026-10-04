@@ -25,6 +25,16 @@ public class CustomBottomSheetBehavior extends BottomSheetBehavior<FrameLayout> 
     }
 
     Rect globalRect = new Rect();
+    /**
+     * Height (px) of the mini player card at the top of the collapsed sheet. Touches below it
+     * (where the floating nav pill is) are not handled by the sheet. 0 disables the check.
+     */
+    private int collapsedTouchHeight = 0;
+
+    public void setCollapsedTouchHeight(final int heightPx) {
+        collapsedTouchHeight = heightPx;
+    }
+
     private boolean skippingInterception = false;
     private final List<Integer> skipInterceptionOfElements = List.of(
             R.id.detail_content_root_layout, R.id.relatedItemsLayout,
@@ -35,6 +45,12 @@ public class CustomBottomSheetBehavior extends BottomSheetBehavior<FrameLayout> 
     public boolean onInterceptTouchEvent(@NonNull final CoordinatorLayout parent,
                                          @NonNull final FrameLayout child,
                                          @NonNull final MotionEvent event) {
+        // The collapsed sheet is taller than the mini player card: ignore the empty part
+        if (collapsedTouchHeight > 0 && getState() == BottomSheetBehavior.STATE_COLLAPSED
+                && event.getY() > child.getTop() + collapsedTouchHeight) {
+            return false;
+        }
+
         // Drop following when action ends
         if (event.getAction() == MotionEvent.ACTION_CANCEL
                 || event.getAction() == MotionEvent.ACTION_UP) {

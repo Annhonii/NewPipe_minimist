@@ -36,6 +36,8 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.ImageView
+import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.edit
 import androidx.core.os.bundleOf
@@ -43,6 +45,7 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.evernote.android.state.State
 import com.xwray.groupie.GroupieAdapter
@@ -83,6 +86,7 @@ import org.schabi.newpipe.util.ThemeHelper.getGridSpanCountStreams
 import org.schabi.newpipe.util.ThemeHelper.getItemViewMode
 import org.schabi.newpipe.util.ThemeHelper.resolveDrawable
 import org.schabi.newpipe.util.ThemeHelper.shouldUseGridLayout
+import org.schabi.newpipe.util.image.CoilHelper
 
 class FeedFragment : BaseStateFragment<FeedState>() {
     private var _feedBinding: FragmentFeedBinding? = null
@@ -161,6 +165,66 @@ class FeedFragment : BaseStateFragment<FeedState>() {
 
         feedBinding.itemsList.adapter = groupAdapter
         setupListViewMode()
+        setupChannelsRow()
+    }
+
+    /**
+     * Shows every subscribed channel as a logo in a single scrollable line above the videos,
+     * like the YouTube subscriptions page.
+     */
+    private fun setupChannelsRow() {
+        if (groupId != FeedGroupEntity.GROUP_ALL_ID) {
+            feedBinding.channelsRow.isVisible = false
+            return
+        }
+        val channelsAdapter = ChannelsRowAdapter { channel ->
+            val url = channel.url ?: return@ChannelsRowAdapter
+            NavigationHelper.openChannelFragment(fm, channel.serviceId, url, channel.name ?: "")
+        }
+        feedBinding.channelsRow.layoutManager =
+            LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+        feedBinding.channelsRow.adapter = channelsAdapter
+
+        disposables.add(
+            SubscriptionManager(requireContext()).subscriptions()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({ list ->
+                    _feedBinding?.channelsRow?.isVisible = list.isNotEmpty()
+                    channelsAdapter.submit(list)
+                }, { throwable -> Log.e(TAG, "Could not load subscribed channels", throwable) })
+        )
+    }
+
+    private class ChannelsRowAdapter(
+        private val onClick: (SubscriptionEntity) -> Unit
+    ) : RecyclerView.Adapter<ChannelsRowAdapter.Holder>() {
+        private var items: List<SubscriptionEntity> = emptyList()
+
+        fun submit(list: List<SubscriptionEntity>) {
+            items = list
+            notifyDataSetChanged()
+        }
+
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): Holder {
+            val view = LayoutInflater.from(parent.context)
+                .inflate(R.layout.item_feed_channel, parent, false)
+            return Holder(view)
+        }
+
+        override fun onBindViewHolder(holder: Holder, position: Int) {
+            val channel = items[position]
+            holder.name.text = channel.name
+            CoilHelper.loadAvatar(holder.avatar, channel.avatarUrl)
+            holder.itemView.setOnClickListener { onClick(channel) }
+        }
+
+        override fun getItemCount() = items.size
+
+        class Holder(view: View) : RecyclerView.ViewHolder(view) {
+            val avatar: ImageView = view.findViewById(R.id.feed_channel_avatar)
+            val name: TextView = view.findViewById(R.id.feed_channel_name)
+        }
     }
 
     override fun onPause() {

@@ -5,30 +5,10 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <!-- Trending category pills (only shown on the YouTube Trending front page) -->
-    <HorizontalScrollView
-        android:id="@+id/trend_pills_scroll"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:scrollbars="none"
-        android:visibility="gone"
-        tools:visibility="visible">
-
-        <LinearLayout
-            android:id="@+id/trend_pills_container"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:paddingHorizontal="12dp"
-            android:paddingVertical="8dp" />
-    </HorizontalScrollView>
-
     <org.schabi.newpipe.views.NewPipeRecyclerView
         android:id="@+id/items_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/trend_pills_scroll"
         android:scrollbars="vertical"
         tools:listitem="@layout/list_stream_item" />
 

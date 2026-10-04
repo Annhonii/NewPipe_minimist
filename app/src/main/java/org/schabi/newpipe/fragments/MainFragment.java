@@ -37,7 +37,6 @@ import org.schabi.newpipe.error.ErrorUtil;
 import org.schabi.newpipe.error.UserAction;
 import org.schabi.newpipe.local.playlist.LocalPlaylistFragment;
 import org.schabi.newpipe.settings.tabs.Tab;
-import org.schabi.newpipe.settings.tabs.TabQuickAdd;
 import org.schabi.newpipe.settings.tabs.TabsManager;
 import org.schabi.newpipe.util.NavigationHelper;
 import org.schabi.newpipe.util.ServiceHelper;
@@ -104,7 +103,6 @@ public class MainFragment extends BaseFragment implements TabLayout.OnTabSelecte
 
         binding.mainTabLayout.setupWithViewPager(binding.pager);
         binding.mainTabLayout.addOnTabSelectedListener(this);
-        binding.mainTabAdd.setOnClickListener(v -> TabQuickAdd.show(activity));
 
         setupTabs();
         updateTabLayoutPosition();
@@ -113,6 +111,14 @@ public class MainFragment extends BaseFragment implements TabLayout.OnTabSelecte
     @Override
     public void onResume() {
         super.onResume();
+
+        // re-apply the mini player space (this page may have just come back to the front)
+        final Fragment playerFragment = requireActivity().getSupportFragmentManager()
+                .findFragmentById(R.id.fragment_player_holder);
+        if (playerFragment instanceof org.schabi.newpipe.fragments.detail.VideoDetailFragment) {
+            ((org.schabi.newpipe.fragments.detail.VideoDetailFragment) playerFragment)
+                    .refreshMiniPlayerSpace();
+        }
 
         final boolean newYoutubeRestrictedModeEnabled =
                 prefs.getBoolean(youtubeRestrictedModeEnabledKey, false);
@@ -222,6 +228,23 @@ public class MainFragment extends BaseFragment implements TabLayout.OnTabSelecte
         pagerAdapter.getLocalPlaylistFragments()
                 .stream()
                 .forEach(LocalPlaylistFragment::saveImmediate);
+    }
+
+    /**
+     * Keeps the page content clear of the mini player that floats above the nav pill.
+     *
+     * @param bottomPx extra space (px) at the bottom of the page content
+     */
+    public void setMiniPlayerInset(final int bottomPx) {
+        if (binding == null) {
+            return;
+        }
+        final ViewPager pager = binding.pager;
+        pager.setClipToPadding(false);
+        if (pager.getPaddingBottom() != bottomPx) {
+            pager.setPadding(pager.getPaddingLeft(), pager.getPaddingTop(),
+                    pager.getPaddingRight(), bottomPx);
+        }
     }
 
     private void updateTabLayoutPosition() {

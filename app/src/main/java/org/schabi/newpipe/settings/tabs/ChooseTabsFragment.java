@@ -258,6 +258,9 @@ public class ChooseTabsFragment extends Fragment {
                             getString(R.string.feed_group_page_summary),
                             tab.getTabIconRes(context)));
                     break;
+                case SUBSCRIPTIONS:
+                    // the dedicated subscriptions page was removed (see the feed page)
+                    break;
                 default:
                     if (!tabList.contains(tab)) {
                         returnList.add(new ChooseTabListItem(context, tab));

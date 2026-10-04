@@ -2,9 +2,12 @@ package org.schabi.newpipe.fragments.detail;
 
 import android.app.Dialog;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
@@ -30,6 +33,7 @@ public class VideoInfoBottomSheet extends BottomSheetDialogFragment {
     private static final String ARG_URL = "url";
     private static final String ARG_TITLE = "title";
     private static final String ARG_INFO = "info";
+    private static final String ARG_TOP_OFFSET = "top_offset";
     private static final String KIND_COMMENTS = "comments";
     private static final String KIND_DESCRIPTION = "description";
     private static final String TAG = "VideoInfoBottomSheet";
@@ -38,23 +42,27 @@ public class VideoInfoBottomSheet extends BottomSheetDialogFragment {
     private int initialBackStackCount;
 
     public static void showComments(@NonNull final FragmentManager fm, final int serviceId,
-                                    final String url, final String title) {
+                                    final String url, final String title,
+                                    final int topOffset) {
         final VideoInfoBottomSheet sheet = new VideoInfoBottomSheet();
         final Bundle args = new Bundle();
         args.putString(ARG_KIND, KIND_COMMENTS);
         args.putInt(ARG_SERVICE_ID, serviceId);
         args.putString(ARG_URL, url);
         args.putString(ARG_TITLE, title);
+        args.putInt(ARG_TOP_OFFSET, topOffset);
         sheet.setArguments(args);
         sheet.show(fm, TAG);
     }
 
     public static void showDescription(@NonNull final FragmentManager fm,
-                                       @NonNull final StreamInfo info) {
+                                       @NonNull final StreamInfo info,
+                                       final int topOffset) {
         final VideoInfoBottomSheet sheet = new VideoInfoBottomSheet();
         final Bundle args = new Bundle();
         args.putString(ARG_KIND, KIND_DESCRIPTION);
         args.putSerializable(ARG_INFO, info);
+        args.putInt(ARG_TOP_OFFSET, topOffset);
         sheet.setArguments(args);
         sheet.show(fm, TAG);
     }
@@ -65,14 +73,6 @@ public class VideoInfoBottomSheet extends BottomSheetDialogFragment {
                              @Nullable final ViewGroup container,
                              @Nullable final Bundle savedInstanceState) {
         final View root = inflater.inflate(R.layout.bottom_sheet_video_info, container, false);
-        final int height = (int) (getResources().getDisplayMetrics().heightPixels * 0.8f);
-        ViewGroup.LayoutParams lp = root.getLayoutParams();
-        if (lp == null) {
-            lp = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, height);
-        } else {
-            lp.height = height;
-        }
-        root.setLayoutParams(lp);
         return root;
     }
 
@@ -111,6 +111,7 @@ public class VideoInfoBottomSheet extends BottomSheetDialogFragment {
                     ((BottomSheetDialog) dialog).getBehavior();
             behavior.setSkipCollapsed(true);
             behavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+            setupBelowPlayerWindow((BottomSheetDialog) dialog, behavior);
         }
 
         // Opening a comment's replies pushes a new screen: close the sheet in that case.
@@ -122,6 +123,38 @@ public class VideoInfoBottomSheet extends BottomSheetDialogFragment {
             }
         };
         activityFm.addOnBackStackChangedListener(backStackListener);
+    }
+
+    /**
+     * Makes the dialog window only as tall as the area below the video player, without dimming
+     * and without swallowing touches outside of it. This way the video stays fully visible
+     * (and usable) while reading comments / the description.
+     */
+    private void setupBelowPlayerWindow(@NonNull final BottomSheetDialog dialog,
+                                        @NonNull final BottomSheetBehavior<FrameLayout> behavior) {
+        final Window window = dialog.getWindow();
+        if (window == null) {
+            return;
+        }
+        final int screenHeight = getResources().getDisplayMetrics().heightPixels;
+        final int topOffset = requireArguments().getInt(ARG_TOP_OFFSET, 0);
+        int height = screenHeight - topOffset;
+        if (topOffset <= 0 || height < screenHeight / 4) {
+            // fallback (e.g. fullscreen/landscape): classic tall sheet
+            height = (int) (screenHeight * 0.8f);
+        }
+        window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, height);
+        window.setGravity(Gravity.BOTTOM);
+        window.clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+        window.addFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL);
+        dialog.setCanceledOnTouchOutside(false);
+        behavior.setDraggable(true);
+        final View sheet = dialog.findViewById(com.google.android.material.R.id.design_bottom_sheet);
+        if (sheet != null) {
+            final ViewGroup.LayoutParams lp = sheet.getLayoutParams();
+            lp.height = ViewGroup.LayoutParams.MATCH_PARENT;
+            sheet.setLayoutParams(lp);
+        }
     }
 
     @Override

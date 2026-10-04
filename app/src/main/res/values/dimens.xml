@@ -87,6 +87,10 @@
     <dimen name="channel_avatar_size">70dp</dimen>
     <dimen name="sub_channel_avatar_size">35dp</dimen>
     <dimen name="mini_player_height">60dp</dimen>
+    <dimen name="mini_player_margin">8dp</dimen>
+    <dimen name="mini_player_video_width">104dp</dimen>
+    <!-- space kept free below the mini player when the floating nav pill is visible -->
+    <dimen name="mini_player_pill_space">88dp</dimen>
     <!-- Paddings & Margins -->
     <dimen name="video_item_detail_pinned_right_margin">5dp</dimen>
     <dimen name="video_item_detail_like_margin">5dp</dimen>

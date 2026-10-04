@@ -167,6 +167,9 @@ public class DownloadManagerService extends Service {
                 .setContentText(getString(R.string.msg_running_detail))
                 .setOngoing(true)
                 .setOnlyAlertOnce(true)
+                .setShowWhen(false)
+                .setSortKey("0")
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setCategory(NotificationCompat.CATEGORY_PROGRESS)
                 .setForegroundServiceBehavior(NotificationCompat.FOREGROUND_SERVICE_IMMEDIATE);
 
@@ -449,12 +452,16 @@ public class DownloadManagerService extends Service {
 
             final boolean known = progress[2] > 0;
             final int percent = known ? (int) Math.min(100, progress[1] * 100 / progress[2]) : 0;
-            String text = Formatter.formatFileSize(this, speed) + "/s";
-            if (known) text = percent + "% \u00b7 " + text;
+            // percentage and speed go in the title line, so they are the first thing visible
+            String title = Formatter.formatFileSize(this, speed) + "/s";
+            if (known) title = percent + "% \u00b7 " + title;
 
-            mForegroundBuilder.setContentText(text).setProgress(100, percent, !known);
+            mForegroundBuilder.setContentTitle(title)
+                    .setContentText(getString(R.string.msg_running))
+                    .setProgress(100, percent, !known);
         } else {
-            mForegroundBuilder.setContentText(getString(R.string.msg_running_detail))
+            mForegroundBuilder.setContentTitle(getString(R.string.msg_running))
+                    .setContentText(getString(R.string.msg_running_detail))
                     .setProgress(0, 0, false);
         }
 

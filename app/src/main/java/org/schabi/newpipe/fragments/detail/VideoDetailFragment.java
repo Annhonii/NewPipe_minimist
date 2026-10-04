@@ -98,6 +98,7 @@ import org.schabi.newpipe.player.PlayerService;
 import org.schabi.newpipe.player.PlayerType;
 import org.schabi.newpipe.player.event.OnKeyDownListener;
 import org.schabi.newpipe.player.event.PlayerServiceExtendedEventListener;
+import org.schabi.newpipe.player.gesture.CustomBottomSheetBehavior;
 import org.schabi.newpipe.player.helper.PlayerHelper;
 import org.schabi.newpipe.player.helper.PlayerHolder;
 import org.schabi.newpipe.player.playqueue.PlayQueue;
@@ -1046,12 +1047,24 @@ public final class VideoDetailFragment
 
     private void showDescriptionSheet() {
         if (currentInfo != null) {
-            VideoInfoBottomSheet.showDescription(getChildFragmentManager(), currentInfo);
+            VideoInfoBottomSheet.showDescription(getChildFragmentManager(), currentInfo,
+                    getPlayerBottomOnScreen());
         }
     }
 
     private void showCommentsSheet() {
-        VideoInfoBottomSheet.showComments(getChildFragmentManager(), serviceId, url, title);
+        VideoInfoBottomSheet.showComments(getChildFragmentManager(), serviceId, url, title,
+                getPlayerBottomOnScreen());
+    }
+
+    /** Y coordinate (screen) of the bottom edge of the video player area. */
+    private int getPlayerBottomOnScreen() {
+        if (binding == null || binding.detailThumbnailRootLayout == null) {
+            return 0;
+        }
+        final int[] loc = new int[2];
+        binding.detailThumbnailRootLayout.getLocationOnScreen(loc);
+        return loc[1] + binding.detailThumbnailRootLayout.getHeight();
     }
 
     /** Loads the first comment and shows it as a preview in the comments card. */
@@ -2398,28 +2411,61 @@ public final class VideoDetailFragment
         }
     }
 
+    /** True when the floating nav pill (main page) is on screen under the mini player. */
+    private boolean isNavPillVisible() {
+        final Fragment current = requireActivity().getSupportFragmentManager()
+                .findFragmentById(R.id.fragment_holder);
+        return current instanceof MainFragment;
+    }
+
+    /** Height of the collapsed sheet: the mini player card plus the space for the nav pill. */
+    private int currentPeekHeight() {
+        final int card = getResources().getDimensionPixelSize(R.dimen.mini_player_height);
+        final int margin = getResources().getDimensionPixelSize(R.dimen.mini_player_margin);
+        final int below = isNavPillVisible()
+                ? getResources().getDimensionPixelSize(R.dimen.mini_player_pill_space)
+                : margin;
+        return card + below;
+    }
+
+    /** Re-applies peek height and bottom space, e.g. after the visible page changed. */
+    public void refreshMiniPlayerSpace() {
+        if (bottomSheetBehavior == null || getActivity() == null) {
+            return;
+        }
+        if (bottomSheetState != BottomSheetBehavior.STATE_HIDDEN) {
+            bottomSheetBehavior.setPeekHeight(currentPeekHeight());
+        }
+        manageSpaceAtTheBottom(bottomSheetState == BottomSheetBehavior.STATE_HIDDEN);
+    }
+
     /**
      * When the mini player exists the view underneath it is not touchable.
-     * Bottom padding should be equal to the mini player's height in this case
+     * Free space equal to the mini player's card is kept above it: either as padding of the
+     * page holder, or (main page, where the nav pill floats at the bottom) as bottom inset of
+     * the main page's content, so the pill stays reachable under the mini player.
      *
      * @param showMore whether main fragment should be expanded or not
      */
     private void manageSpaceAtTheBottom(final boolean showMore) {
-        final int peekHeight = getResources().getDimensionPixelSize(R.dimen.mini_player_height);
+        final int space = getResources().getDimensionPixelSize(R.dimen.mini_player_height)
+                + getResources().getDimensionPixelSize(R.dimen.mini_player_margin);
         final ViewGroup holder = requireActivity().findViewById(R.id.fragment_holder);
-        final int newBottomPadding;
-        if (showMore) {
-            newBottomPadding = 0;
-        } else {
-            newBottomPadding = peekHeight;
+        final boolean pill = isNavPillVisible();
+
+        final int holderPadding = showMore || pill ? 0 : space;
+        if (holder.getPaddingBottom() != holderPadding) {
+            holder.setPadding(holder.getPaddingLeft(),
+                    holder.getPaddingTop(),
+                    holder.getPaddingRight(),
+                    holderPadding);
         }
-        if (holder.getPaddingBottom() == newBottomPadding) {
-            return;
+
+        final Fragment current = requireActivity().getSupportFragmentManager()
+                .findFragmentById(R.id.fragment_holder);
+        if (current instanceof MainFragment) {
+            ((MainFragment) current).setMiniPlayerInset(showMore ? 0 : space);
         }
-        holder.setPadding(holder.getPaddingLeft(),
-                holder.getPaddingTop(),
-                holder.getPaddingRight(),
-                newBottomPadding);
     }
 
     private void setupBottomPlayer() {
@@ -2432,15 +2478,20 @@ public final class VideoDetailFragment
         bottomSheetBehavior.setState(lastStableBottomSheetState);
         updateBottomSheetState(lastStableBottomSheetState);
 
-        final int peekHeight = getResources().getDimensionPixelSize(R.dimen.mini_player_height);
+        if (bottomSheetBehavior instanceof CustomBottomSheetBehavior) {
+            ((CustomBottomSheetBehavior) bottomSheetBehavior).setCollapsedTouchHeight(
+                    getResources().getDimensionPixelSize(R.dimen.mini_player_height));
+        }
         if (bottomSheetState != BottomSheetBehavior.STATE_HIDDEN) {
             manageSpaceAtTheBottom(false);
-            bottomSheetBehavior.setPeekHeight(peekHeight);
+            bottomSheetBehavior.setPeekHeight(currentPeekHeight());
             if (bottomSheetState == BottomSheetBehavior.STATE_COLLAPSED) {
                 binding.overlayLayout.setAlpha(MAX_OVERLAY_ALPHA);
+                applyMiniPlayerLook(0f);
             } else if (bottomSheetState == BottomSheetBehavior.STATE_EXPANDED) {
                 binding.overlayLayout.setAlpha(0);
                 setOverlayElementsClickable(false);
+                applyMiniPlayerLook(1f);
             }
         }
 
@@ -2461,7 +2512,7 @@ public final class VideoDetailFragment
                         moveFocusToMainFragment(false);
                         manageSpaceAtTheBottom(false);
 
-                        bottomSheetBehavior.setPeekHeight(peekHeight);
+                        bottomSheetBehavior.setPeekHeight(currentPeekHeight());
                         // Disable click because overlay buttons located on top of buttons
                         // from the player
                         setOverlayElementsClickable(false);
@@ -2481,7 +2532,7 @@ public final class VideoDetailFragment
                         moveFocusToMainFragment(true);
                         manageSpaceAtTheBottom(false);
 
-                        bottomSheetBehavior.setPeekHeight(peekHeight);
+                        bottomSheetBehavior.setPeekHeight(currentPeekHeight());
 
                         // Re-enable clicks
                         setOverlayElementsClickable(true);
@@ -2521,6 +2572,10 @@ public final class VideoDetailFragment
         activity.getSupportFragmentManager().addOnBackStackChangedListener(() -> {
             if (bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED) {
                 bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+            }
+            // the visible page may have changed (main page with nav pill <-> other page)
+            if (getView() != null) {
+                getView().post(this::refreshMiniPlayerSpace);
             }
         });
     }
@@ -2562,10 +2617,70 @@ public final class VideoDetailFragment
             return;
         }
         binding.overlayLayout.setAlpha(Math.min(MAX_OVERLAY_ALPHA, 1 - slideOffset));
-        // These numbers are not special. They just do a cool transition
-        behavior.setTopAndBottomOffset(
-                (int) (-binding.detailThumbnailImageView.getHeight() * 2 * (1 - slideOffset) / 3));
+        // the video is shrunk with a transform instead of moving the app bar
+        behavior.setTopAndBottomOffset(0);
         appBar.requestLayout();
+        applyMiniPlayerLook(slideOffset);
+    }
+
+    /**
+     * Morphs the video page into a YouTube-like mini player: the video player shrinks into a
+     * small card at the top of the collapsed sheet (just above the nav pill) while the rest of
+     * the page fades out.
+     *
+     * @param rawSlide 0 = collapsed (mini player), 1 = fully expanded
+     */
+    private void applyMiniPlayerLook(final float rawSlide) {
+        if (binding == null) {
+            return;
+        }
+        final float slide = Math.max(0f, Math.min(1f, rawSlide));
+        final View video = binding.detailThumbnailRootLayout;
+        final int width = video.getWidth();
+        final int height = video.getHeight();
+
+        if (slide >= 1f) {
+            // exactly the normal, expanded look
+            video.setScaleX(1f);
+            video.setScaleY(1f);
+            video.setTranslationX(0f);
+            video.setTranslationY(0f);
+        } else if (width > 0 && height > 0) {
+            final float margin = getResources().getDimension(R.dimen.mini_player_margin);
+            final float cardHeight = getResources().getDimension(R.dimen.mini_player_height);
+            final float pad = margin / 4f;
+            final float targetWidth = getResources()
+                    .getDimension(R.dimen.mini_player_video_width) - 2 * pad;
+            final float miniScale = Math.min(targetWidth / width,
+                    (cardHeight - 2 * pad) / height);
+            final float scale = miniScale + (1f - miniScale) * slide;
+
+            video.setPivotX(0f);
+            video.setPivotY(0f);
+            video.setScaleX(scale);
+            video.setScaleY(scale);
+            video.setTranslationX((margin + pad) * (1f - slide));
+            video.setTranslationY(((cardHeight - height * miniScale) / 2f) * (1f - slide));
+        }
+
+        // the rest of the page fades out; invisible views can't steal touches from the card
+        final int restVisibility = slide <= 0f ? View.INVISIBLE : View.VISIBLE;
+        for (final View rest : new View[] {binding.detailContentRootLayout, binding.viewPager,
+                binding.tabLayout, binding.relatedItemsLayout}) {
+            if (rest != null) {
+                rest.setAlpha(slide);
+                rest.setVisibility(restVisibility);
+            }
+        }
+
+        final android.graphics.drawable.Drawable background = binding.getRoot().getBackground();
+        if (background != null) {
+            background.mutate().setAlpha(Math.round(255 * slide));
+        }
+        if (binding.miniPlayerCardBg != null) {
+            binding.miniPlayerCardBg.setAlpha(1f - slide);
+            binding.miniPlayerCardBg.setVisibility(slide >= 1f ? View.INVISIBLE : View.VISIBLE);
+        }
     }
 
     private void setOverlayElementsClickable(final boolean enable) {

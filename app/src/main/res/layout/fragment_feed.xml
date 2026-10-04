@@ -4,10 +4,25 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <!-- Subscribed channels: one scrollable line of logos (YouTube subscriptions style) -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/channels_row"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:clipToPadding="false"
+        android:orientation="horizontal"
+        android:overScrollMode="never"
+        android:paddingHorizontal="8dp"
+        android:paddingVertical="8dp"
+        android:visibility="gone"
+        tools:visibility="visible" />
+
     <RelativeLayout
         android:id="@+id/refresh_root_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@+id/channels_row"
         android:background="?attr/selectableItemBackground"
         android:clickable="true"
         android:focusable="true"

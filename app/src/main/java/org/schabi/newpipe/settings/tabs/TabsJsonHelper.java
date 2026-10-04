@@ -9,6 +9,7 @@ import com.grack.nanojson.JsonParserException;
 import com.grack.nanojson.JsonStringWriter;
 import com.grack.nanojson.JsonWriter;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -22,7 +23,7 @@ public final class TabsJsonHelper {
     private static final List<Tab> FALLBACK_INITIAL_TABS_LIST = List.of(
             Tab.Type.DEFAULT_KIOSK.getTab(),
             Tab.Type.FEED.getTab(),
-            Tab.Type.SUBSCRIPTIONS.getTab(),
+            Tab.Type.DOWNLOADS.getTab(),
             Tab.Type.BOOKMARKS.getTab());
 
     private TabsJsonHelper() { }
@@ -55,10 +56,24 @@ public final class TabsJsonHelper {
 
             final JsonArray tabsArray = outerJsonObject.getArray(JSON_TABS_ARRAY_KEY, null);
 
-            final var returnTabs = tabsArray.streamAsJsonObjects()
+            final var parsedTabs = tabsArray.streamAsJsonObjects()
                     .map(Tab::from)
                     .filter(Objects::nonNull)
-                    .collect(Collectors.toUnmodifiableList());
+                    .collect(Collectors.toList());
+
+            // The dedicated "Subscriptions" page was removed (channels now live at the top of
+            // the feed page): swap it for the "Downloads" tab so the navbar keeps its size.
+            final Tab downloads = Tab.Type.DOWNLOADS.getTab();
+            final var returnTabs = new ArrayList<Tab>();
+            for (final Tab tab : parsedTabs) {
+                if (tab.getTabId() == Tab.SubscriptionsTab.ID) {
+                    if (!parsedTabs.contains(downloads) && !returnTabs.contains(downloads)) {
+                        returnTabs.add(downloads);
+                    }
+                } else {
+                    returnTabs.add(tab);
+                }
+            }
 
             return returnTabs.isEmpty() ? getDefaultTabs() : returnTabs;
         } catch (final JsonParserException e) {
