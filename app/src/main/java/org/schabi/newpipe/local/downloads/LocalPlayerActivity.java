@@ -4,15 +4,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.view.View;
 import android.view.WindowManager;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.view.WindowCompat;
-import androidx.core.view.WindowInsetsCompat;
-import androidx.core.view.WindowInsetsControllerCompat;
 
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.MediaItem;
@@ -36,6 +32,7 @@ public class LocalPlayerActivity extends AppCompatActivity {
     private Uri uri;
     private long resumePosition = 0;
     private boolean playWhenReady = true;
+    private String title;
 
     public static void start(@NonNull final Context context, @NonNull final Uri uri,
                              @Nullable final String title) {
@@ -57,6 +54,9 @@ public class LocalPlayerActivity extends AppCompatActivity {
 
         playerView = findViewById(R.id.local_player_view);
         uri = getIntent().getData();
+        title = getIntent().getStringExtra(EXTRA_TITLE);
+        final android.widget.TextView titleView = findViewById(R.id.local_player_title);
+        titleView.setText(title == null ? "" : title);
         if (uri == null) {
             finish();
             return;
@@ -65,7 +65,6 @@ public class LocalPlayerActivity extends AppCompatActivity {
             resumePosition = savedInstanceState.getLong(STATE_POSITION, 0);
             playWhenReady = savedInstanceState.getBoolean(STATE_PLAY_WHEN_READY, true);
         }
-        hideSystemUi();
     }
 
     @Override
@@ -108,14 +107,6 @@ public class LocalPlayerActivity extends AppCompatActivity {
         outState.putBoolean(STATE_PLAY_WHEN_READY, playWhenReady);
     }
 
-    @Override
-    public void onWindowFocusChanged(final boolean hasFocus) {
-        super.onWindowFocusChanged(hasFocus);
-        if (hasFocus) {
-            hideSystemUi();
-        }
-    }
-
     private void releasePlayer() {
         if (player != null) {
             resumePosition = player.getCurrentPosition();
@@ -126,15 +117,4 @@ public class LocalPlayerActivity extends AppCompatActivity {
         }
     }
 
-    private void hideSystemUi() {
-        WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
-        final View decor = getWindow().getDecorView();
-        final WindowInsetsControllerCompat controller =
-                WindowCompat.getInsetsController(getWindow(), decor);
-        if (controller != null) {
-            controller.setSystemBarsBehavior(
-                    WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
-            controller.hide(WindowInsetsCompat.Type.systemBars());
-        }
-    }
 }

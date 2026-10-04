@@ -1,15 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/black">
+    android:background="?attr/windowBackground"
+    android:orientation="vertical">
 
-    <com.google.android.exoplayer2.ui.StyledPlayerView
-        android:id="@+id/local_player_view"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:resize_mode="fit"
-        app:show_buffering="when_playing"
-        app:use_controller="true" />
-</FrameLayout>
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="@android:color/black">
+
+        <com.google.android.exoplayer2.ui.StyledPlayerView
+            android:id="@+id/local_player_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:resize_mode="fit"
+            app:show_buffering="when_playing"
+            app:use_controller="true" />
+    </FrameLayout>
+
+    <org.schabi.newpipe.views.NewPipeTextView
+        android:id="@+id/local_player_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:maxLines="2"
+        android:ellipsize="end"
+        android:paddingHorizontal="12dp"
+        android:paddingTop="12dp"
+        android:paddingBottom="10dp"
+        android:textSize="17sp"
+        android:textStyle="bold" />
+
+    <!-- Recommendations/comments intentionally stay blank for downloaded media. -->
+    <FrameLayout
+        android:id="@+id/local_player_blank_content"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+</LinearLayout>

@@ -342,6 +342,9 @@
     <string name="create">Create</string>
     <string name="delete">Delete</string>
     <string name="delete_file">Delete file</string>
+    <string name="save_to_internal_storage">Save to internal storage</string>
+    <string name="saved_to_internal_storage">Saved to storage</string>
+    <string name="save_to_internal_storage_error">Could not save the downloaded file</string>
     <string name="delete_entry">Delete entry</string>
     <string name="checksum">Checksum</string>
     <string name="dismiss">Dismiss</string>
