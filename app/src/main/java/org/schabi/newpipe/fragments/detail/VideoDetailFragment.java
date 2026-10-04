@@ -1103,7 +1103,7 @@ public final class VideoDetailFragment
                     binding.detailCommentPreviewAvatar.setVisibility(View.VISIBLE);
                     final String text = top.getCommentText() == null ? ""
                             : androidx.core.text.HtmlCompat.fromHtml(
-                                    top.getCommentText().getContent(),
+                                    top.getCommentText().content(),
                                     androidx.core.text.HtmlCompat.FROM_HTML_MODE_LEGACY)
                                     .toString().trim();
                     binding.detailCommentPreviewText.setText(text);
