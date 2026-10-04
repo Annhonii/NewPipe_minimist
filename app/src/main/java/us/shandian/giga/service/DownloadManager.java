@@ -423,6 +423,67 @@ public class DownloadManager {
         }
     }
 
+    /**
+     * @return true if some download is running or still waiting for its turn / the network,
+     * i.e. the service has to stay in the foreground.
+     */
+    boolean hasActiveMissions() {
+        synchronized (this) {
+            for (DownloadMission mission : mMissionsPending) {
+                if (mission.isFinished() || mission.isPsFailed()) continue;
+                if (mission.running || (mission.enqueued && mission.errCode == ERROR_NOTHING)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Carries on with the downloads that were cut off (the service or the whole app was killed)
+     * and were never paused or cancelled by the user.
+     *
+     * @return true if at least one download was started
+     */
+    boolean resumeInterruptedMissions() {
+        synchronized (this) {
+            mSelfMissionsControl = true;
+            if (!canDownloadInCurrentNetwork()) return false;
+
+            boolean started = false;
+            for (DownloadMission mission : mMissionsPending) {
+                if (mission.running || !mission.enqueued || mission.isFinished()
+                        || mission.isCorrupt() || mission.isPsRunning()) {
+                    continue;
+                }
+
+                mission.start();
+                started = true;
+                if (mPrefQueueLimit) break;
+            }
+            return started;
+        }
+    }
+
+    /**
+     * @return {running downloads, bytes done, bytes total} of all running downloads, used for the
+     * progress shown in the notification.
+     */
+    long[] getRunningProgress() {
+        long count = 0;
+        long done = 0;
+        long total = 0;
+        synchronized (this) {
+            for (DownloadMission mission : mMissionsPending) {
+                if (!mission.running || mission.isFinished()) continue;
+                count++;
+                done += mission.done;
+                total += mission.length;
+            }
+        }
+        return new long[]{count, done, total};
+    }
+
     public void startAllMissions() {
         synchronized (this) {
             for (DownloadMission mission : mMissionsPending) {

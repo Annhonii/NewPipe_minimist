@@ -4,23 +4,48 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-
+    <!-- A rounded pill that floats at the bottom; the selected tab gets a soft pill behind it. -->
     <org.schabi.newpipe.views.ScrollableTabLayout
         android:id="@+id/main_tab_layout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:background="?attr/colorPrimary"
-        app:tabRippleColor="@color/white"
-        app:tabIconTint="@color/white"
-        app:tabIndicatorColor="@color/white"
+        android:layout_height="56dp"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="16dp"
+        android:layout_toStartOf="@id/main_tab_add"
+        android:background="@drawable/bg_nav_pill"
+        android:elevation="6dp"
+        android:padding="4dp"
         app:tabGravity="fill"
-        app:tabMinWidth="60dp" />
+        app:tabIconTint="@color/tab_icon_tint"
+        app:tabIndicator="@drawable/nav_pill_indicator"
+        app:tabIndicatorAnimationMode="elastic"
+        app:tabIndicatorColor="?attr/card_item_contrast_color"
+        app:tabIndicatorFullWidth="true"
+        app:tabIndicatorGravity="stretch"
+        app:tabMinWidth="60dp"
+        app:tabRippleColor="@android:color/transparent" />
+
+    <!-- Round "+" next to the pill: add a tab to the navbar -->
+    <ImageButton
+        android:id="@+id/main_tab_add"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/bg_nav_pill_round"
+        android:contentDescription="@string/tab_choose"
+        android:elevation="6dp"
+        android:src="@drawable/ic_add"
+        app:tint="@color/contrastColor" />
 
     <androidx.viewpager.widget.ViewPager
         android:id="@+id/pager"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/main_tab_layout" />
+        android:layout_above="@id/main_tab_layout" />
 
 </RelativeLayout>

@@ -790,13 +790,14 @@ public class MainActivity extends AppCompatActivity {
         final Fragment fragment = getSupportFragmentManager()
                 .findFragmentById(R.id.fragment_holder);
         if (fragment instanceof MainFragment) {
+            // Minimal home: no hamburger/drawer. Search + settings live in the toolbar.
             getSupportActionBar().setDisplayHomeAsUpEnabled(false);
             if (toggle != null) {
-                toggle.syncState();
-                toolbarLayoutBinding.toolbar.setNavigationOnClickListener(v -> mainBinding.getRoot()
-                        .open());
-                mainBinding.getRoot().setDrawerLockMode(DrawerLayout.LOCK_MODE_UNDEFINED);
+                toggle.setDrawerIndicatorEnabled(false);
             }
+            toolbarLayoutBinding.toolbar.setNavigationIcon(null);
+            toolbarLayoutBinding.toolbar.setNavigationOnClickListener(null);
+            mainBinding.getRoot().setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
         } else {
             mainBinding.getRoot().setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);

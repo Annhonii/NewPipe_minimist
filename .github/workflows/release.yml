@@ -1,0 +1,130 @@
+name: Build & Release
+
+on:
+  push:
+    branches:
+      - dev
+    paths-ignore:
+      - 'README.md'
+      - 'doc/**'
+      - 'fastlane/**'
+      - 'assets/**'
+      - '.github/ISSUE_TEMPLATE/**'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  APP_NAME: newpipe-minimist
+
+jobs:
+  build-release:
+    name: Build APK & publish release
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: gradle
+
+      - name: Accept Android SDK licenses
+        run: yes | "${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager" --licenses > /dev/null || true
+
+      - name: Make Gradle executable
+        run: chmod +x ./gradlew
+
+      - name: Build release APK
+        run: ./gradlew assembleRelease --stacktrace --no-daemon -DskipFormatKtlint
+
+      - name: Find unsigned APK
+        id: apk
+        shell: bash
+        run: |
+          set -euo pipefail
+          APK="$(find app/build/outputs/apk/release -type f -name '*.apk' | head -n 1)"
+          if [ -z "$APK" ]; then
+            echo "::error::Release APK nahi mila"
+            find app/build/outputs -type f || true
+            exit 1
+          fi
+          VERSION_NAME="$(grep -oP 'NEWPIPE_VERSION_NAME\s*=\s*"\K[^"]+' buildSrc/src/main/kotlin/ProjectConfig.kt)"
+          echo "APK found: $APK (version $VERSION_NAME)"
+          echo "path=$APK" >> "$GITHUB_OUTPUT"
+          echo "version=$VERSION_NAME" >> "$GITHUB_OUTPUT"
+
+      - name: Sign APK
+        shell: bash
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+          UNSIGNED_APK: ${{ steps.apk.outputs.path }}
+        run: |
+          set -euo pipefail
+
+          BUILD_TOOLS="$(ls -d "${ANDROID_HOME}"/build-tools/* | sort -V | tail -n 1)"
+          echo "Using build-tools: $BUILD_TOOLS"
+
+          KEYSTORE="$RUNNER_TEMP/release.jks"
+          if [ -n "${KEYSTORE_BASE64:-}" ]; then
+            echo "$KEYSTORE_BASE64" | base64 -d > "$KEYSTORE"
+          else
+            echo "::warning::KEYSTORE_BASE64 secret set nahi hai. Temporary keystore use ho raha hai."
+            KEYSTORE_PASSWORD="newpipe-minimist"
+            KEY_ALIAS="minimist"
+            KEY_PASSWORD="$KEYSTORE_PASSWORD"
+            keytool -genkeypair -v \
+              -keystore "$KEYSTORE" -storepass "$KEYSTORE_PASSWORD" \
+              -alias "$KEY_ALIAS" -keypass "$KEY_PASSWORD" \
+              -keyalg RSA -keysize 4096 -validity 10000 \
+              -dname "CN=newpipe-minimist"
+          fi
+
+          ALIGNED="$RUNNER_TEMP/aligned.apk"
+          "$BUILD_TOOLS/zipalign" -f -p 4 "$UNSIGNED_APK" "$ALIGNED"
+
+          "$BUILD_TOOLS/apksigner" sign \
+            --ks "$KEYSTORE" \
+            --ks-pass "pass:$KEYSTORE_PASSWORD" \
+            --ks-key-alias "$KEY_ALIAS" \
+            --key-pass "pass:$KEY_PASSWORD" \
+            --out "${APP_NAME}.apk" \
+            "$ALIGNED"
+
+          "$BUILD_TOOLS/apksigner" verify --verbose "${APP_NAME}.apk"
+          rm -f "$KEYSTORE"
+          ls -lh "${APP_NAME}.apk"
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.APP_NAME }}-${{ github.run_number }}
+          path: ${{ env.APP_NAME }}.apk
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Publish GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: build-${{ github.run_number }}
+          target_commitish: ${{ github.sha }}
+          name: ${{ env.APP_NAME }} v${{ steps.apk.outputs.version }} (build ${{ github.run_number }})
+          files: ${{ env.APP_NAME }}.apk
+          fail_on_unmatched_files: true
+          generate_release_notes: true
+          make_latest: true

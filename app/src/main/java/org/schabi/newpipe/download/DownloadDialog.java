@@ -315,7 +315,7 @@ public class DownloadDialog extends DialogFragment
 
         prefs = PreferenceManager.getDefaultSharedPreferences(requireContext());
 
-        final int threads = prefs.getInt(getString(R.string.default_download_threads), 3);
+        final int threads = prefs.getInt(getString(R.string.default_download_threads), 8);
         dialogBinding.threadsCount.setText(String.valueOf(threads));
         dialogBinding.threads.setProgress(threads - 1);
         dialogBinding.threads.setOnSeekBarChangeListener(new SimpleOnSeekBarChangeListener() {
@@ -1121,6 +1121,11 @@ public class DownloadDialog extends DialogFragment
 
         Toast.makeText(context, getString(R.string.download_has_started),
                 Toast.LENGTH_SHORT).show();
+
+        final androidx.fragment.app.FragmentActivity host = getActivity();
+        if (host != null) {
+            org.schabi.newpipe.util.KeepAlive.maybePrompt(host);
+        }
 
         dismiss();
     }

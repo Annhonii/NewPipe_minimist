@@ -461,7 +461,16 @@ public final class VideoDetailFragment
     //////////////////////////////////////////////////////////////////////////*/
 
     private void setOnClickListeners() {
-        binding.detailTitleRootLayout.setOnClickListener(v -> toggleTitleAndSecondaryControls());
+        if (isYoutubeStylePage()) {
+            // tap on title -> description sheet; chevron -> extra controls
+            binding.detailTitleRootLayout.setOnClickListener(v -> showDescriptionSheet());
+            binding.detailToggleSecondaryControlsView.setOnClickListener(
+                    v -> toggleTitleAndSecondaryControls());
+            binding.detailCommentsCard.setOnClickListener(v -> showCommentsSheet());
+        } else {
+            binding.detailTitleRootLayout.setOnClickListener(
+                    v -> toggleTitleAndSecondaryControls());
+        }
         binding.detailUploaderRootLayout.setOnClickListener(makeOnClickListener(info -> {
             if (isEmpty(info.getSubChannelUrl())) {
                 if (!isEmpty(info.getUploaderUrl())) {
@@ -604,7 +613,7 @@ public final class VideoDetailFragment
                     VideoPlayerUi.DEFAULT_CONTROLS_DURATION, 180);
             binding.detailSecondaryControlPanel.setVisibility(View.VISIBLE);
         } else {
-            binding.detailVideoTitleView.setMaxLines(1);
+            binding.detailVideoTitleView.setMaxLines(isYoutubeStylePage() ? 2 : 1);
             animateRotation(binding.detailToggleSecondaryControlsView,
                     VideoPlayerUi.DEFAULT_CONTROLS_DURATION, 0);
             binding.detailSecondaryControlPanel.setVisibility(View.GONE);
@@ -898,7 +907,7 @@ public final class VideoDetailFragment
         tabIcons.clear();
         tabContentDescriptions.clear();
 
-        if (shouldShowComments()) {
+        if (shouldShowComments() && !isYoutubeStylePage()) {
             pageAdapter.addFragment(
                     CommentsFragment.getInstance(serviceId, url, title), COMMENTS_TAB_TAG);
             tabIcons.add(R.drawable.ic_comment);
@@ -912,7 +921,7 @@ public final class VideoDetailFragment
             tabContentDescriptions.add(R.string.related_items_tab_description);
         }
 
-        if (showDescription) {
+        if (showDescription && !isYoutubeStylePage()) {
             // temp empty fragment. will be updated in handleResult
             pageAdapter.addFragment(EmptyFragment.newInstance(false), DESCRIPTION_TAB_TAG);
             tabIcons.add(R.drawable.ic_description);
@@ -963,7 +972,7 @@ public final class VideoDetailFragment
             }
         }
 
-        if (showDescription) {
+        if (showDescription && !isYoutubeStylePage()) {
             pageAdapter.updateItem(DESCRIPTION_TAB_TAG, new DescriptionFragment(info));
         }
 
@@ -1030,7 +1039,75 @@ public final class VideoDetailFragment
         updateTabLayoutVisibility();
     }
 
+    /** True when the YouTube-like single-page layout (comments card + sheets) is in use. */
+    private boolean isYoutubeStylePage() {
+        return binding != null && binding.detailCommentsCard != null;
+    }
+
+    private void showDescriptionSheet() {
+        if (currentInfo != null) {
+            VideoInfoBottomSheet.showDescription(getChildFragmentManager(), currentInfo);
+        }
+    }
+
+    private void showCommentsSheet() {
+        VideoInfoBottomSheet.showComments(getChildFragmentManager(), serviceId, url, title);
+    }
+
+    /** Loads the first comment and shows it as a preview in the comments card. */
+    private void loadTopCommentPreview() {
+        if (!isYoutubeStylePage()) {
+            return;
+        }
+        if (!shouldShowComments()) {
+            binding.detailCommentsCard.setVisibility(View.GONE);
+            return;
+        }
+        binding.detailCommentsCard.setVisibility(View.VISIBLE);
+        binding.detailCommentsCard.setEnabled(true);
+        binding.detailCommentPreviewAvatar.setVisibility(View.GONE);
+        binding.detailCommentPreviewText.setText("...");
+
+        disposables.add(ExtractorHelper.getCommentsInfo(serviceId, url, false)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(commentsInfo -> {
+                    if (binding == null || binding.detailCommentsCard == null) {
+                        return;
+                    }
+                    if (commentsInfo.isCommentsDisabled()) {
+                        binding.detailCommentPreviewText.setText(R.string.comments_are_disabled);
+                        binding.detailCommentsCard.setEnabled(false);
+                        return;
+                    }
+                    if (commentsInfo.getRelatedItems().isEmpty()) {
+                        binding.detailCommentPreviewText.setText(R.string.no_comments);
+                        return;
+                    }
+                    final CommentsInfoItem top = commentsInfo.getRelatedItems().get(0);
+                    CoilHelper.INSTANCE.loadAvatar(binding.detailCommentPreviewAvatar,
+                            top.getUploaderAvatars());
+                    binding.detailCommentPreviewAvatar.setVisibility(View.VISIBLE);
+                    final String text = top.getCommentText() == null ? ""
+                            : androidx.core.text.HtmlCompat.fromHtml(
+                                    top.getCommentText().getContent(),
+                                    androidx.core.text.HtmlCompat.FROM_HTML_MODE_LEGACY)
+                                    .toString().trim();
+                    binding.detailCommentPreviewText.setText(text);
+                }, throwable -> {
+                    if (binding != null && binding.detailCommentsCard != null) {
+                        // comments could not be loaded: hide the card instead of showing an error
+                        binding.detailCommentsCard.setVisibility(View.GONE);
+                    }
+                }));
+    }
+
     public void scrollToComment(final CommentsInfoItem comment) {
+        if (isYoutubeStylePage()) {
+            // comments live in a sheet now: bring it back after returning from replies
+            showCommentsSheet();
+            return;
+        }
         final int commentsTabPos = pageAdapter.getItemPositionByTitle(COMMENTS_TAB_TAG);
         final Fragment fragment = pageAdapter.getItem(commentsTabPos);
         if (!(fragment instanceof CommentsFragment)) {
@@ -1422,6 +1499,9 @@ public final class VideoDetailFragment
         }
 
         // hide comments / related streams / description tabs
+        if (binding.detailCommentsCard != null) {
+            binding.detailCommentsCard.setVisibility(View.GONE);
+        }
         binding.viewPager.setVisibility(View.GONE);
         binding.tabLayout.setVisibility(View.GONE);
     }
@@ -1535,6 +1615,7 @@ public final class VideoDetailFragment
         setInitialData(info.getServiceId(), info.getOriginalUrl(), info.getName(), playQueue);
 
         updateTabs(info);
+        loadTopCommentPreview();
 
         animate(binding.detailThumbnailPlayButton, true, 200);
         binding.detailVideoTitleView.setText(title);

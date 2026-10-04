@@ -905,4 +905,13 @@
     <string name="api23_requirement_dialog_title">NewPipe is dropping support for Android 5</string>
     <string name="api23_requirement_dialog_message">Unfortunately NewPipe depends on a few libraries that dropped support for Android 5.0 and 5.1. The next NewPipe release will therefore only work on devices with Android 6 or higher, sadly. Read more in the blogpost.</string>
     <string name="api23_requirement_dialog_blogpost">Blogpost</string>
+    <!-- Keep downloads alive -->
+    <string name="keep_alive_title">Keep downloads running</string>
+    <string name="keep_alive_message">Your phone may stop NewPipe while it downloads in the background. Allow NewPipe to run without battery restrictions so downloads are not killed.</string>
+    <string name="keep_alive_message_xiaomi">Your phone may stop NewPipe while it downloads in the background. Allow it to run without battery restrictions, turn on Autostart for NewPipe, and lock the app in the recent apps list so downloads are not killed.</string>
+    <string name="keep_alive_allow">Allow</string>
+    <string name="keep_alive_autostart">Autostart</string>
+    <string name="keep_alive_later">Later</string>
+    <string name="download_paused_by_android">Downloads paused</string>
+    <string name="download_paused_by_android_detail">Android limits background downloads to about 6 hours. Open NewPipe and they will continue from where they stopped.</string>
 </resources>

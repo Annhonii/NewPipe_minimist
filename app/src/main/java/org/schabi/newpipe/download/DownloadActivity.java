@@ -60,6 +60,8 @@ public class DownloadActivity extends AppCompatActivity {
         if (DeviceUtils.isTv(this)) {
             FocusOverlayView.setupFocusObserver(this);
         }
+
+        org.schabi.newpipe.util.KeepAlive.maybePrompt(this);
     }
 
     private void updateFragments() {

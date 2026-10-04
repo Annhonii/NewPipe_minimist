@@ -11,6 +11,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
+import android.content.pm.ServiceInfo;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.ConnectivityManager;
@@ -23,6 +24,8 @@ import android.os.Handler;
 import android.os.Handler.Callback;
 import android.os.IBinder;
 import android.os.Message;
+import android.os.SystemClock;
+import android.text.format.Formatter;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -88,6 +91,10 @@ public class DownloadManagerService extends Service {
     private DownloadManagerBinder mBinder;
     private DownloadManager mManager;
     private Notification mNotification;
+    private Builder mForegroundBuilder;
+    private long mTickerLastDone = 0;
+    private long mTickerLastTime = 0;
+    private final Runnable mProgressTicker = this::updateProgressNotification;
     private Handler mHandler;
     private boolean mForeground = false;
     private NotificationManager mNotificationManager = null;
@@ -157,8 +164,13 @@ public class DownloadManagerService extends Service {
                 .setSmallIcon(android.R.drawable.stat_sys_download)
                 .setLargeIcon(icLauncher)
                 .setContentTitle(getString(R.string.msg_running))
-                .setContentText(getString(R.string.msg_running_detail));
+                .setContentText(getString(R.string.msg_running_detail))
+                .setOngoing(true)
+                .setOnlyAlertOnce(true)
+                .setCategory(NotificationCompat.CATEGORY_PROGRESS)
+                .setForegroundServiceBehavior(NotificationCompat.FOREGROUND_SERVICE_IMMEDIATE);
 
+        mForegroundBuilder = builder;
         mNotification = builder.build();
 
         mNotificationManager = ContextCompat.getSystemService(this,
@@ -194,13 +206,26 @@ public class DownloadManagerService extends Service {
             Log.d(TAG, intent == null ? "Restarting" : "Starting");
         }
 
-        if (intent == null) return START_NOT_STICKY;
+        if (intent == null) {
+            // The system brought the service back after killing it: go to the foreground again
+            // and carry on with the downloads that were cut off.
+            mHandler.post(this::resumeInterrupted);
+            return START_STICKY;
+        }
 
         Log.i(TAG, "Got intent: " + intent);
         String action = intent.getAction();
-        if (action != null) {
+        if (action == null) {
+            // Opened from the downloads screen: continue anything that was cut off.
+            mHandler.post(this::resumeInterrupted);
+        } else {
             if (action.equals(Intent.ACTION_RUN)) {
-                mHandler.post(() -> startMission(intent));
+                // Started with startForegroundService(): enter the foreground right away.
+                updateForegroundState(true);
+                mHandler.post(() -> {
+                    startMission(intent);
+                    updateForegroundState(mManager.hasActiveMissions());
+                });
             } else if (downloadDoneNotification != null) {
                 if (action.equals(ACTION_RESET_DOWNLOAD_FINISHED) || action.equals(ACTION_OPEN_DOWNLOADS_FINISHED)) {
                     downloadDoneCount = 0;
@@ -217,6 +242,43 @@ public class DownloadManagerService extends Service {
         }
 
         return START_STICKY;
+    }
+
+    private void resumeInterrupted() {
+        if (mManager == null || mHandler == null) return;
+
+        handleConnectivityState(true); // read the current network state first
+        mManager.resumeInterruptedMissions();
+        updateForegroundState(mManager.hasActiveMissions());
+    }
+
+    /**
+     * Android 15+ stops "data sync" foreground services after about 6 hours a day. Stop cleanly
+     * (otherwise the system crashes the app); the downloads stay queued and carry on as soon as
+     * the app is opened again.
+     */
+    @Override
+    public void onTimeout(final int startId, final int fgsType) {
+        Log.w(TAG, "Foreground service timeout, pausing downloads");
+
+        if (mManager != null) {
+            mManager.pauseAllMissions(true);
+        }
+
+        if (mNotificationManager != null) {
+            mNotificationManager.notify(DOWNLOADS_NOTIFICATION_ID + 100,
+                    new Builder(this, getString(R.string.notification_channel_id))
+                            .setSmallIcon(android.R.drawable.stat_sys_warning)
+                            .setContentTitle(getString(R.string.download_paused_by_android))
+                            .setContentText(getString(R.string.download_paused_by_android_detail))
+                            .setStyle(new NotificationCompat.BigTextStyle()
+                                    .bigText(getString(R.string.download_paused_by_android_detail)))
+                            .setAutoCancel(true)
+                            .setContentIntent(mOpenDownloadList)
+                            .build());
+        }
+
+        stopSelf();
     }
 
     @Override
@@ -244,6 +306,7 @@ public class DownloadManagerService extends Service {
         if (icDownloadFailed != null) icDownloadFailed.recycle();
         if (icLauncher != null) icLauncher.recycle();
 
+        stopProgressTicker();
         mHandler = null;
         mManager.pauseAllMissions(true);
     }
@@ -264,7 +327,8 @@ public class DownloadManagerService extends Service {
                 notifyFinishedDownload(mission.storage.getName());
                 mManager.setFinished(mission);
                 handleConnectivityState(false);
-                updateForegroundState(mManager.runMissions());
+                mManager.runMissions();
+                updateForegroundState(mManager.hasActiveMissions());
                 break;
             case MESSAGE_RUNNING:
                 updateForegroundState(true);
@@ -272,10 +336,11 @@ public class DownloadManagerService extends Service {
             case MESSAGE_ERROR:
                 notifyFailedDownload(mission);
                 handleConnectivityState(false);
-                updateForegroundState(mManager.runMissions());
+                mManager.runMissions();
+                updateForegroundState(mManager.hasActiveMissions());
                 break;
             case MESSAGE_PAUSED:
-                updateForegroundState(mManager.getRunningMissionsCount() > 0);
+                updateForegroundState(mManager.hasActiveMissions());
                 break;
         }
 
@@ -335,14 +400,66 @@ public class DownloadManagerService extends Service {
         if (state == mForeground) return;
 
         if (state) {
-            startForeground(FOREGROUND_NOTIFICATION_ID, mNotification);
+            try {
+                ServiceCompat.startForeground(this, FOREGROUND_NOTIFICATION_ID, mNotification,
+                        ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC);
+            } catch (final RuntimeException e) {
+                // e.g. Android 12+ doesn't allow starting a foreground service from the background
+                Log.w(TAG, "Unable to enter the foreground", e);
+                return;
+            }
+            startProgressTicker();
         } else {
+            stopProgressTicker();
             ServiceCompat.stopForeground(this, ServiceCompat.STOP_FOREGROUND_REMOVE);
         }
 
         manageLock(state);
 
         mForeground = state;
+    }
+
+    private void startProgressTicker() {
+        if (mHandler == null) return;
+        mTickerLastDone = 0;
+        mTickerLastTime = SystemClock.elapsedRealtime();
+        mHandler.removeCallbacks(mProgressTicker);
+        mHandler.postDelayed(mProgressTicker, 1000);
+    }
+
+    private void stopProgressTicker() {
+        if (mHandler != null) mHandler.removeCallbacks(mProgressTicker);
+    }
+
+    /** Shows overall progress and speed in the (foreground) notification, once a second. */
+    private void updateProgressNotification() {
+        final Handler handler = mHandler;
+        if (handler == null || mManager == null || mNotificationManager == null || !mForeground) {
+            return;
+        }
+
+        final long[] progress = mManager.getRunningProgress();
+        if (progress[0] > 0) {
+            final long now = SystemClock.elapsedRealtime();
+            final long elapsed = now - mTickerLastTime;
+            final long speed = elapsed > 0
+                    ? Math.max(0, (progress[1] - mTickerLastDone) * 1000 / elapsed) : 0;
+            mTickerLastDone = progress[1];
+            mTickerLastTime = now;
+
+            final boolean known = progress[2] > 0;
+            final int percent = known ? (int) Math.min(100, progress[1] * 100 / progress[2]) : 0;
+            String text = Formatter.formatFileSize(this, speed) + "/s";
+            if (known) text = percent + "% \u00b7 " + text;
+
+            mForegroundBuilder.setContentText(text).setProgress(100, percent, !known);
+        } else {
+            mForegroundBuilder.setContentText(getString(R.string.msg_running_detail))
+                    .setProgress(0, 0, false);
+        }
+
+        mNotificationManager.notify(FOREGROUND_NOTIFICATION_ID, mForegroundBuilder.build());
+        handler.postDelayed(mProgressTicker, 1000);
     }
 
     /**
@@ -377,7 +494,8 @@ public class DownloadManagerService extends Service {
                 .putExtra(EXTRA_STORAGE_TAG, storage.getTag())
                 .putExtra(EXTRA_STREAM_INFO, streamInfo);
 
-        context.startService(intent);
+        // The service goes to the foreground at once (see onStartCommand), so it isn't killed in the background.
+        ContextCompat.startForegroundService(context, intent);
     }
 
     private void startMission(Intent intent) {
