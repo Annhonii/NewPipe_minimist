@@ -10,8 +10,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.IBinder;
-import android.os.Handler;
-import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -40,11 +38,6 @@ import org.schabi.newpipe.util.FilePickerActivityHelper;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.URI;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import us.shandian.giga.get.DownloadMission;
 import us.shandian.giga.service.DownloadManager;
@@ -75,11 +68,6 @@ public class MissionsFragment extends Fragment {
     private boolean mForceUpdate;
 
     private DownloadMission unsafeMissionTarget = null;
-    private us.shandian.giga.get.Mission pendingSaveMission;
-    private final ExecutorService saveExecutor = Executors.newSingleThreadExecutor();
-    private final Handler saveHandler = new Handler(Looper.getMainLooper());
-    private final ActivityResultLauncher<Intent> saveToStorageLauncher =
-            registerForActivityResult(new StartActivityForResult(), this::saveToStorageResult);
     private final ActivityResultLauncher<Intent> requestDownloadSaveAsLauncher =
             registerForActivityResult(new StartActivityForResult(), this::requestDownloadSaveAsResult);
     private final ServiceConnection mConnection = new ServiceConnection() {
@@ -92,7 +80,6 @@ public class MissionsFragment extends Fragment {
             mAdapter = new MissionAdapter(mContext, mBinder.getDownloadManager(), mEmpty, getView());
 
             mAdapter.setRecover(MissionsFragment.this::recoverMission);
-            mAdapter.setSaveToStorageCallback(MissionsFragment.this::saveToStorage);
 
             setAdapterButtons();
 
@@ -115,7 +102,7 @@ public class MissionsFragment extends Fragment {
         View v = inflater.inflate(R.layout.missions, container, false);
 
         mPrefs = PreferenceManager.getDefaultSharedPreferences(requireActivity());
-        mLinear = true;
+        mLinear = mPrefs.getBoolean("linear", false);
 
         // Bind the service
         mContext.bindService(new Intent(mContext, DownloadManagerService.class), mConnection, Context.BIND_AUTO_CREATE);
@@ -183,15 +170,11 @@ public class MissionsFragment extends Fragment {
 
         mBinder = null;
         mAdapter = null;
-        saveExecutor.shutdownNow();
     }
 
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
         mSwitch = menu.findItem(R.id.switch_mode);
-        if (mSwitch != null) {
-            mSwitch.setVisible(false);
-        }
         mClear = menu.findItem(R.id.clear_list);
         mStart = menu.findItem(R.id.start_downloads);
         mPause = menu.findItem(R.id.pause_downloads);
@@ -205,6 +188,8 @@ public class MissionsFragment extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         int itemId = item.getItemId();
         if (itemId == R.id.switch_mode) {
+            mLinear = !mLinear;
+            updateList();
             return true;
         } else if (itemId == R.id.clear_list) {
             showClearDownloadHistoryPrompt();
@@ -243,49 +228,6 @@ public class MissionsFragment extends Fragment {
                 .setPositiveButton(R.string.ok, (dialog, which) ->
                         mAdapter.clearFinishedDownloads(true))
                 .show();
-    }
-
-    private void saveToStorage(@NonNull final us.shandian.giga.get.Mission mission) {
-        pendingSaveMission = mission;
-        final Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
-        intent.addCategory(Intent.CATEGORY_OPENABLE);
-        intent.setType(mission.storage.getType() == null
-                ? "application/octet-stream" : mission.storage.getType());
-        intent.putExtra(Intent.EXTRA_TITLE, mission.storage.getName());
-        saveToStorageLauncher.launch(intent);
-    }
-
-    private void saveToStorageResult(@NonNull final ActivityResult result) {
-        final us.shandian.giga.get.Mission mission = pendingSaveMission;
-        pendingSaveMission = null;
-        if (result.getResultCode() != Activity.RESULT_OK || result.getData() == null
-                || result.getData().getData() == null || mission == null) {
-            return;
-        }
-        final Uri destination = result.getData().getData();
-        final Context context = requireContext().getApplicationContext();
-        saveExecutor.execute(() -> {
-            try (InputStream in = mission.storage.isDirect()
-                    ? new java.io.FileInputStream(new File(URI.create(
-                    mission.storage.getUri().toString())))
-                    : context.getContentResolver().openInputStream(mission.storage.getUri());
-                 OutputStream out = context.getContentResolver().openOutputStream(destination)) {
-                if (in == null || out == null) {
-                    throw new IOException("Unable to open download streams");
-                }
-                final byte[] buffer = new byte[1024 * 64];
-                int read;
-                while ((read = in.read(buffer)) != -1) {
-                    out.write(buffer, 0, read);
-                }
-                out.flush();
-                saveHandler.post(() -> Toast.makeText(requireContext(),
-                        R.string.saved_to_internal_storage, Toast.LENGTH_SHORT).show());
-            } catch (final Exception e) {
-                saveHandler.post(() -> Toast.makeText(requireContext(),
-                        R.string.save_to_internal_storage_error, Toast.LENGTH_LONG).show());
-            }
-        });
     }
 
     private void updateList() {

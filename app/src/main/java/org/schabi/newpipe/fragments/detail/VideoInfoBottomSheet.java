@@ -39,8 +39,6 @@ public class VideoInfoBottomSheet extends BottomSheetDialogFragment {
     private static final String TAG = "VideoInfoBottomSheet";
 
     private FragmentManager.OnBackStackChangedListener backStackListener;
-    private BottomSheetBehavior<?> playerBottomSheetBehavior;
-    private BottomSheetBehavior.BottomSheetCallback playerBottomSheetCallback;
     private int initialBackStackCount;
 
     /** Closes the comments / description sheet if one is currently open. */
@@ -138,31 +136,6 @@ public class VideoInfoBottomSheet extends BottomSheetDialogFragment {
             }
         };
         activityFm.addOnBackStackChangedListener(backStackListener);
-
-        // The video mini-player is a separate bottom sheet. When it is swiped down to
-        // collapsed state, this dialog must disappear too, otherwise the comments can remain
-        // floating over the mini player.
-        final View playerHolder = requireActivity().findViewById(R.id.fragment_player_holder);
-        if (playerHolder != null) {
-            try {
-                playerBottomSheetBehavior = BottomSheetBehavior.from(playerHolder);
-                playerBottomSheetCallback = new BottomSheetBehavior.BottomSheetCallback() {
-                    @Override
-                    public void onStateChanged(@NonNull final View bottomSheet, final int newState) {
-                        if (newState == BottomSheetBehavior.STATE_COLLAPSED
-                                || newState == BottomSheetBehavior.STATE_HIDDEN) {
-                            dismissAllowingStateLoss();
-                        }
-                    }
-
-                    @Override
-                    public void onSlide(@NonNull final View bottomSheet, final float slideOffset) { }
-                };
-                playerBottomSheetBehavior.addBottomSheetCallback(playerBottomSheetCallback);
-            } catch (final IllegalArgumentException ignored) {
-                // The player holder is not a bottom sheet on some configurations.
-            }
-        }
     }
 
     /**
@@ -237,11 +210,6 @@ public class VideoInfoBottomSheet extends BottomSheetDialogFragment {
             getActivity().getSupportFragmentManager()
                     .removeOnBackStackChangedListener(backStackListener);
             backStackListener = null;
-        }
-        if (playerBottomSheetBehavior != null && playerBottomSheetCallback != null) {
-            playerBottomSheetBehavior.removeBottomSheetCallback(playerBottomSheetCallback);
-            playerBottomSheetBehavior = null;
-            playerBottomSheetCallback = null;
         }
     }
 }

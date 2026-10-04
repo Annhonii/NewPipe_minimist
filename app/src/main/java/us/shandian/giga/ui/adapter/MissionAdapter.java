@@ -25,9 +25,7 @@ import android.annotation.SuppressLint;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
@@ -46,7 +44,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.NotificationCompat;
@@ -120,9 +117,6 @@ public class MissionAdapter extends Adapter<ViewHolder> implements Handler.Callb
     private RecoverHelper mRecover;
     private final View mView;
     private final ArrayList<Mission> mHidden;
-    private SaveToStorageCallback mSaveToStorageCallback;
-    private final android.util.LruCache<String, Bitmap> mThumbnailCache =
-            new android.util.LruCache<>(48);
     private Snackbar mSnackbar;
 
     private final CompositeDisposable compositeDisposable = new CompositeDisposable();
@@ -207,28 +201,6 @@ public class MissionAdapter extends Adapter<ViewHolder> implements Handler.Callb
 
         h.icon.setImageResource(Utility.getIconForFileType(type));
         h.name.setText(item.mission.storage.getName());
-        h.thumbnail.setVisibility(View.VISIBLE);
-        h.thumbnail.setImageResource(R.drawable.placeholder_thumbnail_video);
-
-        final String thumbnailKey = String.valueOf(item.mission.storage.getUri());
-        final Bitmap cachedThumbnail = mThumbnailCache.get(thumbnailKey);
-        if (cachedThumbnail != null) {
-            h.thumbnail.setImageBitmap(cachedThumbnail);
-        } else if (item.mission.kind != 'a' && item.mission.storage.existsAsFile()) {
-            final Uri thumbnailUri = item.mission.storage.getUri();
-            h.thumbnail.setTag(thumbnailKey);
-            Observable.fromCallable(() -> extractThumbnail(mContext, thumbnailUri))
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(bitmap -> {
-                        if (bitmap != null) {
-                            mThumbnailCache.put(thumbnailKey, bitmap);
-                            if (thumbnailKey.equals(h.thumbnail.getTag())) {
-                                h.thumbnail.setImageBitmap(bitmap);
-                            }
-                        }
-                    }, ignored -> { });
-        }
 
         h.progress.setColors(Utility.getBackgroundForFileType(mContext, type), Utility.getForegroundForFileType(mContext, type));
 
@@ -714,11 +686,6 @@ public class MissionAdapter extends Adapter<ViewHolder> implements Handler.Callb
             applyChanges();
             checkMasterButtonsVisibility();
             return true;
-        } else if (id == R.id.save_to_internal_storage) {
-            if (mSaveToStorageCallback != null && h.item.mission instanceof FinishedMission) {
-                mSaveToStorageCallback.saveToStorage(h.item.mission);
-            }
-            return true;
         } else if (id == R.id.delete_entry) {// just delete the entry
             mDeleter.append(h.item.mission, false);
             applyChanges();
@@ -882,56 +849,12 @@ public class MissionAdapter extends Adapter<ViewHolder> implements Handler.Callb
         mRecover = callback;
     }
 
-    public void setSaveToStorageCallback(@NonNull SaveToStorageCallback callback) {
-        mSaveToStorageCallback = callback;
-    }
-
-    private boolean isAppPrivateStorage(@NonNull final Mission mission) {
-        if (!mission.storage.isDirect()) {
-            return false;
-        }
-        final String path = mission.storage.getUri().getPath();
-        if (path == null) {
-            return false;
-        }
-        final File external = mContext.getExternalFilesDir(null);
-        final File internal = mContext.getFilesDir();
-        return (external != null && path.startsWith(external.getAbsolutePath()))
-                || path.startsWith(internal.getAbsolutePath());
-    }
-
-    @Nullable
-    private static Bitmap extractThumbnail(@NonNull final Context context, @NonNull final Uri uri) {
-        final MediaMetadataRetriever retriever = new MediaMetadataRetriever();
-        try {
-            retriever.setDataSource(context, uri);
-            final Bitmap frame = retriever.getFrameAtTime(500_000,
-                    MediaMetadataRetriever.OPTION_CLOSEST_SYNC);
-            if (frame == null) {
-                return null;
-            }
-            final int targetWidth = 360;
-            if (frame.getWidth() <= targetWidth) {
-                return frame;
-            }
-            final int targetHeight = frame.getHeight() * targetWidth / frame.getWidth();
-            return Bitmap.createScaledBitmap(frame, targetWidth, targetHeight, true);
-        } catch (final Exception ignored) {
-            return null;
-        } finally {
-            try {
-                retriever.release();
-            } catch (final Exception ignored) { }
-        }
-    }
-
 
     class ViewHolderItem extends RecyclerView.ViewHolder {
         DownloadManager.MissionItem item;
 
         TextView status;
         ImageView icon;
-        ImageView thumbnail;
         TextView name;
         TextView size;
         TextView date;
@@ -948,7 +871,6 @@ public class MissionAdapter extends Adapter<ViewHolder> implements Handler.Callb
         MenuItem delete;
         MenuItem source;
         MenuItem checksum;
-        MenuItem saveToStorage;
 
         long lastTimestamp = -1;
         double lastDone;
@@ -965,7 +887,6 @@ public class MissionAdapter extends Adapter<ViewHolder> implements Handler.Callb
             status = itemView.findViewById(R.id.item_status);
             name = itemView.findViewById(R.id.item_name);
             icon = itemView.findViewById(R.id.item_icon);
-            thumbnail = itemView.findViewById(R.id.item_thumbnail);
             size = itemView.findViewById(R.id.item_size);
             date = itemView.findViewById(R.id.item_date);
 
@@ -986,7 +907,6 @@ public class MissionAdapter extends Adapter<ViewHolder> implements Handler.Callb
             delete = menu.findItem(R.id.delete);
             source = menu.findItem(R.id.source);
             checksum = menu.findItem(R.id.checksum);
-            saveToStorage = menu.findItem(R.id.save_to_internal_storage);
 
             itemView.setHapticFeedbackEnabled(true);
 
@@ -1013,7 +933,6 @@ public class MissionAdapter extends Adapter<ViewHolder> implements Handler.Callb
             delete.setVisible(false);
             source.setVisible(false);
             checksum.setVisible(false);
-            saveToStorage.setVisible(false);
 
             DownloadMission mission = item.mission instanceof DownloadMission ? (DownloadMission) item.mission : null;
 
@@ -1052,8 +971,6 @@ public class MissionAdapter extends Adapter<ViewHolder> implements Handler.Callb
                 open.setVisible(true);
                 delete.setVisible(true);
                 checksum.setVisible(true);
-                saveToStorage.setVisible(isAppPrivateStorage(item.mission)
-                        && mSaveToStorageCallback != null);
             }
 
             if (item.mission.source != null && !item.mission.source.isEmpty()) {
@@ -1089,9 +1006,5 @@ public class MissionAdapter extends Adapter<ViewHolder> implements Handler.Callb
 
     public interface RecoverHelper {
         void tryRecover(DownloadMission mission);
-    }
-
-    public interface SaveToStorageCallback {
-        void saveToStorage(@NonNull Mission mission);
     }
 }

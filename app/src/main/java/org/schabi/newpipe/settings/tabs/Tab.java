@@ -26,7 +26,7 @@ import org.schabi.newpipe.fragments.list.kiosk.KioskFragment;
 import org.schabi.newpipe.fragments.list.kiosk.TrendingFragment;
 import org.schabi.newpipe.fragments.list.playlist.PlaylistFragment;
 import org.schabi.newpipe.local.bookmark.BookmarkFragment;
-import us.shandian.giga.ui.fragment.MissionsFragment;
+import org.schabi.newpipe.local.downloads.DownloadsFragment;
 import org.schabi.newpipe.local.feed.FeedFragment;
 import org.schabi.newpipe.local.history.StatisticsPlaylistFragment;
 import org.schabi.newpipe.local.playlist.LocalPlaylistFragment;
@@ -284,8 +284,8 @@ public abstract class Tab {
         }
 
         @Override
-        public MissionsFragment getFragment(final Context context) {
-            return new MissionsFragment();
+        public DownloadsFragment getFragment(final Context context) {
+            return new DownloadsFragment();
         }
     }
 

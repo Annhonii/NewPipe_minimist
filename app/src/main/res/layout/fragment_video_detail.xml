@@ -34,10 +34,8 @@
 
             <org.schabi.newpipe.views.CustomCollapsingToolbarLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <!-- The video/detail header stays stable; the content pager below handles scrolling. -->
-                <!-- app:layout_scrollFlags intentionally omitted. -->
+                android:layout_height="wrap_content"
+                app:layout_scrollFlags="scroll">
 
                 <!-- THUMBNAIL -->
                 <FrameLayout
@@ -166,7 +164,8 @@
             <RelativeLayout
                 android:id="@+id/detail_content_root_layout"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                app:layout_scrollFlags="scroll">
 
                 <!-- TITLE -->
                 <FrameLayout
@@ -254,7 +253,7 @@
                             android:id="@+id/detail_uploader_root_layout"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:background="@drawable/bg_channel_row"
+                            android:background="?attr/selectableItemBackground"
                             android:gravity="center_vertical"
                             android:orientation="horizontal"
                             android:padding="6dp">
@@ -339,29 +338,40 @@
                         </LinearLayout>
 
                     </RelativeLayout>
-                    <!-- ACTION ROW: likes + background + popup + download -->
+                    <!-- VIEWS + LIKE PILL -->
                     <LinearLayout
-                        android:id="@+id/detail_control_panel"
+                        android:id="@+id/details_panel"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginHorizontal="8dp"
-                        android:layout_marginTop="6dp"
-                        android:background="@drawable/bg_action_row"
-                        android:gravity="center"
-                        android:orientation="horizontal"
-                        android:paddingHorizontal="4dp">
+                        android:layout_marginHorizontal="12dp"
+                        android:layout_marginTop="4dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <org.schabi.newpipe.views.NewPipeTextView
+                            android:id="@+id/detail_view_count_view"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:fontFamily="monospace"
+                            android:lines="1"
+                            android:paddingStart="6dp"
+                            android:textSize="@dimen/video_item_detail_views_text_size"
+                            tools:ignore="RtlSymmetry"
+                            tools:text="2,816,821,505 views" />
 
                         <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="48dp"
-                            android:layout_weight="1"
-                            android:gravity="center"
-                            android:orientation="horizontal">
+                            android:layout_width="wrap_content"
+                            android:layout_height="36dp"
+                            android:background="@drawable/bg_like_pill"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
+                            android:paddingHorizontal="14dp">
 
                             <ImageView
                                 android:id="@+id/detail_thumbs_up_img_view"
-                                android:layout_width="22dp"
-                                android:layout_height="22dp"
+                                android:layout_width="@dimen/video_item_detail_like_image_width"
+                                android:layout_height="@dimen/video_item_detail_like_image_height"
                                 android:contentDescription="@string/detail_likes_img_view_description"
                                 android:src="@drawable/ic_thumb_up" />
 
@@ -369,98 +379,117 @@
                                 android:id="@+id/detail_thumbs_up_count_view"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginStart="5dp"
+                                android:layout_marginStart="6dp"
                                 android:fontFamily="monospace"
                                 android:lines="1"
-                                android:textSize="12sp"
+                                android:textSize="@dimen/video_item_detail_likes_text_size"
                                 tools:text="12M" />
+
+                            <View
+                                android:layout_width="1dp"
+                                android:layout_height="16dp"
+                                android:layout_marginHorizontal="12dp"
+                                android:background="?attr/separator_color" />
+
+                            <ImageView
+                                android:id="@+id/detail_thumbs_down_img_view"
+                                android:layout_width="@dimen/video_item_detail_like_image_width"
+                                android:layout_height="@dimen/video_item_detail_like_image_height"
+                                android:contentDescription="@string/detail_dislikes_img_view_description"
+                                android:src="@drawable/ic_thumb_down" />
+
+                            <org.schabi.newpipe.views.NewPipeTextView
+                                android:id="@+id/detail_thumbs_down_count_view"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="6dp"
+                                android:fontFamily="monospace"
+                                android:lines="1"
+                                android:textSize="@dimen/video_item_detail_likes_text_size"
+                                tools:text="10K" />
 
                             <org.schabi.newpipe.views.NewPipeTextView
                                 android:id="@+id/detail_thumbs_disabled_view"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginStart="5dp"
+                                android:layout_marginStart="6dp"
                                 android:fontFamily="monospace"
                                 android:text="@string/disabled"
-                                android:textSize="12sp"
-                                android:visibility="gone" />
+                                android:textSize="@dimen/video_item_detail_likes_text_size"
+                                android:visibility="gone"
+                                tools:visibility="visible" />
                         </LinearLayout>
+                    </LinearLayout>
+
+
+                    <!-- CONTROLS -->
+                    <LinearLayout
+                        android:id="@+id/detail_control_panel"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:padding="@dimen/detail_control_padding">
+
+                        <org.schabi.newpipe.views.NewPipeTextView
+                            android:id="@+id/detail_controls_playlist_append"
+                            android:layout_width="@dimen/detail_control_width"
+                            android:layout_height="@dimen/detail_control_height"
+                            android:layout_gravity="center_vertical"
+                            android:layout_weight="1"
+                            android:layout_margin="4dp"
+                            android:background="@drawable/bg_action_btn"
+                            android:clickable="true"
+                            android:contentDescription="@string/add_to_playlist"
+                            android:drawableTop="@drawable/ic_playlist_add"
+                            android:focusable="true"
+                            android:gravity="center"
+                            android:paddingVertical="@dimen/detail_control_padding" />
 
                         <org.schabi.newpipe.views.NewPipeTextView
                             android:id="@+id/detail_controls_background"
-                            android:layout_width="0dp"
-                            android:layout_height="48dp"
+                            android:layout_width="@dimen/detail_control_width"
+                            android:layout_height="@dimen/detail_control_height"
+                            android:layout_gravity="center_vertical"
                             android:layout_weight="1"
-                            android:background="@android:color/transparent"
+                            android:layout_margin="4dp"
+                            android:background="@drawable/bg_action_btn"
                             android:clickable="true"
                             android:contentDescription="@string/play_audio"
                             android:drawableTop="@drawable/ic_headset"
                             android:focusable="true"
                             android:gravity="center"
-                            android:text=""
-                            android:drawablePadding="0dp" />
+                            android:paddingVertical="@dimen/detail_control_padding" />
 
                         <org.schabi.newpipe.views.NewPipeTextView
                             android:id="@+id/detail_controls_popup"
-                            android:layout_width="0dp"
-                            android:layout_height="48dp"
+                            android:layout_width="@dimen/detail_control_width"
+                            android:layout_height="@dimen/detail_control_height"
+                            android:layout_gravity="center_vertical"
                             android:layout_weight="1"
-                            android:background="@android:color/transparent"
+                            android:layout_margin="4dp"
+                            android:background="@drawable/bg_action_btn"
                             android:clickable="true"
                             android:contentDescription="@string/open_in_popup_mode"
                             android:drawableTop="@drawable/ic_picture_in_picture"
                             android:focusable="true"
                             android:gravity="center"
-                            android:text=""
-                            android:drawablePadding="0dp" />
+                            android:paddingVertical="@dimen/detail_control_padding" />
 
                         <org.schabi.newpipe.views.NewPipeTextView
                             android:id="@+id/detail_controls_download"
-                            android:layout_width="0dp"
-                            android:layout_height="48dp"
+                            android:layout_width="@dimen/detail_control_width"
+                            android:layout_height="@dimen/detail_control_height"
+                            android:layout_gravity="center_vertical"
                             android:layout_weight="1"
-                            android:background="@android:color/transparent"
+                            android:layout_margin="4dp"
+                            android:background="@drawable/bg_action_btn"
                             android:clickable="true"
                             android:contentDescription="@string/controls_download_desc"
                             android:drawableTop="@drawable/ic_file_download"
                             android:focusable="true"
                             android:gravity="center"
-                            android:text=""
-                            android:drawablePadding="0dp" />
-                    </LinearLayout>
+                            android:paddingVertical="@dimen/detail_control_padding" />
 
-                    <!-- View count belongs to the description sheet, not the action row. -->
-                    <org.schabi.newpipe.views.NewPipeTextView
-                        android:id="@+id/detail_view_count_view"
-                        android:layout_width="1dp"
-                        android:layout_height="1dp"
-                        android:visibility="gone" />
-
-                    <!-- Kept for existing like/dislike binding compatibility; dislikes stay hidden. -->
-                    <FrameLayout
-                        android:layout_width="1dp"
-                        android:layout_height="1dp"
-                        android:visibility="gone">
-                        <ImageView
-                            android:id="@+id/detail_thumbs_down_img_view"
-                            android:layout_width="1dp"
-                            android:layout_height="1dp" />
-                        <org.schabi.newpipe.views.NewPipeTextView
-                            android:id="@+id/detail_thumbs_down_count_view"
-                            android:layout_width="1dp"
-                            android:layout_height="1dp" />
-                    </FrameLayout>
-
-                    <!-- Kept as an empty compatibility container; Add to playlist is removed. -->
-                    <LinearLayout
-                        android:id="@+id/detail_control_panel_legacy"
-                        android:layout_width="1dp"
-                        android:layout_height="1dp"
-                        android:visibility="gone">
-                        <org.schabi.newpipe.views.NewPipeTextView
-                            android:id="@+id/detail_controls_playlist_append"
-                            android:layout_width="1dp"
-                            android:layout_height="1dp" />
                     </LinearLayout>
 
                     <!-- SECONDARY CONTROLS -->

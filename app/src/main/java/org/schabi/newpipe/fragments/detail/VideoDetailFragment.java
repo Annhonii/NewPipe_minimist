@@ -978,8 +978,6 @@ public final class VideoDetailFragment
             pageAdapter.updateItem(DESCRIPTION_TAB_TAG, new DescriptionFragment(info));
         }
 
-        binding.viewPager.setNestedScrollingEnabled(true);
-        binding.viewPager.setOverScrollMode(View.OVER_SCROLL_IF_CONTENT_SCROLLS);
         binding.viewPager.setVisibility(View.VISIBLE);
         // make sure the tab layout is visible
         updateTabLayoutVisibility();

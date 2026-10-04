@@ -77,15 +77,6 @@ public class DescriptionFragment extends BaseDescriptionFragment {
             return;
         }
 
-        if (streamInfo.getViewCount() >= 0) {
-            binding.detailDescriptionViews.setText(streamInfo.getStreamType()
-                    == org.schabi.newpipe.extractor.stream.StreamType.LIVE_STREAM
-                    ? Localization.localizeWatchingCount(activity, streamInfo.getViewCount())
-                    : Localization.localizeViewCount(activity, streamInfo.getViewCount()));
-        } else {
-            binding.detailDescriptionViews.setVisibility(View.GONE);
-        }
-
         addMetadataItem(inflater, layout, false, R.string.metadata_category,
                 streamInfo.getCategory());
 

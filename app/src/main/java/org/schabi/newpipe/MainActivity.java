@@ -52,7 +52,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
-import androidx.core.view.WindowCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentContainerView;
@@ -163,13 +162,6 @@ public class MainActivity extends AppCompatActivity {
         }
 
         super.onCreate(savedInstanceState);
-
-        // Render the app edge-to-edge so the main surface uses the full display.
-        // FocusAwareCoordinator distributes the system-bar insets to the children that need them.
-        WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
-        getWindow().setStatusBarColor(android.graphics.Color.TRANSPARENT);
-        getWindow().setNavigationBarColor(android.graphics.Color.TRANSPARENT);
-
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         sharedPrefEditor = sharedPreferences.edit();
 
