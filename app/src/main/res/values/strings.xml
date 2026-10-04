@@ -920,4 +920,6 @@
     <string name="keep_alive_later">Later</string>
     <string name="download_paused_by_android">Downloads paused</string>
     <string name="download_paused_by_android_detail">Android limits background downloads to about 6 hours. Open NewPipe and they will continue from where they stopped.</string>
+    <string name="use_device_font_title">Use device default font</string>
+    <string name="use_device_font_summary">Use the system font instead of the app font. Restart the app to apply.</string>
 </resources>

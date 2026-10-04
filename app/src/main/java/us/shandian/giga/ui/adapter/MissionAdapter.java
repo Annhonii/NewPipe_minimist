@@ -348,6 +348,16 @@ public class MissionAdapter extends Adapter<ViewHolder> implements Handler.Callb
 
         String mimeType = resolveMimeType(mission);
 
+        // audio / video downloads play in the app's own player
+        if (mimeType != null && (mimeType.startsWith("video/") || mimeType.startsWith("audio/"))) {
+            final String fileName = mission.storage.getName();
+            final int dot = fileName == null ? -1 : fileName.lastIndexOf('.');
+            org.schabi.newpipe.local.downloads.LocalPlayerActivity.start(mContext,
+                    mission.storage.getUri(),
+                    dot > 0 ? fileName.substring(0, dot) : fileName);
+            return;
+        }
+
         if (BuildConfig.DEBUG)
             Log.v(TAG, "Mime: " + mimeType + " package: " + BuildConfig.APPLICATION_ID + ".provider");
 

@@ -23,7 +23,9 @@
         app:tabIndicatorColor="?attr/card_item_contrast_color"
         app:tabIndicatorFullWidth="true"
         app:tabIndicatorGravity="stretch"
-        app:tabMinWidth="60dp"
+        app:tabMinWidth="0dp"
+        app:tabPaddingEnd="0dp"
+        app:tabPaddingStart="0dp"
         app:tabRippleColor="@android:color/transparent" />
 
     <androidx.viewpager.widget.ViewPager

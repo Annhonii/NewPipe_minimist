@@ -1,0 +1,2 @@
+Copy your Ntype82 font file here and name it exactly: ntype82.ttf
+(ntype82.otf also works). Until it exists, titles use the normal app font.

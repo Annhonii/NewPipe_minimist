@@ -41,6 +41,17 @@ public class VideoInfoBottomSheet extends BottomSheetDialogFragment {
     private FragmentManager.OnBackStackChangedListener backStackListener;
     private int initialBackStackCount;
 
+    /** Closes the comments / description sheet if one is currently open. */
+    public static void dismissIfShown(@NonNull final FragmentManager fm) {
+        if (fm.isStateSaved()) {
+            return;
+        }
+        final androidx.fragment.app.Fragment f = fm.findFragmentByTag(TAG);
+        if (f instanceof VideoInfoBottomSheet) {
+            ((VideoInfoBottomSheet) f).dismissAllowingStateLoss();
+        }
+    }
+
     public static void showComments(@NonNull final FragmentManager fm, final int serviceId,
                                     final String url, final String title,
                                     final int topOffset) {

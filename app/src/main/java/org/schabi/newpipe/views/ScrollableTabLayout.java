@@ -17,6 +17,7 @@ public class ScrollableTabLayout extends TabLayout {
 
     private int layoutWidth = 0;
     private int prevVisibility = View.GONE;
+    private boolean fixedModeOnly = false;
 
     public ScrollableTabLayout(final Context context) {
         super(context);
@@ -85,6 +86,22 @@ public class ScrollableTabLayout extends TabLayout {
         }
     }
 
+    /**
+     * Keep the tabs equally spread over the whole width and never scroll them. Used by the
+     * floating nav pill (icon-only tabs), where scrolling made the selection pill glitch on the
+     * last tab.
+     *
+     * @param fixedOnly true to always use {@link TabLayout#MODE_FIXED}
+     */
+    public void setFixedModeOnly(final boolean fixedOnly) {
+        fixedModeOnly = fixedOnly;
+        if (fixedOnly) {
+            setMode(MODE_FIXED);
+        } else {
+            remeasureTabs();
+        }
+    }
+
     private void setMode(final int mode) {
         if (mode == getTabMode()) {
             return;
@@ -108,6 +125,10 @@ public class ScrollableTabLayout extends TabLayout {
      * Calculate minimal width required by tabs and set tabMode accordingly.
      */
     private void remeasureTabs() {
+        if (fixedModeOnly) {
+            setMode(MODE_FIXED);
+            return;
+        }
         if (prevVisibility != View.VISIBLE) {
             return;
         }

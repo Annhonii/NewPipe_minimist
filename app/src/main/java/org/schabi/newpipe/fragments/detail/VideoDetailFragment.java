@@ -1746,7 +1746,77 @@ public final class VideoDetailFragment
                 noVideoStreams ? R.drawable.ic_headset_shadow : R.drawable.ic_play_arrow_shadow);
     }
 
+    private Disposable subscribeStateDisposable = null;
+    private boolean uploaderSubscribed = false;
+
+    /** Shows the subscribe button next to the channel name and keeps its state up to date. */
+    private void setupSubscribeButton(final StreamInfo info) {
+        final org.schabi.newpipe.views.NewPipeTextView button = binding.detailSubscribeButton;
+        if (button == null) {
+            return;
+        }
+        final String channelUrl = info.getUploaderUrl();
+        if (subscribeStateDisposable != null) {
+            subscribeStateDisposable.dispose();
+            subscribeStateDisposable = null;
+        }
+        if (isEmpty(channelUrl)) {
+            button.setVisibility(View.GONE);
+            return;
+        }
+        button.setVisibility(View.VISIBLE);
+        final org.schabi.newpipe.local.subscription.SubscriptionManager manager =
+                new org.schabi.newpipe.local.subscription.SubscriptionManager(requireContext());
+        final int channelServiceId = info.getServiceId();
+
+        subscribeStateDisposable = manager.subscriptionTable()
+                .getSubscriptionFlowable(channelServiceId, channelUrl)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(list -> updateSubscribeButton(!list.isEmpty()), throwable -> { });
+        disposables.add(subscribeStateDisposable);
+
+        button.setOnClickListener(v -> {
+            final Disposable d;
+            if (uploaderSubscribed) {
+                d = manager.deleteSubscription(channelServiceId, channelUrl)
+                        .subscribe(() -> Toast.makeText(requireContext(),
+                                R.string.channel_unsubscribed, Toast.LENGTH_SHORT).show(),
+                                throwable -> Toast.makeText(requireContext(),
+                                        R.string.subscription_change_failed,
+                                        Toast.LENGTH_SHORT).show());
+            } else {
+                final org.schabi.newpipe.database.subscription.SubscriptionEntity entity =
+                        new org.schabi.newpipe.database.subscription.SubscriptionEntity();
+                entity.setServiceId(channelServiceId);
+                entity.setUrl(channelUrl);
+                entity.setName(info.getUploaderName());
+                entity.setAvatarUrl(org.schabi.newpipe.util.image.ImageStrategy
+                        .imageListToDbUrl(info.getUploaderAvatars()));
+                d = io.reactivex.rxjava3.core.Completable
+                        .fromAction(() -> manager.insertSubscription(entity))
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(() -> { },
+                                throwable -> Toast.makeText(requireContext(),
+                                        R.string.subscription_change_failed,
+                                        Toast.LENGTH_SHORT).show());
+            }
+            disposables.add(d);
+        });
+    }
+
+    private void updateSubscribeButton(final boolean subscribed) {
+        uploaderSubscribed = subscribed;
+        if (binding == null || binding.detailSubscribeButton == null) {
+            return;
+        }
+        binding.detailSubscribeButton.setText(subscribed
+                ? R.string.subscribed_button_title : R.string.subscribe_button_title);
+        binding.detailSubscribeButton.setAlpha(subscribed ? 0.6f : 1f);
+    }
+
     private void displayUploaderAsSubChannel(final StreamInfo info) {
+        setupSubscribeButton(info);
         binding.detailSubChannelTextView.setText(info.getUploaderName());
         binding.detailSubChannelTextView.setVisibility(View.VISIBLE);
         binding.detailSubChannelTextView.setSelected(true);
@@ -1766,6 +1836,7 @@ public final class VideoDetailFragment
     }
 
     private void displayBothUploaderAndSubChannel(final StreamInfo info) {
+        setupSubscribeButton(info);
         binding.detailSubChannelTextView.setText(info.getSubChannelName());
         binding.detailSubChannelTextView.setVisibility(View.VISIBLE);
         binding.detailSubChannelTextView.setSelected(true);
@@ -2530,6 +2601,8 @@ public final class VideoDetailFragment
                         setOverlayLook(binding.appBarLayout, behavior, 1);
                         break;
                     case BottomSheetBehavior.STATE_COLLAPSED:
+                        // comments / description must not stay open over the mini player
+                        VideoInfoBottomSheet.dismissIfShown(getChildFragmentManager());
                         moveFocusToMainFragment(true);
                         manageSpaceAtTheBottom(false);
 
@@ -2598,8 +2671,8 @@ public final class VideoDetailFragment
                                    @NonNull final List<Image> thumbnails) {
         binding.overlayTitleTextView.setText(isEmpty(overlayTitle) ? "" : overlayTitle);
         binding.overlayChannelTextView.setText(isEmpty(uploader) ? "" : uploader);
+        // the live video is shown in the mini player, so no thumbnail is loaded behind it
         binding.overlayThumbnail.setImageDrawable(null);
-        CoilHelper.INSTANCE.loadDetailsThumbnail(binding.overlayThumbnail, thumbnails);
     }
 
     private void setOverlayPlayPauseImage(final boolean playerIsPlaying) {
@@ -2682,6 +2755,39 @@ public final class VideoDetailFragment
             binding.miniPlayerCardBg.setAlpha(1f - slide);
             binding.miniPlayerCardBg.setVisibility(slide >= 1f ? View.INVISIBLE : View.VISIBLE);
         }
+        updateMiniPlayerCornerMask(slide, width, height);
+    }
+
+    /** Gives the minimised video smooth rounded corners (all four, like the card). */
+    private void updateMiniPlayerCornerMask(final float slide, final int videoWidth,
+                                            final int videoHeight) {
+        final org.schabi.newpipe.views.MiniPlayerCornerMask mask = binding.miniPlayerCornerMask;
+        if (mask == null) {
+            return;
+        }
+        final View root = binding.getRoot();
+        if (slide >= 1f || videoWidth <= 0 || videoHeight <= 0 || root.getWidth() <= 0) {
+            mask.setVisibility(View.INVISIBLE);
+            return;
+        }
+        final float margin = getResources().getDimension(R.dimen.mini_player_margin);
+        final float cardHeight = getResources().getDimension(R.dimen.mini_player_height);
+        final float pad = margin / 4f;
+        final float cardRadius = 14 * getResources().getDisplayMetrics().density;
+        final float videoRadius = Math.max(0f, cardRadius - pad);
+
+        final View video = binding.detailThumbnailRootLayout;
+        final float left = video.getTranslationX();
+        final float top = video.getTranslationY();
+        final float right = left + videoWidth * video.getScaleX();
+        final float bottom = top + videoHeight * video.getScaleY();
+
+        mask.setColor(org.schabi.newpipe.util.ThemeHelper.resolveColorFromAttr(
+                requireContext(), R.attr.card_item_background_color));
+        mask.setGeometry(margin, 0f, root.getWidth() - margin, cardHeight, cardRadius,
+                left, top, right, bottom, videoRadius);
+        mask.setAlpha(1f - slide);
+        mask.setVisibility(View.VISIBLE);
     }
 
     private void setOverlayElementsClickable(final boolean enable) {

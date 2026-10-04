@@ -1527,4 +1527,5 @@
         <item>@string/image_quality_medium_key</item>
         <item>@string/image_quality_high_key</item>
     </string-array>
+    <string name="use_device_font_key" translatable="false">use_device_font</string>
 </resources>

@@ -1,7 +1,6 @@
 package org.schabi.newpipe.local.downloads;
 
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
@@ -12,23 +11,18 @@ import android.text.format.Formatter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.MimeTypeMap;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.content.FileProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import org.schabi.newpipe.BaseFragment;
-import org.schabi.newpipe.BuildConfig;
 import org.schabi.newpipe.R;
 
-import java.io.File;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -133,31 +127,43 @@ public class DownloadsFragment extends BaseFragment {
         return mission.kind == 'a';
     }
 
+    /** Plays the downloaded file in the app's own player. */
     private void open(@NonNull final FinishedMission mission) {
         try {
-            final Uri uri;
-            if (mission.storage.isDirect()) {
-                uri = FileProvider.getUriForFile(requireContext(),
-                        BuildConfig.APPLICATION_ID + ".provider",
-                        new File(URI.create(mission.storage.getUri().toString())));
-            } else {
-                uri = mission.storage.getUri();
-            }
-            String mime = mission.storage.getType();
-            if (mime == null || mime.isEmpty() || mime.equals("application/octet-stream")) {
-                final String name = mission.storage.getName();
-                final int dot = name == null ? -1 : name.lastIndexOf('.');
-                mime = dot < 0 ? null : MimeTypeMap.getSingleton()
-                        .getMimeTypeFromExtension(name.substring(dot + 1));
-            }
-            final Intent view = new Intent(Intent.ACTION_VIEW);
-            view.setDataAndType(uri, mime == null ? "video/*" : mime);
-            view.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            startActivity(Intent.createChooser(view, null));
+            final Uri uri = mission.storage.getUri();
+            LocalPlayerActivity.start(requireContext(), uri, titleOf(mission));
         } catch (final Exception e) {
             Toast.makeText(requireContext(), R.string.downloads_cannot_open,
                     Toast.LENGTH_SHORT).show();
         }
+    }
+
+    /** Asks for confirmation, then removes the file from storage and the downloads list. */
+    private void confirmDelete(@NonNull final FinishedMission mission) {
+        new androidx.appcompat.app.AlertDialog.Builder(requireContext())
+                .setTitle(R.string.delete_file)
+                .setMessage(titleOf(mission))
+                .setNegativeButton(R.string.cancel, null)
+                .setPositiveButton(R.string.delete, (dialog, which) -> delete(mission))
+                .show();
+    }
+
+    private void delete(@NonNull final FinishedMission mission) {
+        final Context appContext = requireContext().getApplicationContext();
+        executor.execute(() -> {
+            try {
+                mission.storage.delete();
+                new FinishedMissionStore(appContext).deleteMission(mission);
+            } catch (final Exception ignored) {
+                // reload() below only lists files that still exist
+            }
+            mainHandler.post(() -> {
+                if (!destroyed && adapter != null) {
+                    thumbCache.remove(String.valueOf(mission.storage.getUri()));
+                    reload();
+                }
+            });
+        });
     }
 
     private final class DownloadsAdapter extends RecyclerView.Adapter<DownloadViewHolder> {
@@ -177,6 +183,11 @@ public class DownloadsFragment extends BaseFragment {
             holder.info.setText(Formatter.formatFileSize(holder.itemView.getContext(),
                     mission.length));
             holder.itemView.setOnClickListener(v -> open(mission));
+            holder.itemView.setOnLongClickListener(v -> {
+                confirmDelete(mission);
+                return true;
+            });
+            holder.delete.setOnClickListener(v -> confirmDelete(mission));
 
             final String key = String.valueOf(mission.storage.getUri());
             holder.boundKey = key;
@@ -245,6 +256,7 @@ public class DownloadsFragment extends BaseFragment {
         final ImageView thumb;
         final TextView title;
         final TextView info;
+        final View delete;
         String boundKey;
 
         DownloadViewHolder(@NonNull final View itemView) {
@@ -252,6 +264,7 @@ public class DownloadsFragment extends BaseFragment {
             thumb = itemView.findViewById(R.id.download_thumbnail);
             title = itemView.findViewById(R.id.download_title);
             info = itemView.findViewById(R.id.download_info);
+            delete = itemView.findViewById(R.id.download_delete);
         }
     }
 }

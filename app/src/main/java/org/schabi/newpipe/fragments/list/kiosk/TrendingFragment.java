@@ -23,14 +23,19 @@ import org.schabi.newpipe.util.ServiceHelper;
  */
 public class TrendingFragment extends BaseFragment {
     private static final int[] TAB_TITLES = {
+            R.string.trending,
             R.string.duration_live,
+            R.string.trending_music,
             R.string.trending_gaming,
             R.string.trending_movies,
             R.string.trending_podcasts
     };
     // null = the default kiosk of the service, the others are search based
+    // (YouTube retired its own Trending page in July 2025, so "trending" is a search too)
     private static final String[] TAB_QUERIES = {
+            "trending now",
             null,
+            "trending music videos",
             "gaming trending",
             "new movie trailers trending",
             "trending podcast"

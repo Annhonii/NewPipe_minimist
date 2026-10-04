@@ -166,4 +166,10 @@
 
     <style name="RouterActivityThemeDark" parent="Base.RouterActivityThemeDark" />
 
+
+    <!-- Applied on top of the theme when "Use device default font" is on -->
+    <style name="DeviceFontOverlay">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="fontFamily">sans-serif</item>
+    </style>
 </resources>

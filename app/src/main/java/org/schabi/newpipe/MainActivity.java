@@ -177,6 +177,8 @@ public class MainActivity extends AppCompatActivity {
         }
 
         setSupportActionBar(toolbarLayoutBinding.toolbar);
+        org.schabi.newpipe.util.FontHelper.installToolbarTitleFont(
+                toolbarLayoutBinding.toolbar);
         try {
             setupDrawer();
         } catch (final Exception e) {

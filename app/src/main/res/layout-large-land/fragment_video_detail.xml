@@ -296,8 +296,9 @@
                                 </FrameLayout>
 
                                 <LinearLayout
-                                    android:layout_width="match_parent"
+                                    android:layout_width="0dp"
                                     android:layout_height="match_parent"
+                                    android:layout_weight="1"
                                     android:gravity="center_vertical"
                                     android:orientation="vertical">
 
@@ -331,6 +332,21 @@
                                         tools:ignore="RtlHardcoded"
                                         tools:text="Uploader" />
                                 </LinearLayout>
+
+                                <org.schabi.newpipe.views.NewPipeTextView
+                                    android:id="@+id/detail_subscribe_button"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="36dp"
+                                    android:layout_marginStart="8dp"
+                                    android:background="@drawable/bg_like_pill"
+                                    android:clickable="true"
+                                    android:focusable="true"
+                                    android:gravity="center"
+                                    android:paddingHorizontal="16dp"
+                                    android:text="@string/subscribe_button_title"
+                                    android:textSize="13sp"
+                                    android:textStyle="bold"
+                                    android:visibility="gone" />
 
                             </LinearLayout>
 
@@ -444,9 +460,7 @@
                                 android:drawableTop="@drawable/ic_playlist_add"
                                 android:focusable="true"
                                 android:gravity="center"
-                                android:paddingVertical="@dimen/detail_control_padding"
-                                android:text="@string/controls_add_to_playlist_title"
-                                android:textSize="@dimen/detail_control_text_size" />
+                                android:paddingVertical="@dimen/detail_control_padding" />
 
                             <org.schabi.newpipe.views.NewPipeTextView
                                 android:id="@+id/detail_controls_background"
@@ -460,9 +474,7 @@
                                 android:drawableTop="@drawable/ic_headset"
                                 android:focusable="true"
                                 android:gravity="center"
-                                android:paddingVertical="@dimen/detail_control_padding"
-                                android:text="@string/controls_background_title"
-                                android:textSize="@dimen/detail_control_text_size" />
+                                android:paddingVertical="@dimen/detail_control_padding" />
 
                             <org.schabi.newpipe.views.NewPipeTextView
                                 android:id="@+id/detail_controls_popup"
@@ -476,9 +488,7 @@
                                 android:drawableTop="@drawable/ic_picture_in_picture"
                                 android:focusable="true"
                                 android:gravity="center"
-                                android:paddingVertical="@dimen/detail_control_padding"
-                                android:text="@string/controls_popup_title"
-                                android:textSize="@dimen/detail_control_text_size" />
+                                android:paddingVertical="@dimen/detail_control_padding" />
 
                             <org.schabi.newpipe.views.NewPipeTextView
                                 android:id="@+id/detail_controls_download"
@@ -492,9 +502,7 @@
                                 android:drawableTop="@drawable/ic_file_download"
                                 android:focusable="true"
                                 android:gravity="center"
-                                android:paddingVertical="@dimen/detail_control_padding"
-                                android:text="@string/download"
-                                android:textSize="@dimen/detail_control_text_size" />
+                                android:paddingVertical="@dimen/detail_control_padding" />
 
                         </LinearLayout>
 
@@ -633,6 +641,13 @@
             android:layout_weight="3" />
     </LinearLayout>
 
+
+    <org.schabi.newpipe.views.MiniPlayerCornerMask
+        android:id="@+id/mini_player_corner_mask"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/mini_player_height"
+        android:alpha="0"
+        android:visibility="invisible" />
 
     <RelativeLayout
         android:id="@+id/overlay_layout"

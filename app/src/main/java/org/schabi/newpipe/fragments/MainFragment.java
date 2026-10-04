@@ -101,6 +101,8 @@ public class MainFragment extends BaseFragment implements TabLayout.OnTabSelecte
 
         binding = FragmentMainBinding.bind(rootView);
 
+        // icon-only floating pill: tabs always share the width, no scrolling
+        binding.mainTabLayout.setFixedModeOnly(true);
         binding.mainTabLayout.setupWithViewPager(binding.pager);
         binding.mainTabLayout.addOnTabSelectedListener(this);
 
