@@ -117,6 +117,7 @@ import org.schabi.newpipe.util.NavigationHelper;
 import org.schabi.newpipe.util.PermissionHelper;
 import org.schabi.newpipe.util.PlayButtonHelper;
 import org.schabi.newpipe.util.StreamTypeUtil;
+import org.schabi.newpipe.util.SystemInsets;
 import org.schabi.newpipe.util.ThemeHelper;
 import org.schabi.newpipe.util.external_communication.KoreUtils;
 import org.schabi.newpipe.util.external_communication.ShareUtils;
@@ -688,6 +689,7 @@ public final class VideoDetailFragment
         });
 
         setupBottomPlayer();
+        onSystemInsetsChanged();
         if (!playerHolder.isBound()) {
             setHeightThumbnail();
         } else {
@@ -1642,20 +1644,23 @@ public final class VideoDetailFragment
             displayUploaderAsSubChannel(info);
         }
 
-        if (info.getViewCount() >= 0) {
-            if (info.getStreamType().equals(StreamType.AUDIO_LIVE_STREAM)) {
-                binding.detailViewCountView.setText(Localization.listeningCount(activity,
-                        info.getViewCount()));
-            } else if (info.getStreamType().equals(StreamType.LIVE_STREAM)) {
-                binding.detailViewCountView.setText(Localization
-                        .localizeWatchingCount(activity, info.getViewCount()));
+        // the phone layout shows the views count inside the description only
+        if (binding.detailViewCountView != null) {
+            if (info.getViewCount() >= 0) {
+                if (info.getStreamType().equals(StreamType.AUDIO_LIVE_STREAM)) {
+                    binding.detailViewCountView.setText(Localization.listeningCount(activity,
+                            info.getViewCount()));
+                } else if (info.getStreamType().equals(StreamType.LIVE_STREAM)) {
+                    binding.detailViewCountView.setText(Localization
+                            .localizeWatchingCount(activity, info.getViewCount()));
+                } else {
+                    binding.detailViewCountView.setText(Localization
+                            .localizeViewCount(activity, info.getViewCount()));
+                }
+                binding.detailViewCountView.setVisibility(View.VISIBLE);
             } else {
-                binding.detailViewCountView.setText(Localization
-                        .localizeViewCount(activity, info.getViewCount()));
+                binding.detailViewCountView.setVisibility(View.GONE);
             }
-            binding.detailViewCountView.setVisibility(View.VISIBLE);
-        } else {
-            binding.detailViewCountView.setVisibility(View.GONE);
         }
 
         if (info.getDislikeCount() == -1 && info.getLikeCount() == -1) {
@@ -2135,7 +2140,7 @@ public final class VideoDetailFragment
                 (CoordinatorLayout.LayoutParams) binding.appBarLayout.getLayoutParams();
         final AppBarLayout.Behavior behavior = (AppBarLayout.Behavior) params.getBehavior();
         final ValueAnimator valueAnimator = ValueAnimator
-                .ofInt(0, -binding.playerPlaceholder.getHeight());
+                .ofInt(0, -binding.detailContentRootLayout.getHeight());
         valueAnimator.setInterpolator(new DecelerateInterpolator());
         valueAnimator.addUpdateListener(animation -> {
             behavior.setTopAndBottomOffset((int) animation.getAnimatedValue());
@@ -2164,10 +2169,17 @@ public final class VideoDetailFragment
             activity.getWindow().getAttributes().layoutInDisplayCutoutMode =
                     WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_DEFAULT;
         }
-        activity.getWindow().getDecorView().setSystemUiVisibility(0);
+        // bring the bars back but keep drawing behind them (the app is edge-to-edge)
         activity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        activity.getWindow().setStatusBarColor(ThemeHelper.resolveColorFromAttr(
-                requireContext(), android.R.attr.colorPrimary));
+        androidx.core.view.WindowCompat.setDecorFitsSystemWindows(activity.getWindow(), false);
+        final androidx.core.view.WindowInsetsControllerCompat controller =
+                androidx.core.view.WindowCompat.getInsetsController(activity.getWindow(),
+                        activity.getWindow().getDecorView());
+        if (controller != null) {
+            controller.show(androidx.core.view.WindowInsetsCompat.Type.systemBars());
+        }
+        activity.getWindow().setStatusBarColor(Color.TRANSPARENT);
+        activity.getWindow().setNavigationBarColor(Color.TRANSPARENT);
     }
 
     private void hideSystemUi() {
@@ -2497,7 +2509,7 @@ public final class VideoDetailFragment
         final int below = isNavPillVisible()
                 ? getResources().getDimensionPixelSize(R.dimen.mini_player_pill_space)
                 : margin;
-        return card + below;
+        return card + below + SystemInsets.getBottom();
     }
 
     /** Re-applies peek height and bottom space, e.g. after the visible page changed. */
@@ -2525,7 +2537,7 @@ public final class VideoDetailFragment
         final ViewGroup holder = requireActivity().findViewById(R.id.fragment_holder);
         final boolean pill = isNavPillVisible();
 
-        final int holderPadding = showMore || pill ? 0 : space;
+        final int holderPadding = (showMore || pill ? 0 : space) + SystemInsets.getBottom();
         if (holder.getPaddingBottom() != holderPadding) {
             holder.setPadding(holder.getPaddingLeft(),
                     holder.getPaddingTop(),
@@ -2538,6 +2550,36 @@ public final class VideoDetailFragment
         if (current instanceof MainFragment) {
             ((MainFragment) current).setMiniPlayerInset(showMore ? 0 : space);
         }
+    }
+
+    private float lastMiniSlide = 1f;
+
+    /**
+     * Called when the system bars changed size (app is drawn edge-to-edge): keeps the video
+     * below the status bar and the mini player above the navigation bar.
+     */
+    public void onSystemInsetsChanged() {
+        if (binding == null) {
+            return;
+        }
+        final View spacer = binding.detailStatusSpacer;
+        if (spacer != null) {
+            final ViewGroup.LayoutParams lp = spacer.getLayoutParams();
+            if (lp.height != SystemInsets.getTop()) {
+                lp.height = SystemInsets.getTop();
+                spacer.setLayoutParams(lp);
+            }
+        }
+        if (binding.detailScrollCoordinator != null
+                && binding.detailScrollCoordinator.getPaddingBottom() != SystemInsets.getBottom()) {
+            binding.detailScrollCoordinator.setPadding(0, 0, 0, SystemInsets.getBottom());
+        }
+        refreshMiniPlayerSpace();
+        binding.getRoot().post(() -> {
+            if (binding != null) {
+                applyMiniPlayerLook(lastMiniSlide);
+            }
+        });
     }
 
     private void setupBottomPlayer() {
@@ -2618,6 +2660,9 @@ public final class VideoDetailFragment
                         break;
                     case BottomSheetBehavior.STATE_DRAGGING:
                     case BottomSheetBehavior.STATE_SETTLING:
+                        // the player is being minimised: comments / description must go away
+                        // right now, not only once the mini player has settled
+                        VideoInfoBottomSheet.dismissIfShown(getChildFragmentManager());
                         if (isFullscreen()) {
                             showSystemUi();
                         }
@@ -2636,6 +2681,9 @@ public final class VideoDetailFragment
 
             @Override
             public void onSlide(@NonNull final View bottomSheet, final float slideOffset) {
+                if (slideOffset < 0.95f) {
+                    VideoInfoBottomSheet.dismissIfShown(getChildFragmentManager());
+                }
                 setOverlayLook(binding.appBarLayout, behavior, slideOffset);
             }
         };
@@ -2709,6 +2757,7 @@ public final class VideoDetailFragment
             return;
         }
         final float slide = Math.max(0f, Math.min(1f, rawSlide));
+        lastMiniSlide = slide;
         final View video = binding.detailThumbnailRootLayout;
         final int width = video.getWidth();
         final int height = video.getHeight();
@@ -2722,7 +2771,8 @@ public final class VideoDetailFragment
         } else if (width > 0 && height > 0) {
             final float margin = getResources().getDimension(R.dimen.mini_player_margin);
             final float cardHeight = getResources().getDimension(R.dimen.mini_player_height);
-            final float pad = margin / 4f;
+            // the video sits flush in the card (no gap), so its outer corners follow the card
+            final float pad = 0f;
             final float targetWidth = getResources()
                     .getDimension(R.dimen.mini_player_video_width) - 2 * pad;
             final float miniScale = Math.min(targetWidth / width,
@@ -2734,13 +2784,15 @@ public final class VideoDetailFragment
             video.setScaleX(scale);
             video.setScaleY(scale);
             video.setTranslationX((margin + pad) * (1f - slide));
-            video.setTranslationY(((cardHeight - height * miniScale) / 2f) * (1f - slide));
+            // the video's layout top is below the status bar strip: compensate for it
+            video.setTranslationY(((cardHeight - height * miniScale) / 2f - video.getTop())
+                    * (1f - slide));
         }
 
         // the rest of the page fades out; invisible views can't steal touches from the card
         final int restVisibility = slide <= 0f ? View.INVISIBLE : View.VISIBLE;
         for (final View rest : new View[] {binding.detailContentRootLayout, binding.viewPager,
-                binding.tabLayout, binding.relatedItemsLayout}) {
+                binding.tabLayout, binding.relatedItemsLayout, binding.detailStatusSpacer}) {
             if (rest != null) {
                 rest.setAlpha(slide);
                 rest.setVisibility(restVisibility);
@@ -2772,17 +2824,18 @@ public final class VideoDetailFragment
         }
         final float margin = getResources().getDimension(R.dimen.mini_player_margin);
         final float cardHeight = getResources().getDimension(R.dimen.mini_player_height);
-        final float pad = margin / 4f;
+        // smooth corners on the left AND right: the video is flush in the card, so both of its
+        // left corners use the card radius, and its right corners are rounded the same way
         final float cardRadius = 14 * getResources().getDisplayMetrics().density;
-        final float videoRadius = Math.max(0f, cardRadius - pad);
+        final float videoRadius = cardRadius;
 
         final View video = binding.detailThumbnailRootLayout;
         final float left = video.getTranslationX();
-        final float top = video.getTranslationY();
+        final float top = video.getTop() + video.getTranslationY();
         final float right = left + videoWidth * video.getScaleX();
         final float bottom = top + videoHeight * video.getScaleY();
 
-        mask.setColor(org.schabi.newpipe.util.ThemeHelper.resolveColorFromAttr(
+        mask.setColor(ThemeHelper.resolveColorFromAttr(
                 requireContext(), R.attr.card_item_background_color));
         mask.setGeometry(margin, 0f, root.getWidth() - margin, cardHeight, cardRadius,
                 left, top, right, bottom, videoRadius);

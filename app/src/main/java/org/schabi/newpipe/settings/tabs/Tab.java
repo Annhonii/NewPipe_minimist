@@ -26,7 +26,6 @@ import org.schabi.newpipe.fragments.list.kiosk.KioskFragment;
 import org.schabi.newpipe.fragments.list.kiosk.TrendingFragment;
 import org.schabi.newpipe.fragments.list.playlist.PlaylistFragment;
 import org.schabi.newpipe.local.bookmark.BookmarkFragment;
-import org.schabi.newpipe.local.downloads.DownloadsFragment;
 import org.schabi.newpipe.local.feed.FeedFragment;
 import org.schabi.newpipe.local.history.StatisticsPlaylistFragment;
 import org.schabi.newpipe.local.playlist.LocalPlaylistFragment;
@@ -35,6 +34,8 @@ import org.schabi.newpipe.util.KioskTranslator;
 import org.schabi.newpipe.util.ServiceHelper;
 
 import java.util.Objects;
+
+import us.shandian.giga.ui.fragment.MissionsFragment;
 
 public abstract class Tab {
     private static final String JSON_TAB_ID_KEY = "tab_id";
@@ -284,8 +285,9 @@ public abstract class Tab {
         }
 
         @Override
-        public DownloadsFragment getFragment(final Context context) {
-            return new DownloadsFragment();
+        public MissionsFragment getFragment(final Context context) {
+            // NewPipe's own downloads page (live progress, pause/resume, ...)
+            return new MissionsFragment();
         }
     }
 

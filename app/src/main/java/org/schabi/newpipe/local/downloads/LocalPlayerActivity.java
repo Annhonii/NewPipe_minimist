@@ -51,11 +51,14 @@ public class LocalPlayerActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(@Nullable final Bundle savedInstanceState) {
+        org.schabi.newpipe.util.ThemeHelper.setTheme(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_local_player);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         playerView = findViewById(R.id.local_player_view);
+        final android.widget.TextView titleView = findViewById(R.id.local_player_title);
+        titleView.setText(getIntent().getStringExtra(EXTRA_TITLE));
         uri = getIntent().getData();
         if (uri == null) {
             finish();
@@ -65,7 +68,7 @@ public class LocalPlayerActivity extends AppCompatActivity {
             resumePosition = savedInstanceState.getLong(STATE_POSITION, 0);
             playWhenReady = savedInstanceState.getBoolean(STATE_PLAY_WHEN_READY, true);
         }
-        hideSystemUi();
+        applySystemUi();
     }
 
     @Override
@@ -112,7 +115,7 @@ public class LocalPlayerActivity extends AppCompatActivity {
     public void onWindowFocusChanged(final boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
         if (hasFocus) {
-            hideSystemUi();
+            applySystemUi();
         }
     }
 
@@ -126,15 +129,45 @@ public class LocalPlayerActivity extends AppCompatActivity {
         }
     }
 
-    private void hideSystemUi() {
-        WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
-        final View decor = getWindow().getDecorView();
+    private boolean isLandscape() {
+        return getResources().getConfiguration().orientation
+                == android.content.res.Configuration.ORIENTATION_LANDSCAPE;
+    }
+
+    /**
+     * Portrait: same look as the online player page (status bar visible, video on top).
+     * Landscape: bars hidden, the video fills the screen.
+     */
+    private void applySystemUi() {
+        final android.view.Window window = getWindow();
+        WindowCompat.setDecorFitsSystemWindows(window, false);
+        window.setStatusBarColor(android.graphics.Color.TRANSPARENT);
+        window.setNavigationBarColor(android.graphics.Color.TRANSPARENT);
         final WindowInsetsControllerCompat controller =
-                WindowCompat.getInsetsController(getWindow(), decor);
-        if (controller != null) {
-            controller.setSystemBarsBehavior(
-                    WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
-            controller.hide(WindowInsetsCompat.Type.systemBars());
+                WindowCompat.getInsetsController(window, window.getDecorView());
+        final View spacer = findViewById(R.id.local_player_status_spacer);
+
+        if (isLandscape()) {
+            if (controller != null) {
+                controller.setSystemBarsBehavior(
+                        WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
+                controller.hide(WindowInsetsCompat.Type.systemBars());
+            }
+            return;
         }
+        if (controller != null) {
+            controller.show(WindowInsetsCompat.Type.systemBars());
+        }
+        androidx.core.view.ViewCompat.setOnApplyWindowInsetsListener(
+                findViewById(android.R.id.content), (v, insets) -> {
+                    final int top = insets.getInsets(WindowInsetsCompat.Type.systemBars()).top;
+                    final android.view.ViewGroup.LayoutParams lp = spacer.getLayoutParams();
+                    if (lp.height != top) {
+                        lp.height = top;
+                        spacer.setLayoutParams(lp);
+                    }
+                    return insets;
+                });
+        androidx.core.view.ViewCompat.requestApplyInsets(findViewById(android.R.id.content));
     }
 }

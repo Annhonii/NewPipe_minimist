@@ -51,7 +51,11 @@ import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.graphics.Insets;
 import androidx.core.view.GravityCompat;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentContainerView;
@@ -94,6 +98,7 @@ import org.schabi.newpipe.util.ReleaseVersionUtil;
 import org.schabi.newpipe.util.SerializedCache;
 import org.schabi.newpipe.util.ServiceHelper;
 import org.schabi.newpipe.util.StateSaver;
+import org.schabi.newpipe.util.SystemInsets;
 import org.schabi.newpipe.util.ThemeHelper;
 import org.schabi.newpipe.util.external_communication.ShareUtils;
 import org.schabi.newpipe.views.FocusOverlayView;
@@ -171,6 +176,7 @@ public class MainActivity extends AppCompatActivity {
                 .getHeaderView(0));
         toolbarLayoutBinding = mainBinding.toolbarLayout;
         setContentView(mainBinding.getRoot());
+        setupEdgeToEdge();
 
         if (getSupportFragmentManager().getBackStackEntryCount() == 0) {
             initFragments();
@@ -209,6 +215,65 @@ public class MainActivity extends AppCompatActivity {
         }
 
         MigrationManager.showUserInfoIfPresent(this);
+    }
+
+    /*//////////////////////////////////////////////////////////////////////////
+    // Edge-to-edge (the app draws behind the status and navigation bars)
+    //////////////////////////////////////////////////////////////////////////*/
+
+    private int baseHolderTopMargin = -1;
+
+    private void setupEdgeToEdge() {
+        final android.view.Window window = getWindow();
+        WindowCompat.setDecorFitsSystemWindows(window, false);
+        window.setStatusBarColor(android.graphics.Color.TRANSPARENT);
+        window.setNavigationBarColor(android.graphics.Color.TRANSPARENT);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            window.setNavigationBarContrastEnforced(false);
+            window.setStatusBarContrastEnforced(false);
+        }
+
+        ViewCompat.setOnApplyWindowInsetsListener(mainBinding.getRoot(), (view, insets) -> {
+            final Insets bars = insets.getInsets(WindowInsetsCompat.Type.systemBars()
+                    | WindowInsetsCompat.Type.displayCutout());
+            SystemInsets.set(bars.top, bars.bottom);
+            applySystemInsets();
+            // not consumed: the drawer etc. still get the insets
+            return insets;
+        });
+        ViewCompat.requestApplyInsets(mainBinding.getRoot());
+    }
+
+    private void applySystemInsets() {
+        final int top = SystemInsets.getTop();
+
+        // toolbar sits below the status bar
+        toolbarLayoutBinding.getRoot().setPadding(0, top, 0, 0);
+
+        // page content starts below the toolbar
+        final View holder = findViewById(R.id.fragment_holder);
+        if (holder != null && holder.getLayoutParams()
+                instanceof android.view.ViewGroup.MarginLayoutParams) {
+            final android.view.ViewGroup.MarginLayoutParams lp =
+                    (android.view.ViewGroup.MarginLayoutParams) holder.getLayoutParams();
+            if (baseHolderTopMargin < 0) {
+                baseHolderTopMargin = lp.topMargin;
+            }
+            if (lp.topMargin != baseHolderTopMargin + top) {
+                lp.topMargin = baseHolderTopMargin + top;
+                holder.setLayoutParams(lp);
+            }
+        }
+
+        // keep pages above the navigation bar; the video page also re-applies its own spacing
+        final Fragment player = getSupportFragmentManager()
+                .findFragmentById(R.id.fragment_player_holder);
+        if (player instanceof VideoDetailFragment) {
+            ((VideoDetailFragment) player).onSystemInsetsChanged();
+        } else if (holder != null && holder.getPaddingBottom() != SystemInsets.getBottom()) {
+            holder.setPadding(holder.getPaddingLeft(), holder.getPaddingTop(),
+                    holder.getPaddingRight(), SystemInsets.getBottom());
+        }
     }
 
     @Override

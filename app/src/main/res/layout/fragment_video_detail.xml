@@ -19,10 +19,147 @@
         android:background="@drawable/bg_mini_player"
         android:visibility="invisible" />
 
-    <androidx.coordinatorlayout.widget.CoordinatorLayout
+    <!-- The video is pinned on top; only the area below it (info, comments card, related
+         videos) scrolls, so scrolling the related videos never moves the player. -->
+    <LinearLayout
         android:id="@+id/detail_main_content"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <!-- Black strip under the status bar (edge-to-edge); its height is set in code -->
+        <View
+            android:id="@+id/detail_status_spacer"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:background="@android:color/black" />
+
+            <!-- THUMBNAIL -->
+            <FrameLayout
+                android:id="@+id/detail_thumbnail_root_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@android:color/black"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackground">
+
+                <ImageView
+                    android:id="@+id/detail_thumbnail_image_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="?windowBackground"
+                    android:contentDescription="@string/detail_thumbnail_view_description"
+                    android:minHeight="200dp"
+                    android:scaleType="fitCenter"
+                    tools:ignore="RtlHardcoded"
+                    tools:layout_height="200dp"
+                    tools:src="@drawable/placeholder_thumbnail_video" />
+
+                <ImageView
+                    android:id="@+id/detail_thumbnail_play_button"
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"
+                    android:layout_gravity="center"
+                    android:background="@android:color/transparent"
+                    android:src="@drawable/ic_play_arrow_shadow"
+                    android:visibility="invisible"
+                    tools:ignore="ContentDescription"
+                    tools:visibility="visible" />
+
+                <org.schabi.newpipe.views.NewPipeTextView
+                    android:id="@+id/touch_append_detail"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:background="#64000000"
+                    android:paddingLeft="30dp"
+                    android:paddingTop="10dp"
+                    android:paddingRight="30dp"
+                    android:paddingBottom="10dp"
+                    android:text="@string/hold_to_append"
+                    android:textColor="@android:color/white"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:visibility="gone"
+                    tools:ignore="RtlHardcoded"
+                    tools:visibility="visible" />
+
+                <org.schabi.newpipe.views.NewPipeTextView
+                    android:id="@+id/detail_duration_view"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom|right"
+                    android:layout_marginLeft="12dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginRight="12dp"
+                    android:layout_marginBottom="8dp"
+                    android:alpha=".6"
+                    android:background="#23000000"
+                    android:gravity="center"
+                    android:paddingLeft="6dp"
+                    android:paddingTop="2dp"
+                    android:paddingRight="6dp"
+                    android:paddingBottom="2dp"
+                    android:textAllCaps="true"
+                    android:textColor="@android:color/white"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:visibility="gone"
+                    tools:ignore="RtlHardcoded"
+                    tools:text="12:38"
+                    tools:visibility="visible" />
+
+                <org.schabi.newpipe.views.NewPipeTextView
+                    android:id="@+id/detail_position_view"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom|left"
+                    android:layout_marginLeft="12dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginRight="12dp"
+                    android:layout_marginBottom="8dp"
+                    android:alpha=".6"
+                    android:background="?colorPrimary"
+                    android:gravity="center"
+                    android:paddingLeft="6dp"
+                    android:paddingTop="2dp"
+                    android:paddingRight="6dp"
+                    android:paddingBottom="2dp"
+                    android:textAllCaps="true"
+                    android:textColor="@android:color/white"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:visibility="gone"
+                    tools:ignore="RtlHardcoded"
+                    tools:text="12:38"
+                    tools:visibility="visible" />
+
+                <org.schabi.newpipe.views.AnimatedProgressBar
+                    android:id="@+id/position_view"
+                    style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="2dp"
+                    android:layout_gravity="bottom"
+                    android:progressDrawable="?attr/progress_horizontal_drawable"
+                    android:visibility="invisible"
+                    tools:max="100"
+                    tools:progress="40"
+                    tools:visibility="visible" />
+
+                <!-- Player will be inserted here in realtime -->
+                <FrameLayout
+                    android:id="@+id/player_placeholder"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+
+            </FrameLayout>
+
+        <androidx.coordinatorlayout.widget.CoordinatorLayout
+            android:id="@+id/detail_scroll_coordinator"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
 
         <com.google.android.material.appbar.AppBarLayout
             android:id="@+id/app_bar_layout"
@@ -31,134 +168,6 @@
             android:background="@android:color/transparent"
             app:elevation="0dp"
             app:layout_behavior="com.google.android.material.appbar.FlingBehavior">
-
-            <org.schabi.newpipe.views.CustomCollapsingToolbarLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:layout_scrollFlags="scroll">
-
-                <!-- THUMBNAIL -->
-                <FrameLayout
-                    android:id="@+id/detail_thumbnail_root_layout"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="@android:color/black"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:foreground="?attr/selectableItemBackground"
-                    app:layout_collapseMode="parallax">
-
-                    <ImageView
-                        android:id="@+id/detail_thumbnail_image_view"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:background="?windowBackground"
-                        android:contentDescription="@string/detail_thumbnail_view_description"
-                        android:minHeight="200dp"
-                        android:scaleType="fitCenter"
-                        tools:ignore="RtlHardcoded"
-                        tools:layout_height="200dp"
-                        tools:src="@drawable/placeholder_thumbnail_video" />
-
-                    <ImageView
-                        android:id="@+id/detail_thumbnail_play_button"
-                        android:layout_width="64dp"
-                        android:layout_height="64dp"
-                        android:layout_gravity="center"
-                        android:background="@android:color/transparent"
-                        android:src="@drawable/ic_play_arrow_shadow"
-                        android:visibility="invisible"
-                        tools:ignore="ContentDescription"
-                        tools:visibility="visible" />
-
-                    <org.schabi.newpipe.views.NewPipeTextView
-                        android:id="@+id/touch_append_detail"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:background="#64000000"
-                        android:paddingLeft="30dp"
-                        android:paddingTop="10dp"
-                        android:paddingRight="30dp"
-                        android:paddingBottom="10dp"
-                        android:text="@string/hold_to_append"
-                        android:textColor="@android:color/white"
-                        android:textSize="20sp"
-                        android:textStyle="bold"
-                        android:visibility="gone"
-                        tools:ignore="RtlHardcoded"
-                        tools:visibility="visible" />
-
-                    <org.schabi.newpipe.views.NewPipeTextView
-                        android:id="@+id/detail_duration_view"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="bottom|right"
-                        android:layout_marginLeft="12dp"
-                        android:layout_marginTop="8dp"
-                        android:layout_marginRight="12dp"
-                        android:layout_marginBottom="8dp"
-                        android:alpha=".6"
-                        android:background="#23000000"
-                        android:gravity="center"
-                        android:paddingLeft="6dp"
-                        android:paddingTop="2dp"
-                        android:paddingRight="6dp"
-                        android:paddingBottom="2dp"
-                        android:textAllCaps="true"
-                        android:textColor="@android:color/white"
-                        android:textSize="12sp"
-                        android:textStyle="bold"
-                        android:visibility="gone"
-                        tools:ignore="RtlHardcoded"
-                        tools:text="12:38"
-                        tools:visibility="visible" />
-
-                    <org.schabi.newpipe.views.NewPipeTextView
-                        android:id="@+id/detail_position_view"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="bottom|left"
-                        android:layout_marginLeft="12dp"
-                        android:layout_marginTop="8dp"
-                        android:layout_marginRight="12dp"
-                        android:layout_marginBottom="8dp"
-                        android:alpha=".6"
-                        android:background="?colorPrimary"
-                        android:gravity="center"
-                        android:paddingLeft="6dp"
-                        android:paddingTop="2dp"
-                        android:paddingRight="6dp"
-                        android:paddingBottom="2dp"
-                        android:textAllCaps="true"
-                        android:textColor="@android:color/white"
-                        android:textSize="12sp"
-                        android:textStyle="bold"
-                        android:visibility="gone"
-                        tools:ignore="RtlHardcoded"
-                        tools:text="12:38"
-                        tools:visibility="visible" />
-
-                    <org.schabi.newpipe.views.AnimatedProgressBar
-                        android:id="@+id/position_view"
-                        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
-                        android:layout_width="match_parent"
-                        android:layout_height="2dp"
-                        android:layout_gravity="bottom"
-                        android:progressDrawable="?attr/progress_horizontal_drawable"
-                        android:visibility="invisible"
-                        tools:max="100"
-                        tools:progress="40"
-                        tools:visibility="visible" />
-
-                    <!-- Player will be inserted here in realtime -->
-                    <FrameLayout
-                        android:id="@+id/player_placeholder"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent" />
-
-                </FrameLayout>
-            </org.schabi.newpipe.views.CustomCollapsingToolbarLayout>
 
             <!-- CONTENT -->
             <RelativeLayout
@@ -237,136 +246,120 @@
                     android:visibility="gone"
                     tools:visibility="visible">
 
-                    <!--DETAIL-->
-                    <RelativeLayout
-                        android:id="@+id/detail_root"
+                    <!-- CHANNEL: avatar, name and subscribe inside a bordered rectangle -->
+                    <LinearLayout
+                        android:id="@+id/detail_uploader_root_layout"
                         android:layout_width="match_parent"
-                        android:layout_height="55dp"
-                        android:layout_marginLeft="12dp"
+                        android:layout_height="64dp"
+                        android:layout_marginHorizontal="12dp"
                         android:layout_marginTop="6dp"
-                        android:layout_marginRight="12dp"
-                        android:baselineAligned="false"
-                        android:orientation="horizontal">
+                        android:background="@drawable/bg_channel_box"
+                        android:foreground="?attr/selectableItemBackground"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingHorizontal="10dp">
 
-                        <!--UPLOADER-->
+                        <FrameLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content">
+
+                            <com.google.android.material.imageview.ShapeableImageView
+                                android:id="@+id/detail_sub_channel_thumbnail_view"
+                                android:layout_width="@dimen/video_item_detail_uploader_image_size"
+                                android:layout_height="@dimen/video_item_detail_uploader_image_size"
+                                android:contentDescription="@string/detail_sub_channel_thumbnail_view_description"
+                                android:src="@drawable/placeholder_person"
+                                app:shapeAppearance="@style/CircularImageView" />
+
+                            <com.google.android.material.imageview.ShapeableImageView
+                                android:id="@+id/detail_uploader_thumbnail_view"
+                                android:layout_width="@dimen/video_item_detail_sub_channel_image_size"
+                                android:layout_height="@dimen/video_item_detail_sub_channel_image_size"
+                                android:layout_gravity="bottom|right"
+                                android:contentDescription="@string/detail_uploader_thumbnail_view_description"
+                                android:src="@drawable/placeholder_person"
+                                app:shapeAppearance="@style/CircularImageView"
+                                tools:ignore="RtlHardcoded" />
+
+                        </FrameLayout>
+
                         <LinearLayout
-                            android:id="@+id/detail_uploader_root_layout"
-                            android:layout_width="match_parent"
+                            android:layout_width="0dp"
                             android:layout_height="match_parent"
-                            android:background="?attr/selectableItemBackground"
+                            android:layout_marginLeft="10dp"
+                            android:layout_weight="1"
                             android:gravity="center_vertical"
-                            android:orientation="horizontal"
-                            android:padding="6dp">
-
-                            <FrameLayout
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content">
-
-                                <com.google.android.material.imageview.ShapeableImageView
-                                    android:id="@+id/detail_sub_channel_thumbnail_view"
-                                    android:layout_width="@dimen/video_item_detail_uploader_image_size"
-                                    android:layout_height="@dimen/video_item_detail_uploader_image_size"
-                                    android:contentDescription="@string/detail_sub_channel_thumbnail_view_description"
-                                    android:src="@drawable/placeholder_person"
-                                    app:shapeAppearance="@style/CircularImageView" />
-
-                                <com.google.android.material.imageview.ShapeableImageView
-                                    android:id="@+id/detail_uploader_thumbnail_view"
-                                    android:layout_width="@dimen/video_item_detail_sub_channel_image_size"
-                                    android:layout_height="@dimen/video_item_detail_sub_channel_image_size"
-                                    android:layout_gravity="bottom|right"
-                                    android:contentDescription="@string/detail_uploader_thumbnail_view_description"
-                                    android:src="@drawable/placeholder_person"
-                                    app:shapeAppearance="@style/CircularImageView"
-                                    tools:ignore="RtlHardcoded" />
-
-                            </FrameLayout>
-
-                            <LinearLayout
-                                android:layout_width="0dp"
-                                android:layout_height="match_parent"
-                                android:layout_marginLeft="8dp"
-                                android:layout_weight="1"
-                                android:gravity="center_vertical"
-                                android:orientation="vertical">
-
-                                <org.schabi.newpipe.views.NewPipeTextView
-                                    android:id="@+id/detail_sub_channel_text_view"
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    android:ellipsize="marquee"
-                                    android:fadingEdge="horizontal"
-                                    android:marqueeRepeatLimit="marquee_forever"
-                                    android:scrollHorizontally="true"
-                                    android:singleLine="true"
-                                    android:textAppearance="?android:attr/textAppearanceLarge"
-                                    android:textSize="@dimen/video_item_detail_sub_channel_text_size"
-                                    android:textStyle="normal|bold"
-                                    tools:ignore="RtlHardcoded"
-                                    tools:text="Channel" />
-
-                                <org.schabi.newpipe.views.NewPipeTextView
-                                    android:id="@+id/detail_uploader_text_view"
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    android:ellipsize="marquee"
-                                    android:fadingEdge="horizontal"
-                                    android:marqueeRepeatLimit="marquee_forever"
-                                    android:scrollHorizontally="true"
-                                    android:singleLine="true"
-                                    android:textSize="@dimen/video_item_detail_uploader_text_size"
-                                    tools:ignore="RtlHardcoded"
-                                    tools:text="Uploader" />
-
-                            </LinearLayout>
+                            android:orientation="vertical"
+                            tools:ignore="RtlHardcoded">
 
                             <org.schabi.newpipe.views.NewPipeTextView
-                                android:id="@+id/detail_subscribe_button"
-                                android:layout_width="wrap_content"
-                                android:layout_height="36dp"
-                                android:layout_marginStart="8dp"
-                                android:background="@drawable/bg_like_pill"
-                                android:clickable="true"
-                                android:focusable="true"
-                                android:gravity="center"
-                                android:paddingHorizontal="16dp"
-                                android:text="@string/subscribe_button_title"
-                                android:textSize="13sp"
-                                android:textStyle="bold"
-                                android:visibility="gone"
-                                tools:visibility="visible" />
+                                android:id="@+id/detail_sub_channel_text_view"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:ellipsize="marquee"
+                                android:fadingEdge="horizontal"
+                                android:marqueeRepeatLimit="marquee_forever"
+                                android:scrollHorizontally="true"
+                                android:singleLine="true"
+                                android:textAppearance="?android:attr/textAppearanceLarge"
+                                android:textSize="@dimen/video_item_detail_sub_channel_text_size"
+                                android:textStyle="normal|bold"
+                                tools:ignore="RtlHardcoded"
+                                tools:text="Channel" />
+
+                            <org.schabi.newpipe.views.NewPipeTextView
+                                android:id="@+id/detail_uploader_text_view"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:ellipsize="marquee"
+                                android:fadingEdge="horizontal"
+                                android:marqueeRepeatLimit="marquee_forever"
+                                android:scrollHorizontally="true"
+                                android:singleLine="true"
+                                android:textSize="@dimen/video_item_detail_uploader_text_size"
+                                tools:ignore="RtlHardcoded"
+                                tools:text="Uploader" />
+
                         </LinearLayout>
 
-                    </RelativeLayout>
-                    <!-- VIEWS + LIKE PILL -->
+                        <org.schabi.newpipe.views.NewPipeTextView
+                            android:id="@+id/detail_subscribe_button"
+                            android:layout_width="wrap_content"
+                            android:layout_height="36dp"
+                            android:layout_marginStart="8dp"
+                            android:background="@drawable/bg_like_pill"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:gravity="center"
+                            android:paddingHorizontal="16dp"
+                            android:text="@string/subscribe_button_title"
+                            android:textSize="13sp"
+                            android:textStyle="bold"
+                            android:visibility="gone"
+                            tools:visibility="visible" />
+                    </LinearLayout>
+
+                    <!-- ACTIONS (one row): likes | play in background | popup | download.
+                         The views count is shown inside the description only. -->
                     <LinearLayout
-                        android:id="@+id/details_panel"
+                        android:id="@+id/detail_control_panel"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginHorizontal="12dp"
-                        android:layout_marginTop="4dp"
+                        android:layout_marginTop="10dp"
                         android:gravity="center_vertical"
                         android:orientation="horizontal">
 
-                        <org.schabi.newpipe.views.NewPipeTextView
-                            android:id="@+id/detail_view_count_view"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:fontFamily="monospace"
-                            android:lines="1"
-                            android:paddingStart="6dp"
-                            android:textSize="@dimen/video_item_detail_views_text_size"
-                            tools:ignore="RtlSymmetry"
-                            tools:text="2,816,821,505 views" />
-
                         <LinearLayout
-                            android:layout_width="wrap_content"
+                            android:id="@+id/details_panel"
+                            android:layout_width="0dp"
                             android:layout_height="36dp"
+                            android:layout_marginEnd="8dp"
+                            android:layout_weight="1"
                             android:background="@drawable/bg_like_pill"
-                            android:gravity="center_vertical"
+                            android:gravity="center"
                             android:orientation="horizontal"
-                            android:paddingHorizontal="14dp">
+                            android:paddingHorizontal="8dp">
 
                             <ImageView
                                 android:id="@+id/detail_thumbs_up_img_view"
@@ -388,7 +381,7 @@
                             <View
                                 android:layout_width="1dp"
                                 android:layout_height="16dp"
-                                android:layout_marginHorizontal="12dp"
+                                android:layout_marginHorizontal="10dp"
                                 android:background="?attr/separator_color" />
 
                             <ImageView
@@ -419,76 +412,53 @@
                                 android:visibility="gone"
                                 tools:visibility="visible" />
                         </LinearLayout>
-                    </LinearLayout>
 
-
-                    <!-- CONTROLS -->
-                    <LinearLayout
-                        android:id="@+id/detail_control_panel"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:padding="@dimen/detail_control_padding">
-
-                        <org.schabi.newpipe.views.NewPipeTextView
+                        <!-- kept (hidden) because the page code still wires it up -->
+                        <ImageView
                             android:id="@+id/detail_controls_playlist_append"
-                            android:layout_width="@dimen/detail_control_width"
-                            android:layout_height="@dimen/detail_control_height"
-                            android:layout_gravity="center_vertical"
-                            android:layout_weight="1"
-                            android:layout_margin="4dp"
-                            android:background="@drawable/bg_action_btn"
-                            android:clickable="true"
+                            android:layout_width="0dp"
+                            android:layout_height="36dp"
+                            android:background="@drawable/bg_like_pill"
                             android:contentDescription="@string/add_to_playlist"
-                            android:drawableTop="@drawable/ic_playlist_add"
-                            android:focusable="true"
-                            android:gravity="center"
-                            android:paddingVertical="@dimen/detail_control_padding" />
+                            android:scaleType="center"
+                            android:src="@drawable/ic_playlist_add"
+                            android:visibility="gone" />
 
-                        <org.schabi.newpipe.views.NewPipeTextView
+                        <ImageView
                             android:id="@+id/detail_controls_background"
-                            android:layout_width="@dimen/detail_control_width"
-                            android:layout_height="@dimen/detail_control_height"
-                            android:layout_gravity="center_vertical"
-                            android:layout_weight="1"
-                            android:layout_margin="4dp"
-                            android:background="@drawable/bg_action_btn"
+                            android:layout_width="48dp"
+                            android:layout_height="36dp"
+                            android:layout_marginStart="4dp"
+                            android:background="@drawable/bg_like_pill"
                             android:clickable="true"
                             android:contentDescription="@string/play_audio"
-                            android:drawableTop="@drawable/ic_headset"
                             android:focusable="true"
-                            android:gravity="center"
-                            android:paddingVertical="@dimen/detail_control_padding" />
+                            android:scaleType="center"
+                            android:src="@drawable/ic_headset" />
 
-                        <org.schabi.newpipe.views.NewPipeTextView
+                        <ImageView
                             android:id="@+id/detail_controls_popup"
-                            android:layout_width="@dimen/detail_control_width"
-                            android:layout_height="@dimen/detail_control_height"
-                            android:layout_gravity="center_vertical"
-                            android:layout_weight="1"
-                            android:layout_margin="4dp"
-                            android:background="@drawable/bg_action_btn"
+                            android:layout_width="48dp"
+                            android:layout_height="36dp"
+                            android:layout_marginStart="8dp"
+                            android:background="@drawable/bg_like_pill"
                             android:clickable="true"
                             android:contentDescription="@string/open_in_popup_mode"
-                            android:drawableTop="@drawable/ic_picture_in_picture"
                             android:focusable="true"
-                            android:gravity="center"
-                            android:paddingVertical="@dimen/detail_control_padding" />
+                            android:scaleType="center"
+                            android:src="@drawable/ic_picture_in_picture" />
 
-                        <org.schabi.newpipe.views.NewPipeTextView
+                        <ImageView
                             android:id="@+id/detail_controls_download"
-                            android:layout_width="@dimen/detail_control_width"
-                            android:layout_height="@dimen/detail_control_height"
-                            android:layout_gravity="center_vertical"
-                            android:layout_weight="1"
-                            android:layout_margin="4dp"
-                            android:background="@drawable/bg_action_btn"
+                            android:layout_width="48dp"
+                            android:layout_height="36dp"
+                            android:layout_marginStart="8dp"
+                            android:background="@drawable/bg_like_pill"
                             android:clickable="true"
                             android:contentDescription="@string/controls_download_desc"
-                            android:drawableTop="@drawable/ic_file_download"
                             android:focusable="true"
-                            android:gravity="center"
-                            android:paddingVertical="@dimen/detail_control_padding" />
+                            android:scaleType="center"
+                            android:src="@drawable/ic_file_download" />
 
                     </LinearLayout>
 
@@ -688,7 +658,9 @@
             app:tabIconTint="?attr/colorAccent"
             app:tabIndicatorGravity="top" />
 
-    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+        </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+    </LinearLayout>
 
     <!-- Rounds the corners of the video while minimised (drawn above the video, below the
          mini player buttons). -->

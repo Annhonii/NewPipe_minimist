@@ -12,6 +12,7 @@ import android.os.Environment;
 import android.os.IBinder;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -102,7 +103,8 @@ public class MissionsFragment extends Fragment {
         View v = inflater.inflate(R.layout.missions, container, false);
 
         mPrefs = PreferenceManager.getDefaultSharedPreferences(requireActivity());
-        mLinear = mPrefs.getBoolean("linear", false);
+        // downloads are always shown as rectangular cards (one per row)
+        mLinear = true;
 
         // Bind the service
         mContext.bindService(new Intent(mContext, DownloadManagerService.class), mConnection, Context.BIND_AUTO_CREATE);
@@ -170,6 +172,21 @@ public class MissionsFragment extends Fragment {
 
         mBinder = null;
         mAdapter = null;
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        // When this page is a tab of the main screen nobody inflated the downloads menu yet
+        // (DownloadActivity does it on its own, and then the items already exist).
+        if (menu.findItem(R.id.clear_list) == null) {
+            inflater.inflate(R.menu.download_menu, menu);
+        }
+        final MenuItem switchMode = menu.findItem(R.id.switch_mode);
+        if (switchMode != null) {
+            // there is only the rectangular list now
+            switchMode.setVisible(false);
+        }
     }
 
     @Override

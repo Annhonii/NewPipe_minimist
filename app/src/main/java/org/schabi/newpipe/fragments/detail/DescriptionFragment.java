@@ -66,9 +66,33 @@ public class DescriptionFragment extends BaseDescriptionFragment {
     @Override
     protected void setupMetadata(final LayoutInflater inflater,
                                  final LinearLayout layout) {
+        // views are only shown here (inside the description), not on the video page itself
+        final StringBuilder headline = new StringBuilder();
+        if (streamInfo != null && streamInfo.getViewCount() >= 0) {
+            switch (streamInfo.getStreamType()) {
+                case AUDIO_LIVE_STREAM:
+                    headline.append(Localization.listeningCount(activity,
+                            streamInfo.getViewCount()));
+                    break;
+                case LIVE_STREAM:
+                    headline.append(Localization.localizeWatchingCount(activity,
+                            streamInfo.getViewCount()));
+                    break;
+                default:
+                    headline.append(Localization.localizeViewCount(activity,
+                            streamInfo.getViewCount()));
+                    break;
+            }
+        }
         if (streamInfo != null && streamInfo.getUploadDate() != null) {
-            binding.detailUploadDateView.setText(Localization
-                    .localizeUploadDate(activity, streamInfo.getUploadDate().offsetDateTime()));
+            if (headline.length() > 0) {
+                headline.append("  \u2022  ");
+            }
+            headline.append(Localization.localizeUploadDate(activity,
+                    streamInfo.getUploadDate().offsetDateTime()));
+        }
+        if (headline.length() > 0) {
+            binding.detailUploadDateView.setText(headline);
         } else {
             binding.detailUploadDateView.setVisibility(View.GONE);
         }

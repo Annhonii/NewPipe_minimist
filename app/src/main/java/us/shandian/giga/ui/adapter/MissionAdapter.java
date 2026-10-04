@@ -343,6 +343,80 @@ public class MissionAdapter extends Adapter<ViewHolder> implements Handler.Callb
         }
     }
 
+    /** True for finished downloads stored in the app's own (private) download folder. */
+    private boolean isInAppDownload(Mission mission) {
+        try {
+            final Uri uri = mission.storage.getUri();
+            if (uri == null || !"file".equals(uri.getScheme()) || uri.getPath() == null) {
+                return false;
+            }
+            final File appDir = mContext.getExternalFilesDir(null);
+            final String path = new File(uri.getPath()).getCanonicalPath();
+            if (appDir != null && path.startsWith(appDir.getCanonicalPath())) {
+                return true;
+            }
+            return path.startsWith(mContext.getFilesDir().getCanonicalPath());
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    /** Copies an app-folder download into the public Movies / Music folder. */
+    private void saveToInternalStorage(Mission mission) {
+        if (checkInvalidFile(mission)) return;
+
+        final Context appContext = mContext.getApplicationContext();
+        final Uri source = mission.storage.getUri();
+        final String name = mission.storage.getName();
+        final String mime = resolveMimeType(mission);
+        final boolean audio = mime != null && mime.startsWith("audio/");
+
+        compositeDisposable.add(io.reactivex.rxjava3.core.Completable.fromAction(() -> {
+            final String dir = audio ? Environment.DIRECTORY_MUSIC : Environment.DIRECTORY_MOVIES;
+            try (java.io.InputStream in = new java.io.FileInputStream(new File(source.getPath()))) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    final android.content.ContentValues values = new android.content.ContentValues();
+                    values.put(android.provider.MediaStore.MediaColumns.DISPLAY_NAME, name);
+                    values.put(android.provider.MediaStore.MediaColumns.MIME_TYPE,
+                            mime == null ? "application/octet-stream" : mime);
+                    values.put(android.provider.MediaStore.MediaColumns.RELATIVE_PATH, dir);
+                    final Uri collection = audio
+                            ? android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
+                            : android.provider.MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
+                    final Uri target = appContext.getContentResolver().insert(collection, values);
+                    if (target == null) throw new IOException("insert failed");
+                    try (java.io.OutputStream out =
+                                 appContext.getContentResolver().openOutputStream(target)) {
+                        if (out == null) throw new IOException("no output stream");
+                        copyStream(in, out);
+                    }
+                } else {
+                    final File folder = Environment.getExternalStoragePublicDirectory(dir);
+                    if (!folder.isDirectory() && !folder.mkdirs()) throw new IOException("mkdirs");
+                    try (java.io.OutputStream out =
+                                 new java.io.FileOutputStream(new File(folder, name))) {
+                        copyStream(in, out);
+                    }
+                }
+            }
+        }).subscribeOn(io.reactivex.rxjava3.schedulers.Schedulers.io())
+                .observeOn(io.reactivex.rxjava3.android.schedulers.AndroidSchedulers.mainThread())
+                .subscribe(
+                        () -> Toast.makeText(mContext, R.string.saved_to_internal_storage,
+                                Toast.LENGTH_SHORT).show(),
+                        e -> Toast.makeText(mContext, R.string.save_to_internal_storage_failed,
+                                Toast.LENGTH_SHORT).show()));
+    }
+
+    private static void copyStream(java.io.InputStream in, java.io.OutputStream out)
+            throws IOException {
+        final byte[] buf = new byte[64 * 1024];
+        int n;
+        while ((n = in.read(buf)) > 0) {
+            out.write(buf, 0, n);
+        }
+    }
+
     private void viewWithFileProvider(Mission mission) {
         if (checkInvalidFile(mission)) return;
 
@@ -681,6 +755,9 @@ public class MissionAdapter extends Adapter<ViewHolder> implements Handler.Callb
         if (id == R.id.menu_item_share) {
             shareFile(h.item.mission);
             return true;
+        } else if (id == R.id.save_to_internal) {
+            saveToInternalStorage(h.item.mission);
+            return true;
         } else if (id == R.id.delete) {// delete the entry and the file
             mDeleter.append(h.item.mission, true);
             applyChanges();
@@ -869,6 +946,7 @@ public class MissionAdapter extends Adapter<ViewHolder> implements Handler.Callb
         MenuItem queue;
         MenuItem showError;
         MenuItem delete;
+        MenuItem saveToInternal;
         MenuItem source;
         MenuItem checksum;
 
@@ -882,7 +960,17 @@ public class MissionAdapter extends Adapter<ViewHolder> implements Handler.Callb
             super(view);
 
             progress = new ProgressDrawable();
-            itemView.findViewById(R.id.item_bkg).setBackground(progress);
+            final View card = itemView.findViewById(R.id.item_bkg);
+            card.setBackground(progress);
+            // rectangular card with smooth corners
+            final float radius = 14 * mContext.getResources().getDisplayMetrics().density;
+            card.setOutlineProvider(new android.view.ViewOutlineProvider() {
+                @Override
+                public void getOutline(View view, android.graphics.Outline outline) {
+                    outline.setRoundRect(0, 0, view.getWidth(), view.getHeight(), radius);
+                }
+            });
+            card.setClipToOutline(true);
 
             status = itemView.findViewById(R.id.item_status);
             name = itemView.findViewById(R.id.item_name);
@@ -905,6 +993,7 @@ public class MissionAdapter extends Adapter<ViewHolder> implements Handler.Callb
             queue = menu.findItem(R.id.queue);
             showError = menu.findItem(R.id.error_message_view);
             delete = menu.findItem(R.id.delete);
+            saveToInternal = menu.findItem(R.id.save_to_internal);
             source = menu.findItem(R.id.source);
             checksum = menu.findItem(R.id.checksum);
 
@@ -931,6 +1020,7 @@ public class MissionAdapter extends Adapter<ViewHolder> implements Handler.Callb
             queue.setVisible(false);
             showError.setVisible(false);
             delete.setVisible(false);
+            saveToInternal.setVisible(false);
             source.setVisible(false);
             checksum.setVisible(false);
 
@@ -971,6 +1061,7 @@ public class MissionAdapter extends Adapter<ViewHolder> implements Handler.Callb
                 open.setVisible(true);
                 delete.setVisible(true);
                 checksum.setVisible(true);
+                saveToInternal.setVisible(isInAppDownload(item.mission));
             }
 
             if (item.mission.source != null && !item.mission.source.isEmpty()) {

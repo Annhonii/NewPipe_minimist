@@ -1,15 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<!-- Downloaded video page, same look as the online player: video on top, title below.
+     The space where recommended videos / comments would be is left blank. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/black">
+    android:background="?attr/windowBackground"
+    android:orientation="vertical">
+
+    <!-- black strip under the status bar (height set in code) -->
+    <View
+        android:id="@+id/local_player_status_spacer"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="@android:color/black" />
 
     <com.google.android.exoplayer2.ui.StyledPlayerView
         android:id="@+id/local_player_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/black"
         app:resize_mode="fit"
         app:show_buffering="when_playing"
         app:use_controller="true" />
-</FrameLayout>
+
+    <org.schabi.newpipe.views.NewPipeTextView
+        android:id="@+id/local_player_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:maxLines="2"
+        android:paddingHorizontal="12dp"
+        android:paddingTop="12dp"
+        android:paddingBottom="8dp"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textSize="@dimen/video_item_detail_title_text_size" />
+
+</LinearLayout>

@@ -83,9 +83,7 @@
 
         <activity
             android:name=".local.downloads.LocalPlayerActivity"
-            android:configChanges="orientation|screenSize|keyboardHidden|smallestScreenSize|screenLayout"
-            android:exported="false"
-            android:theme="@style/Theme.AppCompat.NoActionBar" />
+            android:exported="false" />
 
         <activity
             android:name=".player.PlayQueueActivity"
