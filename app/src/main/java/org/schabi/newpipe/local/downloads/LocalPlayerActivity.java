@@ -51,9 +51,15 @@ public class LocalPlayerActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(@Nullable final Bundle savedInstanceState) {
+        org.schabi.newpipe.util.ThemeHelper.setDayNightMode(this);
         org.schabi.newpipe.util.ThemeHelper.setTheme(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_local_player);
+        // same background colour as the online video page (never plain white)
+        final int pageColor = org.schabi.newpipe.util.ThemeHelper.resolveColorFromAttr(
+                this, R.attr.windowBackground);
+        findViewById(android.R.id.content).setBackgroundColor(pageColor);
+        getWindow().getDecorView().setBackgroundColor(pageColor);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         playerView = findViewById(R.id.local_player_view);

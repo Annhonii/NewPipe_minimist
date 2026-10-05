@@ -339,27 +339,32 @@
                             tools:visibility="visible" />
                     </LinearLayout>
 
-                    <!-- ACTIONS (one row): likes | play in background | popup | download.
-                         The views count is shown inside the description only. -->
-                    <LinearLayout
+                    <!-- ACTIONS (one scrollable row, YouTube style): likes | share | background |
+                         popup | download. The views count is shown inside the description. -->
+                    <HorizontalScrollView
                         android:id="@+id/detail_control_panel"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginHorizontal="12dp"
                         android:layout_marginTop="10dp"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal">
+                        android:overScrollMode="never"
+                        android:scrollbars="none">
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
+                            android:paddingHorizontal="12dp">
 
                         <LinearLayout
                             android:id="@+id/details_panel"
-                            android:layout_width="0dp"
+                            android:layout_width="wrap_content"
                             android:layout_height="36dp"
                             android:layout_marginEnd="8dp"
-                            android:layout_weight="1"
                             android:background="@drawable/bg_like_pill"
                             android:gravity="center"
                             android:orientation="horizontal"
-                            android:paddingHorizontal="8dp">
+                            android:paddingHorizontal="14dp">
 
                             <ImageView
                                 android:id="@+id/detail_thumbs_up_img_view"
@@ -413,54 +418,68 @@
                                 tools:visibility="visible" />
                         </LinearLayout>
 
-                        <!-- kept (hidden) because the page code still wires it up -->
-                        <ImageView
-                            android:id="@+id/detail_controls_playlist_append"
-                            android:layout_width="0dp"
-                            android:layout_height="36dp"
-                            android:background="@drawable/bg_like_pill"
-                            android:contentDescription="@string/add_to_playlist"
-                            android:scaleType="center"
-                            android:src="@drawable/ic_playlist_add"
-                            android:visibility="gone" />
-
-                        <ImageView
+                        <org.schabi.newpipe.views.NewPipeTextView
                             android:id="@+id/detail_controls_background"
-                            android:layout_width="48dp"
+                            android:layout_width="wrap_content"
                             android:layout_height="36dp"
-                            android:layout_marginStart="4dp"
+                            android:layout_marginEnd="8dp"
                             android:background="@drawable/bg_like_pill"
                             android:clickable="true"
                             android:contentDescription="@string/play_audio"
+                            android:drawableStart="@drawable/ic_headset"
+                            android:drawablePadding="0dp"
                             android:focusable="true"
-                            android:scaleType="center"
-                            android:src="@drawable/ic_headset" />
+                            android:gravity="center"
+                            android:paddingHorizontal="12dp"
+                            android:text=""
+                            android:textSize="13sp"
+                            android:textStyle="bold" />
 
-                        <ImageView
+                        <org.schabi.newpipe.views.NewPipeTextView
                             android:id="@+id/detail_controls_popup"
-                            android:layout_width="48dp"
+                            android:layout_width="wrap_content"
                             android:layout_height="36dp"
-                            android:layout_marginStart="8dp"
+                            android:layout_marginEnd="8dp"
                             android:background="@drawable/bg_like_pill"
                             android:clickable="true"
                             android:contentDescription="@string/open_in_popup_mode"
+                            android:drawableStart="@drawable/ic_picture_in_picture"
+                            android:drawablePadding="0dp"
                             android:focusable="true"
-                            android:scaleType="center"
-                            android:src="@drawable/ic_picture_in_picture" />
+                            android:gravity="center"
+                            android:paddingHorizontal="12dp"
+                            android:text=""
+                            android:textSize="13sp"
+                            android:textStyle="bold" />
 
-                        <ImageView
+                        <org.schabi.newpipe.views.NewPipeTextView
                             android:id="@+id/detail_controls_download"
-                            android:layout_width="48dp"
+                            android:layout_width="wrap_content"
                             android:layout_height="36dp"
-                            android:layout_marginStart="8dp"
+                            android:layout_marginEnd="8dp"
                             android:background="@drawable/bg_like_pill"
                             android:clickable="true"
                             android:contentDescription="@string/controls_download_desc"
+                            android:drawableStart="@drawable/ic_file_download"
+                            android:drawablePadding="8dp"
                             android:focusable="true"
-                            android:scaleType="center"
-                            android:src="@drawable/ic_file_download" />
+                            android:gravity="center"
+                            android:paddingHorizontal="14dp"
+                            android:text="@string/download"
+                            android:textSize="13sp"
+                            android:textStyle="bold" />
 
-                    </LinearLayout>
+                            <!-- kept (hidden): the page code still wires it up -->
+                            <ImageView
+                                android:id="@+id/detail_controls_playlist_append"
+                                android:layout_width="0dp"
+                                android:layout_height="36dp"
+                                android:contentDescription="@string/add_to_playlist"
+                                android:src="@drawable/ic_playlist_add"
+                                android:visibility="gone" />
+
+                        </LinearLayout>
+                    </HorizontalScrollView>
 
                     <!-- SECONDARY CONTROLS -->
                     <LinearLayout
