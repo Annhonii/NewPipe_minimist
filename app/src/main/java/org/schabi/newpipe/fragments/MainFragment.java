@@ -40,6 +40,7 @@ import org.schabi.newpipe.settings.tabs.Tab;
 import org.schabi.newpipe.settings.tabs.TabsManager;
 import org.schabi.newpipe.util.NavigationHelper;
 import org.schabi.newpipe.util.ServiceHelper;
+import org.schabi.newpipe.util.ThemeHelper;
 import org.schabi.newpipe.views.ScrollableTabLayout;
 
 import java.util.ArrayList;
@@ -101,8 +102,10 @@ public class MainFragment extends BaseFragment implements TabLayout.OnTabSelecte
 
         binding = FragmentMainBinding.bind(rootView);
 
-        // floating text pill: tabs always share the width, no scrolling
+        // icon-only floating pill: tabs always share the width, no scrolling
         binding.mainTabLayout.setFixedModeOnly(true);
+        binding.mainTabLayout.setSelectedTabIndicatorColor(ThemeHelper.resolveColorFromAttr(
+                requireContext(), R.attr.card_item_contrast_color));
         binding.mainTabLayout.setupWithViewPager(binding.pager);
         binding.mainTabLayout.addOnTabSelectedListener(this);
 
@@ -205,18 +208,18 @@ public class MainFragment extends BaseFragment implements TabLayout.OnTabSelecte
         binding.pager.setAdapter(null);
         binding.pager.setAdapter(pagerAdapter);
 
-        updateTabsTextAndDescription();
+        updateTabsIconAndDescription();
         updateTitleForTab(binding.pager.getCurrentItem());
 
         hasTabsChanged = false;
     }
 
-    private void updateTabsTextAndDescription() {
+    private void updateTabsIconAndDescription() {
         for (int i = 0; i < tabsList.size(); i++) {
             final TabLayout.Tab tabToSet = binding.mainTabLayout.getTabAt(i);
             if (tabToSet != null) {
                 final Tab tab = tabsList.get(i);
-                tabToSet.setText(tab.getTabName(requireContext()));
+                tabToSet.setIcon(tab.getTabIconRes(requireContext()));
                 tabToSet.setContentDescription(tab.getTabName(requireContext()));
             }
         }
