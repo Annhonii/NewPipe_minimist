@@ -10,9 +10,10 @@
     <org.schabi.newpipe.views.NewPipeTextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="¯\\_(ツ)_/¯"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        tools:ignore="HardcodedText" />
+        android:text="@string/empty_list_title"
+        android:textAppearance="@style/TextAppearance.App.Accent"
+        android:textColor="?android:attr/textColorPrimary"
+        android:textSize="28sp" />
 
     <org.schabi.newpipe.views.NewPipeTextView
         android:layout_width="wrap_content"
@@ -21,5 +22,7 @@
         android:layout_marginTop="6dp"
         android:gravity="center"
         android:paddingHorizontal="16dp"
-        android:text="@string/empty_list_subtitle" />
+        android:text="@string/empty_list_subtitle"
+        android:textColor="?android:attr/textColorSecondary"
+        android:textSize="12sp" />
 </LinearLayout>

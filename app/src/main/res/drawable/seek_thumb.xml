@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Invisible knob: keeps a comfortable touch target while the fill acts as the handle. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="oval">
+    <solid android:color="@android:color/transparent" />
+    <size android:width="22dp" android:height="22dp" />
+</shape>

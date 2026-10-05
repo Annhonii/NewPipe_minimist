@@ -16,7 +16,7 @@
         android:id="@+id/video_info_sheet_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:fontFamily="monospace"
+        android:fontFamily="@font/ntype82"
         android:paddingHorizontal="16dp"
         android:paddingVertical="12dp"
         android:textSize="16sp"

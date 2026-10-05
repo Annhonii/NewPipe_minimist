@@ -21,6 +21,14 @@
         <item name="colorControlActivated">?attr/colorPrimary</item>
         <item name="android:fontFamily">@font/geist</item>
         <item name="fontFamily">@font/geist</item>
+
+        <!-- Nothing / Music component styles (see styles_nothing.xml) -->
+        <item name="switchStyle">@style/Widget.App.Switch</item>
+        <item name="seekBarStyle">@style/Widget.App.SeekBar</item>
+        <item name="popupMenuStyle">@style/Widget.App.PopupMenu</item>
+        <item name="actionOverflowMenuStyle">@style/Widget.App.PopupMenu.Overflow</item>
+        <item name="alertDialogTheme">@style/ThemeOverlay.App.AlertDialog</item>
+        <item name="android:windowAnimationStyle">@style/Animation.App.Window</item>
     </style>
     <style name="Base" parent="Base.V21"/>
 
@@ -33,6 +41,11 @@
         <item name="windowBackground">@color/light_background_color</item>
         <item name="android:statusBarColor">@color/light_background_color</item>
         <item name="android:windowLightStatusBar">true</item>
+        <item name="android:textColorPrimary">@color/text_primary_light</item>
+        <item name="android:textColorSecondary">@color/text_secondary_light</item>
+        <item name="android:textColorHint">@color/on_surface_variant_light</item>
+        <item name="switch_track_off_color">@color/switch_track_off_light</item>
+        <item name="surface_bright_color">@color/light_dialog_background_color</item>
 
         <item name="separator_color">@color/light_separator_color</item>
         <item name="contrast_background_color">@color/light_contrast_background_color</item>
@@ -59,6 +72,11 @@
         <item name="windowBackground">@color/dark_background_color</item>
         <item name="android:statusBarColor">@color/dark_background_color</item>
         <item name="android:windowLightStatusBar">false</item>
+        <item name="android:textColorPrimary">@color/text_primary_dark</item>
+        <item name="android:textColorSecondary">@color/text_secondary_dark</item>
+        <item name="android:textColorHint">@color/on_surface_variant_dark</item>
+        <item name="switch_track_off_color">@color/switch_track_off_dark</item>
+        <item name="surface_bright_color">@color/dark_dialog_background_color</item>
 
         <item name="separator_color">@color/dark_separator_color</item>
         <item name="contrast_background_color">@color/dark_contrast_background_color</item>
@@ -81,6 +99,7 @@
         <item name="android:windowBackground">@color/black_background_color</item>
         <item name="windowBackground">@color/black_background_color</item>
         <item name="android:statusBarColor">@color/black_background_color</item>
+        <item name="switch_track_off_color">@color/switch_track_off_black</item>
 
         <item name="separator_color">@color/black_separator_color</item>
         <item name="contrast_background_color">@color/black_contrast_background_color</item>
@@ -93,42 +112,111 @@
     <style name="Base.BlackTheme" parent="Base.V21.BlackTheme" />
     <style name="BlackTheme" parent="Base.BlackTheme"/>
 
-    <!-- Dialogs -->
+    <!-- Dialogs: floating rounded surfaces with accent text buttons -->
     <style name="LightDialogTheme" parent="Theme.AppCompat.DayNight.Dialog">
+        <item name="colorPrimary">@color/nothing_red</item>
+        <item name="colorPrimaryDark">@color/nothing_red</item>
+        <item name="colorAccent">@color/nothing_red</item>
+        <item name="android:windowBackground">@drawable/bg_dialog</item>
+        <item name="android:windowAnimationStyle">@style/Animation.App.Dialog</item>
         <item name="android:fontFamily">@font/geist</item>
-        <item name="colorPrimary">@color/light_youtube_primary_color</item>
-        <item name="colorPrimaryDark">@color/light_youtube_primary_color</item>
-        <item name="colorAccent">@color/light_youtube_accent_color</item>
-        <item name="android:windowBackground">@color/light_dialog_background_color</item>
+        <item name="fontFamily">@font/geist</item>
+        <item name="android:textColorPrimary">@color/text_primary_light</item>
+        <item name="android:textColorSecondary">@color/text_secondary_light</item>
+        <item name="android:textColorHint">@color/on_surface_variant_light</item>
+        <item name="android:textColorAlertDialogListItem">@color/text_primary_light</item>
+        <item name="surface_bright_color">@color/light_dialog_background_color</item>
+        <item name="switch_track_off_color">@color/switch_track_off_light</item>
+        <item name="card_item_background_color">@color/light_card_item_background_color</item>
+        <item name="card_item_contrast_color">@color/light_card_item_contrast_color</item>
+        <item name="separator_color">@color/light_separator_color</item>
+        <item name="contrast_background_color">@color/light_contrast_background_color</item>
+        <item name="colorControlHighlight">@color/light_ripple_color</item>
+        <item name="buttonBarButtonStyle">@style/Widget.App.DialogButton</item>
+        <item name="switchStyle">@style/Widget.App.Switch</item>
+        <item name="seekBarStyle">@style/Widget.App.SeekBar</item>
+        <item name="popupMenuStyle">@style/Widget.App.PopupMenu</item>
         <item name="windowBackground">@color/light_dialog_background_color</item>
     </style>
 
     <style name="DarkDialogTheme" parent="Theme.AppCompat.DayNight.Dialog">
+        <item name="colorPrimary">@color/nothing_red</item>
+        <item name="colorPrimaryDark">@color/nothing_red</item>
+        <item name="colorAccent">@color/nothing_red</item>
+        <item name="android:windowBackground">@drawable/bg_dialog</item>
+        <item name="android:windowAnimationStyle">@style/Animation.App.Dialog</item>
         <item name="android:fontFamily">@font/geist</item>
-        <item name="colorPrimary">@color/dark_youtube_primary_color</item>
-        <item name="colorPrimaryDark">@color/dark_youtube_primary_color</item>
-        <item name="colorAccent">@color/dark_youtube_accent_color</item>
-        <item name="android:windowBackground">@color/dark_dialog_background_color</item>
+        <item name="fontFamily">@font/geist</item>
+        <item name="android:textColorPrimary">@color/text_primary_dark</item>
+        <item name="android:textColorSecondary">@color/text_secondary_dark</item>
+        <item name="android:textColorHint">@color/on_surface_variant_dark</item>
+        <item name="android:textColorAlertDialogListItem">@color/text_primary_dark</item>
+        <item name="surface_bright_color">@color/dark_dialog_background_color</item>
+        <item name="switch_track_off_color">@color/switch_track_off_dark</item>
+        <item name="card_item_background_color">@color/dark_card_item_background_color</item>
+        <item name="card_item_contrast_color">@color/dark_card_item_contrast_color</item>
+        <item name="separator_color">@color/dark_separator_color</item>
+        <item name="contrast_background_color">@color/dark_contrast_background_color</item>
+        <item name="colorControlHighlight">@color/dark_ripple_color</item>
+        <item name="buttonBarButtonStyle">@style/Widget.App.DialogButton</item>
+        <item name="switchStyle">@style/Widget.App.Switch</item>
+        <item name="seekBarStyle">@style/Widget.App.SeekBar</item>
+        <item name="popupMenuStyle">@style/Widget.App.PopupMenu</item>
         <item name="windowBackground">@color/dark_dialog_background_color</item>
     </style>
 
     <style name="LightDialogMinWidthTheme" parent="Theme.AppCompat.DayNight.Dialog.MinWidth">
+        <item name="colorPrimary">@color/nothing_red</item>
+        <item name="colorPrimaryDark">@color/nothing_red</item>
+        <item name="colorAccent">@color/nothing_red</item>
+        <item name="android:windowBackground">@drawable/bg_dialog</item>
+        <item name="android:windowAnimationStyle">@style/Animation.App.Dialog</item>
         <item name="android:fontFamily">@font/geist</item>
-        <item name="colorPrimary">@color/light_youtube_primary_color</item>
-        <item name="colorPrimaryDark">@color/light_youtube_primary_color</item>
-        <item name="colorAccent">@color/light_youtube_accent_color</item>
-        <item name="android:windowBackground">@color/light_dialog_background_color</item>
+        <item name="fontFamily">@font/geist</item>
+        <item name="android:textColorPrimary">@color/text_primary_light</item>
+        <item name="android:textColorSecondary">@color/text_secondary_light</item>
+        <item name="android:textColorHint">@color/on_surface_variant_light</item>
+        <item name="android:textColorAlertDialogListItem">@color/text_primary_light</item>
+        <item name="surface_bright_color">@color/light_dialog_background_color</item>
+        <item name="switch_track_off_color">@color/switch_track_off_light</item>
+        <item name="card_item_background_color">@color/light_card_item_background_color</item>
+        <item name="card_item_contrast_color">@color/light_card_item_contrast_color</item>
+        <item name="separator_color">@color/light_separator_color</item>
+        <item name="contrast_background_color">@color/light_contrast_background_color</item>
+        <item name="colorControlHighlight">@color/light_ripple_color</item>
+        <item name="buttonBarButtonStyle">@style/Widget.App.DialogButton</item>
+        <item name="switchStyle">@style/Widget.App.Switch</item>
+        <item name="seekBarStyle">@style/Widget.App.SeekBar</item>
+        <item name="popupMenuStyle">@style/Widget.App.PopupMenu</item>
         <item name="windowBackground">@color/light_dialog_background_color</item>
     </style>
 
     <style name="DarkDialogMinWidthTheme" parent="Theme.AppCompat.DayNight.Dialog.MinWidth">
+        <item name="colorPrimary">@color/nothing_red</item>
+        <item name="colorPrimaryDark">@color/nothing_red</item>
+        <item name="colorAccent">@color/nothing_red</item>
+        <item name="android:windowBackground">@drawable/bg_dialog</item>
+        <item name="android:windowAnimationStyle">@style/Animation.App.Dialog</item>
         <item name="android:fontFamily">@font/geist</item>
-        <item name="colorPrimary">@color/dark_youtube_primary_color</item>
-        <item name="colorPrimaryDark">@color/dark_youtube_primary_color</item>
-        <item name="colorAccent">@color/dark_youtube_accent_color</item>
-        <item name="android:windowBackground">@color/dark_dialog_background_color</item>
+        <item name="fontFamily">@font/geist</item>
+        <item name="android:textColorPrimary">@color/text_primary_dark</item>
+        <item name="android:textColorSecondary">@color/text_secondary_dark</item>
+        <item name="android:textColorHint">@color/on_surface_variant_dark</item>
+        <item name="android:textColorAlertDialogListItem">@color/text_primary_dark</item>
+        <item name="surface_bright_color">@color/dark_dialog_background_color</item>
+        <item name="switch_track_off_color">@color/switch_track_off_dark</item>
+        <item name="card_item_background_color">@color/dark_card_item_background_color</item>
+        <item name="card_item_contrast_color">@color/dark_card_item_contrast_color</item>
+        <item name="separator_color">@color/dark_separator_color</item>
+        <item name="contrast_background_color">@color/dark_contrast_background_color</item>
+        <item name="colorControlHighlight">@color/dark_ripple_color</item>
+        <item name="buttonBarButtonStyle">@style/Widget.App.DialogButton</item>
+        <item name="switchStyle">@style/Widget.App.Switch</item>
+        <item name="seekBarStyle">@style/Widget.App.SeekBar</item>
+        <item name="popupMenuStyle">@style/Widget.App.PopupMenu</item>
         <item name="windowBackground">@color/dark_dialog_background_color</item>
     </style>
+
 
     <!-- Settings -->
     <style name="LightSettingsTheme" parent="LightTheme">

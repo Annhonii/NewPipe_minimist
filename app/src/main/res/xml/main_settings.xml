@@ -20,7 +20,11 @@
         android:fragment="org.schabi.newpipe.settings.AppearanceSettingsFragment"
         android:icon="@drawable/ic_palette"
         android:title="@string/settings_category_appearance_title"
-        app:iconSpaceReserved="false" />
+        app:iconSpaceReserved="false">
+        <extra
+            android:name="segment_break"
+            android:value="true" />
+    </PreferenceScreen>
 
     <PreferenceScreen
         android:fragment="org.schabi.newpipe.settings.HistorySettingsFragment"
@@ -45,7 +49,11 @@
         android:icon="@drawable/ic_cloud_download"
         android:key="update_pref_screen_key"
         android:title="@string/settings_category_updates_title"
-        app:iconSpaceReserved="false" />
+        app:iconSpaceReserved="false">
+        <extra
+            android:name="segment_break"
+            android:value="true" />
+    </PreferenceScreen>
 
     <PreferenceScreen
         android:fragment="org.schabi.newpipe.settings.BackupRestoreSettingsFragment"

@@ -11,6 +11,8 @@
 
     <ImageView
         android:id="@+id/itemThumbnailView"
+        android:background="@drawable/bg_thumbnail"
+        android:clipToOutline="true"
         android:layout_width="@dimen/video_item_search_thumbnail_image_width"
         android:layout_height="@dimen/video_item_search_thumbnail_image_height"
         android:layout_alignParentStart="true"
@@ -28,7 +30,7 @@
         android:layout_alignTop="@id/itemThumbnailView"
         android:layout_alignEnd="@id/itemThumbnailView"
         android:layout_alignBottom="@id/itemThumbnailView"
-        android:background="@color/playlist_stream_count_background_color"
+        android:background="@drawable/bg_badge_playlist"
         android:drawableTop="@drawable/ic_playlist_play"
         android:drawableTint="@color/duration_text_color"
         android:gravity="center"

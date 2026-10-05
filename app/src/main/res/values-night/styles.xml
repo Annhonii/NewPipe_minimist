@@ -6,4 +6,7 @@
         <item name="android:navigationBarColor">@color/dark_youtube_primary_color</item>
     </style>
 
+    <!-- Dark AlertDialog theme in night mode -->
+    <style name="ThemeOverlay.App.AlertDialog" parent="Theme.App.AlertDialog.Dark" />
+
 </resources>

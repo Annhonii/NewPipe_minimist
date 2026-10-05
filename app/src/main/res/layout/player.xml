@@ -469,7 +469,7 @@
 
                 <org.schabi.newpipe.views.FocusAwareSeekBar
                     android:id="@+id/playbackSeekBar"
-                    style="@style/Widget.AppCompat.SeekBar"
+                    style="@style/Widget.App.SeekBar"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"

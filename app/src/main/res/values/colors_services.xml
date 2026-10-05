@@ -4,35 +4,35 @@
     <color name="light_youtube_primary_color">#D71921</color>
     <color name="light_youtube_accent_color">#000000</color>
 
-    <color name="dark_youtube_primary_color">#E5363D</color>
+    <color name="dark_youtube_primary_color">#D71921</color>
     <color name="dark_youtube_accent_color">#FFFFFF</color>
 
     <!-- SoundCloud -->
     <color name="light_soundcloud_primary_color">#D71921</color>
     <color name="light_soundcloud_accent_color">#000000</color>
 
-    <color name="dark_soundcloud_primary_color">#E5363D</color>
+    <color name="dark_soundcloud_primary_color">#D71921</color>
     <color name="dark_soundcloud_accent_color">#FFFFFF</color>
 
     <!-- PeerTube -->
     <color name="light_peertube_primary_color">#D71921</color>
     <color name="light_peertube_accent_color">#000000</color>
 
-    <color name="dark_peertube_primary_color">#E5363D</color>
+    <color name="dark_peertube_primary_color">#D71921</color>
     <color name="dark_peertube_accent_color">#FFFFFF</color>
 
     <!-- media.ccc.de -->
     <color name="light_media_ccc_primary_color">#D71921</color>
     <color name="light_media_ccc_accent_color">#000000</color>
 
-    <color name="dark_media_ccc_primary_color">#E5363D</color>
+    <color name="dark_media_ccc_primary_color">#D71921</color>
     <color name="dark_media_ccc_accent_color">#FFFFFF</color>
 
     <!-- Bandcamp -->
     <color name="light_bandcamp_primary_color">#D71921</color>
     <color name="light_bandcamp_accent_color">#000000</color>
 
-    <color name="dark_bandcamp_primary_color">#E5363D</color>
+    <color name="dark_bandcamp_primary_color">#D71921</color>
     <color name="dark_bandcamp_accent_color">#FFFFFF</color>
 
 </resources>

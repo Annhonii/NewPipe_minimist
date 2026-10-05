@@ -11,12 +11,14 @@
 
     <ImageView
         android:id="@+id/itemThumbnailView"
+        android:background="@drawable/bg_thumbnail"
+        android:clipToOutline="true"
         android:layout_width="@dimen/video_item_grid_thumbnail_image_width"
         android:layout_height="@dimen/video_item_grid_thumbnail_image_height"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:layout_marginRight="@dimen/video_item_search_image_right_margin"
-        android:scaleType="fitCenter"
+        android:scaleType="centerCrop"
         android:src="@drawable/placeholder_thumbnail_video"
         tools:ignore="RtlHardcoded" />
 
@@ -28,7 +30,7 @@
         android:layout_alignBottom="@id/itemThumbnailView"
         android:layout_marginRight="@dimen/video_item_search_duration_margin"
         android:layout_marginBottom="@dimen/video_item_search_duration_margin"
-        android:background="@color/duration_background_color"
+        android:background="@drawable/bg_badge"
         android:paddingLeft="@dimen/video_item_search_duration_horizontal_padding"
         android:paddingTop="@dimen/video_item_search_duration_vertical_padding"
         android:paddingRight="@dimen/video_item_search_duration_horizontal_padding"

@@ -74,6 +74,7 @@
         <item name="android:textColorSecondary">?attr/actionColor</item>
         <item name="tint">?attr/actionColor</item>
         <item name="iconTint">?attr/actionColor</item>
+        <item name="toolbarNavigationButtonStyle">@style/Widget.App.Toolbar.Button.Navigation</item>
     </style>
     <style name="ToolbarPopupTheme" parent="ThemeOverlay.AppCompat.DayNight.ActionBar">
         <item name="tint">@color/contrastColor</item>
@@ -85,6 +86,7 @@
         <item name="tint">@color/contrastColor</item>
         <item name="iconTint">@color/contrastColor</item>
         <item name="toolbarSearchColor">@color/contrastColor</item>
+        <item name="toolbarNavigationButtonStyle">@style/Widget.App.Toolbar.Button.Navigation</item>
     </style>
 
     <style name="WhiteTintTheme">

@@ -138,4 +138,16 @@
     <!-- Feed Groups dimensions-->
 
     <dimen name="search_suggestion_text_size">16sp</dimen>
+
+    <!-- Music/Nothing design tokens: corner radii -->
+    <dimen name="radius_xs">4dp</dimen>
+    <dimen name="radius_sm">8dp</dimen>
+    <dimen name="radius_md">12dp</dimen>
+    <dimen name="radius_lg">16dp</dimen>
+    <dimen name="radius_xl">24dp</dimen>
+    <!-- Segmented list spacing -->
+    <dimen name="segment_gap">3dp</dimen>
+    <dimen name="segment_padding">16dp</dimen>
+    <dimen name="screen_padding">16dp</dimen>
+    <dimen name="section_gap">24dp</dimen>
 </resources>

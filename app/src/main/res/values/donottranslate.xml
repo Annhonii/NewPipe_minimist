@@ -27,4 +27,5 @@
     <string name="preferred_open_action_share_menu_title">@string/app_name</string>
     <string name="leakcanary">LeakCanary</string>
     <string name="caption_file_name">%1$s-%2$s</string>
+    <string name="empty_list_title">Nothing here</string>
 </resources>

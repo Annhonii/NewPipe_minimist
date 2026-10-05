@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 20dp white thumb inside a 24dp box => 2dp margin to the track edge, like Music's <Switch />. -->
+<inset xmlns:android="http://schemas.android.com/apk/res/android"
+    android:insetLeft="2dp"
+    android:insetTop="2dp"
+    android:insetRight="2dp"
+    android:insetBottom="2dp">
+    <shape android:shape="oval">
+        <solid android:color="@color/white" />
+        <size android:width="20dp" android:height="20dp" />
+    </shape>
+</inset>

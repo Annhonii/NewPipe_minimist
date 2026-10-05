@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Nothing / Music inspired component styles: pill switch, fat pill slider, rounded floating
+    dialogs, rounded popup menus, text buttons, round filled toolbar buttons.
+-->
+<resources>
+
+    <!-- Toggle: 44x24 pill, white 20dp thumb, grey -> accent track -->
+    <style name="Widget.App.Switch" parent="Widget.AppCompat.CompoundButton.Switch">
+        <item name="android:thumb">@drawable/switch_thumb</item>
+        <item name="track">@drawable/switch_track</item>
+        <item name="showText">false</item>
+        <item name="splitTrack">false</item>
+        <item name="switchMinWidth">44dp</item>
+        <item name="switchPadding">0dp</item>
+        <item name="thumbTextPadding">0dp</item>
+    </style>
+
+    <!-- Slider: fat rounded fill without a visible knob -->
+    <style name="Widget.App.SeekBar" parent="Widget.AppCompat.SeekBar">
+        <item name="android:progressDrawable">@drawable/seek_track</item>
+        <item name="android:thumb">@drawable/seek_thumb</item>
+        <item name="android:minHeight">10dp</item>
+        <item name="android:maxHeight">10dp</item>
+        <item name="android:splitTrack">false</item>
+    </style>
+
+    <!-- Menus -->
+    <style name="Widget.App.PopupMenu" parent="Widget.AppCompat.PopupMenu">
+        <item name="android:popupBackground">@drawable/bg_popup_menu</item>
+    </style>
+    <style name="Widget.App.PopupMenu.Overflow" parent="Widget.AppCompat.PopupMenu.Overflow">
+        <item name="android:popupBackground">@drawable/bg_popup_menu</item>
+    </style>
+
+    <!-- Dialog buttons: rounded text buttons in the accent colour -->
+    <style name="Widget.App.DialogButton" parent="Widget.AppCompat.Button.ButtonBar.AlertDialog">
+        <item name="android:textColor">?attr/colorPrimary</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="textAllCaps">false</item>
+        <item name="android:fontFamily">@font/geist_medium</item>
+        <item name="android:background">@drawable/bg_text_button</item>
+        <item name="android:minWidth">64dp</item>
+        <item name="android:minHeight">44dp</item>
+        <item name="android:paddingStart">16dp</item>
+        <item name="android:paddingEnd">16dp</item>
+    </style>
+
+    <!-- Filled accent button (use via style="@style/Widget.App.Button.Filled") -->
+    <style name="Widget.App.Button.Filled" parent="Widget.AppCompat.Button">
+        <item name="android:background">@drawable/bg_button_filled</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="textAllCaps">false</item>
+        <item name="android:fontFamily">@font/geist_medium</item>
+        <item name="android:minHeight">48dp</item>
+        <item name="android:stateListAnimator">@null</item>
+        <item name="android:paddingStart">20dp</item>
+        <item name="android:paddingEnd">20dp</item>
+    </style>
+
+    <!-- Toolbar -->
+    <style name="TextAppearance.App.ToolbarTitle"
+        parent="TextAppearance.AppCompat.Widget.ActionBar.Title">
+        <item name="android:textSize">16sp</item>
+        <item name="android:fontFamily">@font/geist_medium</item>
+    </style>
+    <style name="Widget.App.Toolbar.Button.Navigation"
+        parent="Widget.AppCompat.Toolbar.Button.Navigation">
+        <item name="android:background">@drawable/bg_icon_button</item>
+        <item name="android:minWidth">40dp</item>
+        <item name="android:minHeight">40dp</item>
+        <item name="android:padding">8dp</item>
+    </style>
+
+    <!-- Accent text (Ndot dot-matrix) used for big headings -->
+    <style name="TextAppearance.App.Accent" parent="TextAppearance.AppCompat">
+        <item name="android:fontFamily">@font/ndot</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:letterSpacing">0.02</item>
+    </style>
+    <style name="TextAppearance.App.Headline" parent="TextAppearance.AppCompat">
+        <item name="android:fontFamily">@font/ntype82</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+    <style name="TextAppearance.App.Mono" parent="TextAppearance.AppCompat">
+        <item name="android:fontFamily">@font/geist_mono</item>
+    </style>
+    <style name="TextAppearance.App.SectionLabel" parent="TextAppearance.AppCompat">
+        <item name="android:textSize">12sp</item>
+        <item name="android:fontFamily">@font/geist_medium</item>
+    </style>
+
+    <!-- Window animations -->
+    <style name="Animation.App.Dialog" parent="@android:style/Animation.Dialog">
+        <item name="android:windowEnterAnimation">@anim/dialog_enter</item>
+        <item name="android:windowExitAnimation">@anim/dialog_exit</item>
+    </style>
+
+    <style name="Animation.App.Window" parent="@android:style/Animation.Activity">
+        <item name="android:activityOpenEnterAnimation">@anim/screen_enter</item>
+        <item name="android:activityOpenExitAnimation">@anim/screen_exit</item>
+        <item name="android:activityCloseEnterAnimation">@anim/screen_enter</item>
+        <item name="android:activityCloseExitAnimation">@anim/screen_exit</item>
+    </style>
+
+    <!-- Default dialog theme for AlertDialog.Builder(context); light by default, dark in -night -->
+    <style name="Theme.App.AlertDialog.Light" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="colorPrimary">@color/nothing_red</item>
+        <item name="colorPrimaryDark">@color/nothing_red</item>
+        <item name="colorAccent">@color/nothing_red</item>
+        <item name="android:windowBackground">@drawable/bg_dialog</item>
+        <item name="android:windowAnimationStyle">@style/Animation.App.Dialog</item>
+        <item name="android:fontFamily">@font/geist</item>
+        <item name="fontFamily">@font/geist</item>
+        <item name="android:textColorPrimary">@color/text_primary_light</item>
+        <item name="android:textColorSecondary">@color/text_secondary_light</item>
+        <item name="android:textColorHint">@color/on_surface_variant_light</item>
+        <item name="android:textColorAlertDialogListItem">@color/text_primary_light</item>
+        <item name="surface_bright_color">@color/light_dialog_background_color</item>
+        <item name="switch_track_off_color">@color/switch_track_off_light</item>
+        <item name="card_item_background_color">@color/light_card_item_background_color</item>
+        <item name="card_item_contrast_color">@color/light_card_item_contrast_color</item>
+        <item name="separator_color">@color/light_separator_color</item>
+        <item name="contrast_background_color">@color/light_contrast_background_color</item>
+        <item name="colorControlHighlight">@color/light_ripple_color</item>
+        <item name="buttonBarButtonStyle">@style/Widget.App.DialogButton</item>
+        <item name="switchStyle">@style/Widget.App.Switch</item>
+        <item name="seekBarStyle">@style/Widget.App.SeekBar</item>
+        <item name="popupMenuStyle">@style/Widget.App.PopupMenu</item>
+        <item name="windowBackground">@color/light_dialog_background_color</item>
+    </style>
+    <style name="Theme.App.AlertDialog.Dark" parent="Theme.AppCompat.Dialog.Alert">
+        <item name="colorPrimary">@color/nothing_red</item>
+        <item name="colorPrimaryDark">@color/nothing_red</item>
+        <item name="colorAccent">@color/nothing_red</item>
+        <item name="android:windowBackground">@drawable/bg_dialog</item>
+        <item name="android:windowAnimationStyle">@style/Animation.App.Dialog</item>
+        <item name="android:fontFamily">@font/geist</item>
+        <item name="fontFamily">@font/geist</item>
+        <item name="android:textColorPrimary">@color/text_primary_dark</item>
+        <item name="android:textColorSecondary">@color/text_secondary_dark</item>
+        <item name="android:textColorHint">@color/on_surface_variant_dark</item>
+        <item name="android:textColorAlertDialogListItem">@color/text_primary_dark</item>
+        <item name="surface_bright_color">@color/dark_dialog_background_color</item>
+        <item name="switch_track_off_color">@color/switch_track_off_dark</item>
+        <item name="card_item_background_color">@color/dark_card_item_background_color</item>
+        <item name="card_item_contrast_color">@color/dark_card_item_contrast_color</item>
+        <item name="separator_color">@color/dark_separator_color</item>
+        <item name="contrast_background_color">@color/dark_contrast_background_color</item>
+        <item name="colorControlHighlight">@color/dark_ripple_color</item>
+        <item name="buttonBarButtonStyle">@style/Widget.App.DialogButton</item>
+        <item name="switchStyle">@style/Widget.App.Switch</item>
+        <item name="seekBarStyle">@style/Widget.App.SeekBar</item>
+        <item name="popupMenuStyle">@style/Widget.App.PopupMenu</item>
+        <item name="windowBackground">@color/dark_dialog_background_color</item>
+    </style>
+    <style name="ThemeOverlay.App.AlertDialog" parent="Theme.App.AlertDialog.Light" />
+
+</resources>

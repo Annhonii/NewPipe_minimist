@@ -3,6 +3,7 @@ package org.schabi.newpipe.settings;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
+import android.view.animation.AnimationUtils;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -10,8 +11,12 @@ import androidx.annotation.StringRes;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceManager;
+import androidx.preference.PreferenceScreen;
+import androidx.recyclerview.widget.RecyclerView;
 
 import org.schabi.newpipe.MainActivity;
+import org.schabi.newpipe.R;
+import org.schabi.newpipe.util.DeviceUtils;
 import org.schabi.newpipe.util.ThemeHelper;
 
 import java.util.Objects;
@@ -38,7 +43,27 @@ public abstract class BasePreferenceFragment extends PreferenceFragmentCompat {
                               @Nullable final Bundle savedInstanceState) {
         super.onViewCreated(rootView, savedInstanceState);
         setDivider(null);
+        setupSegmentedList();
         ThemeHelper.setTitleToAppCompatActivity(getActivity(), getPreferenceScreen().getTitle());
+    }
+
+    /**
+     * Gives the list the Music-app look: floating segmented cards (see
+     * {@link SegmentedPreferenceAdapter}) that rise in one after another.
+     */
+    private void setupSegmentedList() {
+        final RecyclerView list = getListView();
+        list.setClipToPadding(false);
+        list.setPadding(0, DeviceUtils.dpToPx(8, requireContext()), 0,
+                DeviceUtils.dpToPx(32, requireContext()));
+        list.setLayoutAnimation(
+                AnimationUtils.loadLayoutAnimation(requireContext(), R.anim.layout_list_enter));
+    }
+
+    @NonNull
+    @Override
+    protected RecyclerView.Adapter onCreateAdapter(@NonNull final PreferenceScreen screen) {
+        return new SegmentedPreferenceAdapter(screen, requireContext());
     }
 
     @Override
