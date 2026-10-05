@@ -70,6 +70,26 @@ public final class CommentRepliesFragment
         return inflater.inflate(R.layout.fragment_comments, container, false);
     }
 
+    private boolean insideSheet() {
+        return getParentFragment() instanceof
+                org.schabi.newpipe.fragments.detail.VideoInfoBottomSheet;
+    }
+
+    @Override
+    public void setTitle(final String title) {
+        if (!insideSheet()) {
+            super.setTitle(title);
+        }
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull final android.view.Menu menu,
+                                    @NonNull final android.view.MenuInflater inflater) {
+        if (!insideSheet()) {
+            super.onCreateOptionsMenu(menu, inflater);
+        }
+    }
+
     @Override
     public void onDestroyView() {
         disposables.clear();

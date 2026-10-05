@@ -13,6 +13,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
@@ -21,7 +22,10 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
 import org.schabi.newpipe.R;
 import org.schabi.newpipe.extractor.stream.StreamInfo;
+import org.schabi.newpipe.extractor.comments.CommentsInfoItem;
+import org.schabi.newpipe.fragments.list.comments.CommentRepliesFragment;
 import org.schabi.newpipe.fragments.list.comments.CommentsFragment;
+import org.schabi.newpipe.util.Localization;
 
 /**
  * YouTube-style sheet that shows either the full comments list or the video description
@@ -50,6 +54,62 @@ public class VideoInfoBottomSheet extends BottomSheetDialogFragment {
         if (f instanceof VideoInfoBottomSheet) {
             ((VideoInfoBottomSheet) f).dismissAllowingStateLoss();
         }
+    }
+
+    /**
+     * Shows the replies of a comment inside the open comments sheet, so the video keeps playing
+     * on top (like YouTube). Returns false if no comments sheet is open.
+     */
+    public static boolean showRepliesIfShown(@NonNull final FragmentActivity activity,
+                                             @NonNull final CommentsInfoItem comment) {
+        final FragmentManager fm = activity.getSupportFragmentManager();
+        final androidx.fragment.app.Fragment f = fm.findFragmentByTag(TAG);
+        if (f instanceof VideoInfoBottomSheet && f.isAdded() && !f.isStateSaved()) {
+            ((VideoInfoBottomSheet) f).showReplies(comment);
+            return true;
+        }
+        return false;
+    }
+
+    private void showReplies(@NonNull final CommentsInfoItem comment) {
+        final View root = getView();
+        if (root != null) {
+            final TextView titleView = root.findViewById(R.id.video_info_sheet_title);
+            titleView.setText(Localization.replyCount(requireContext(), comment.getReplyCount()));
+        }
+        getChildFragmentManager().beginTransaction()
+                .replace(R.id.video_info_sheet_container, new CommentRepliesFragment(comment),
+                        CommentRepliesFragment.TAG)
+                .addToBackStack(CommentRepliesFragment.TAG)
+                .commit();
+    }
+
+    /** Goes back from replies to the comments list. Returns true if it consumed the back. */
+    private boolean popReplies() {
+        final FragmentManager child = getChildFragmentManager();
+        if (child.getBackStackEntryCount() > 0) {
+            child.popBackStack();
+            final View root = getView();
+            if (root != null && child.getBackStackEntryCount() <= 1) {
+                ((TextView) root.findViewById(R.id.video_info_sheet_title))
+                        .setText(R.string.comments_tab_description);
+            }
+            return true;
+        }
+        return false;
+    }
+
+    @NonNull
+    @Override
+    public Dialog onCreateDialog(@Nullable final Bundle savedInstanceState) {
+        return new BottomSheetDialog(requireContext(), getTheme()) {
+            @Override
+            public void onBackPressed() {
+                if (!popReplies()) {
+                    super.onBackPressed();
+                }
+            }
+        };
     }
 
     public static void showComments(@NonNull final FragmentManager fm, final int serviceId,

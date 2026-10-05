@@ -1677,8 +1677,9 @@ public final class VideoDetailFragment
                 binding.detailThumbsDownCountView.setVisibility(View.VISIBLE);
                 binding.detailThumbsDownImgView.setVisibility(View.VISIBLE);
             } else {
+                // like YouTube: the dislike button stays, only its count is hidden
                 binding.detailThumbsDownCountView.setVisibility(View.GONE);
-                binding.detailThumbsDownImgView.setVisibility(View.GONE);
+                binding.detailThumbsDownImgView.setVisibility(View.VISIBLE);
             }
 
             if (info.getLikeCount() >= 0) {
@@ -1817,7 +1818,16 @@ public final class VideoDetailFragment
         }
         binding.detailSubscribeButton.setText(subscribed
                 ? R.string.subscribed_button_title : R.string.subscribe_button_title);
-        binding.detailSubscribeButton.setAlpha(subscribed ? 0.6f : 1f);
+        // YouTube style: filled inverted pill to subscribe, tonal pill once subscribed
+        final android.util.TypedValue tv = new android.util.TypedValue();
+        final android.content.Context ctx = binding.detailSubscribeButton.getContext();
+        ctx.getTheme().resolveAttribute(subscribed
+                ? android.R.attr.textColorPrimary : android.R.attr.colorBackground, tv, true);
+        final int textColor = tv.resourceId != 0
+                ? ContextCompat.getColor(ctx, tv.resourceId) : tv.data;
+        binding.detailSubscribeButton.setBackgroundResource(subscribed
+                ? R.drawable.bg_like_pill : R.drawable.bg_subscribe_pill);
+        binding.detailSubscribeButton.setTextColor(textColor);
     }
 
     private void displayUploaderAsSubChannel(final StreamInfo info) {

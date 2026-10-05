@@ -251,13 +251,11 @@
                         android:id="@+id/detail_uploader_root_layout"
                         android:layout_width="match_parent"
                         android:layout_height="64dp"
-                        android:layout_marginHorizontal="12dp"
-                        android:layout_marginTop="6dp"
-                        android:background="@drawable/bg_channel_box"
+                        android:layout_marginTop="2dp"
                         android:foreground="?attr/selectableItemBackground"
                         android:gravity="center_vertical"
                         android:orientation="horizontal"
-                        android:paddingHorizontal="10dp">
+                        android:paddingHorizontal="12dp">
 
                         <FrameLayout
                             android:layout_width="wrap_content"
@@ -265,8 +263,8 @@
 
                             <com.google.android.material.imageview.ShapeableImageView
                                 android:id="@+id/detail_sub_channel_thumbnail_view"
-                                android:layout_width="@dimen/video_item_detail_uploader_image_size"
-                                android:layout_height="@dimen/video_item_detail_uploader_image_size"
+                                android:layout_width="40dp"
+                                android:layout_height="40dp"
                                 android:contentDescription="@string/detail_sub_channel_thumbnail_view_description"
                                 android:src="@drawable/placeholder_person"
                                 app:shapeAppearance="@style/CircularImageView" />
@@ -286,7 +284,7 @@
                         <LinearLayout
                             android:layout_width="0dp"
                             android:layout_height="match_parent"
-                            android:layout_marginLeft="10dp"
+                            android:layout_marginLeft="12dp"
                             android:layout_weight="1"
                             android:gravity="center_vertical"
                             android:orientation="vertical"
@@ -302,7 +300,7 @@
                                 android:scrollHorizontally="true"
                                 android:singleLine="true"
                                 android:textAppearance="?android:attr/textAppearanceLarge"
-                                android:textSize="@dimen/video_item_detail_sub_channel_text_size"
+                                android:textSize="15sp"
                                 android:textStyle="normal|bold"
                                 tools:ignore="RtlHardcoded"
                                 tools:text="Channel" />
@@ -316,7 +314,8 @@
                                 android:marqueeRepeatLimit="marquee_forever"
                                 android:scrollHorizontally="true"
                                 android:singleLine="true"
-                                android:textSize="@dimen/video_item_detail_uploader_text_size"
+                                android:textSize="12sp"
+                                android:alpha="0.7"
                                 tools:ignore="RtlHardcoded"
                                 tools:text="Uploader" />
 
@@ -327,13 +326,14 @@
                             android:layout_width="wrap_content"
                             android:layout_height="36dp"
                             android:layout_marginStart="8dp"
-                            android:background="@drawable/bg_like_pill"
+                            android:background="@drawable/bg_subscribe_pill"
                             android:clickable="true"
                             android:focusable="true"
                             android:gravity="center"
                             android:paddingHorizontal="16dp"
                             android:text="@string/subscribe_button_title"
-                            android:textSize="13sp"
+                            android:textColor="?android:attr/colorBackground"
+                            android:textSize="14sp"
                             android:textStyle="bold"
                             android:visibility="gone"
                             tools:visibility="visible" />

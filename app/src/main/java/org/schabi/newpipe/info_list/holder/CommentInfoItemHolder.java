@@ -178,8 +178,12 @@ public class CommentInfoItemHolder extends InfoItemHolder {
     }
 
     private void openCommentReplies(@NonNull final CommentsInfoItem item) {
-        NavigationHelper.openCommentRepliesFragment((FragmentActivity) itemBuilder.getContext(),
-                item);
+        final FragmentActivity activity = (FragmentActivity) itemBuilder.getContext();
+        // inside the comments sheet the replies open in the sheet, so the video stays visible
+        if (!org.schabi.newpipe.fragments.detail.VideoInfoBottomSheet
+                .showRepliesIfShown(activity, item)) {
+            NavigationHelper.openCommentRepliesFragment(activity, item);
+        }
     }
 
     private void allowLinkFocus() {
