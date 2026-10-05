@@ -561,101 +561,112 @@
 
                     </LinearLayout>
 
-                    <!-- COMMENTS PREVIEW (YouTube-style) -->
-                    <LinearLayout
-                        android:id="@+id/detail_comments_card"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginHorizontal="12dp"
-                        android:layout_marginTop="8dp"
-                        android:background="@drawable/bg_comment_card"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:foreground="?attr/selectableItemBackground"
-                        android:orientation="vertical"
-                        android:padding="12dp"
-                        android:visibility="gone"
-                        tools:visibility="visible">
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:gravity="center_vertical"
-                            android:orientation="horizontal">
-
-                            <org.schabi.newpipe.views.NewPipeTextView
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:fontFamily="monospace"
-                                android:text="@string/comments_tab_description"
-                                android:textSize="14sp"
-                                android:textStyle="bold" />
-
-                            <ImageView
-                                android:layout_width="20dp"
-                                android:layout_height="20dp"
-                                android:rotation="270"
-                                android:src="@drawable/ic_expand_more"
-                                tools:ignore="ContentDescription" />
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="8dp"
-                            android:gravity="center_vertical"
-                            android:orientation="horizontal">
-
-                            <com.google.android.material.imageview.ShapeableImageView
-                                android:id="@+id/detail_comment_preview_avatar"
-                                android:layout_width="24dp"
-                                android:layout_height="24dp"
-                                android:src="@drawable/placeholder_person"
-                                android:visibility="gone"
-                                app:shapeAppearance="@style/CircularImageView"
-                                tools:ignore="ContentDescription"
-                                tools:visibility="visible" />
-
-                            <org.schabi.newpipe.views.NewPipeTextView
-                                android:id="@+id/detail_comment_preview_text"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_marginStart="10dp"
-                                android:layout_weight="1"
-                                android:ellipsize="end"
-                                android:maxLines="2"
-                                android:textSize="13sp"
-                                tools:text="Top comment preview goes here" />
-                        </LinearLayout>
-                    </LinearLayout>
-
-                    <View
-                        android:id="@+id/detail_meta_info_separator"
-                        android:layout_width="match_parent"
-                        android:layout_height="1px"
-                        android:layout_marginLeft="8dp"
-                        android:layout_marginRight="8dp"
-                        android:background="?attr/separator_color" />
-
-                    <org.schabi.newpipe.views.NewPipeTextView
-                        android:id="@+id/detail_meta_info_text_view"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:padding="12dp"
-                        android:textSize="@dimen/video_item_detail_description_text_size"
-                        tools:text="Stream meta info with link" />
-
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1px"
-                        android:layout_marginLeft="8dp"
-                        android:layout_marginRight="8dp"
-                        android:background="?attr/separator_color" />
-
                 </LinearLayout>
             </RelativeLayout>
+
+            <!-- Scrolls away together with the related videos list (second AppBar child, the
+                 first one above stays pinned under the video). -->
+            <LinearLayout
+                android:id="@+id/detail_scrolling_extras"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_scrollFlags="scroll">
+
+                <!-- COMMENTS PREVIEW (YouTube-style) -->
+                <LinearLayout
+                    android:id="@+id/detail_comments_card"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="12dp"
+                    android:layout_marginTop="8dp"
+                    android:background="@drawable/bg_comment_card"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackground"
+                    android:orientation="vertical"
+                    android:padding="12dp"
+                    android:visibility="gone"
+                    tools:visibility="visible">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <org.schabi.newpipe.views.NewPipeTextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:fontFamily="monospace"
+                            android:text="@string/comments_tab_description"
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
+
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:rotation="270"
+                            android:src="@drawable/ic_expand_more"
+                            tools:ignore="ContentDescription" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <com.google.android.material.imageview.ShapeableImageView
+                            android:id="@+id/detail_comment_preview_avatar"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:src="@drawable/placeholder_person"
+                            android:visibility="gone"
+                            app:shapeAppearance="@style/CircularImageView"
+                            tools:ignore="ContentDescription"
+                            tools:visibility="visible" />
+
+                        <org.schabi.newpipe.views.NewPipeTextView
+                            android:id="@+id/detail_comment_preview_text"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="10dp"
+                            android:layout_weight="1"
+                            android:ellipsize="end"
+                            android:maxLines="2"
+                            android:textSize="13sp"
+                            tools:text="Top comment preview goes here" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <View
+                    android:id="@+id/detail_meta_info_separator"
+                    android:layout_width="match_parent"
+                    android:layout_height="1px"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginRight="8dp"
+                    android:background="?attr/separator_color" />
+
+                <org.schabi.newpipe.views.NewPipeTextView
+                    android:id="@+id/detail_meta_info_text_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:padding="12dp"
+                    android:textSize="@dimen/video_item_detail_description_text_size"
+                    tools:text="Stream meta info with link" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1px"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginRight="8dp"
+                    android:background="?attr/separator_color" />
+
+            </LinearLayout>
         </com.google.android.material.appbar.AppBarLayout>
 
         <androidx.viewpager.widget.ViewPager
