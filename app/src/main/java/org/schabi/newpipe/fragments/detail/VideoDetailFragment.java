@@ -1239,8 +1239,9 @@ public final class VideoDetailFragment
      * {@code forceFullscreen} is reset to {@code false} after this call.
      */
     public void openVideoPlayerAutoFullscreen() {
-        openVideoPlayer(forceFullscreen
-                || PlayerHelper.isStartMainPlayerFullscreenEnabled(requireContext()));
+        // Like YouTube, the video starts inline in the player area under the status bar; the
+        // user goes fullscreen with the fullscreen button (or by rotating the phone).
+        openVideoPlayer(forceFullscreen);
         forceFullscreen = false;
     }
 
@@ -1663,35 +1664,18 @@ public final class VideoDetailFragment
             }
         }
 
-        if (info.getDislikeCount() == -1 && info.getLikeCount() == -1) {
-            binding.detailThumbsDownImgView.setVisibility(View.VISIBLE);
-            binding.detailThumbsUpImgView.setVisibility(View.VISIBLE);
-            binding.detailThumbsUpCountView.setVisibility(View.GONE);
-            binding.detailThumbsDownCountView.setVisibility(View.GONE);
-
-            binding.detailThumbsDisabledView.setVisibility(View.VISIBLE);
+        // YouTube style: [like icon] [like count] | [dislike icon] - no dislike count and no
+        // "disabled" label (YouTube hides dislike counts, so the extractor often has none)
+        binding.detailThumbsUpImgView.setVisibility(View.VISIBLE);
+        binding.detailThumbsDownImgView.setVisibility(View.VISIBLE);
+        binding.detailThumbsDownCountView.setVisibility(View.GONE);
+        binding.detailThumbsDisabledView.setVisibility(View.GONE);
+        if (info.getLikeCount() >= 0) {
+            binding.detailThumbsUpCountView.setText(Localization.shortCount(activity,
+                    info.getLikeCount()));
+            binding.detailThumbsUpCountView.setVisibility(View.VISIBLE);
         } else {
-            if (info.getDislikeCount() >= 0) {
-                binding.detailThumbsDownCountView.setText(Localization
-                        .shortCount(activity, info.getDislikeCount()));
-                binding.detailThumbsDownCountView.setVisibility(View.VISIBLE);
-                binding.detailThumbsDownImgView.setVisibility(View.VISIBLE);
-            } else {
-                // like YouTube: the dislike button stays, only its count is hidden
-                binding.detailThumbsDownCountView.setVisibility(View.GONE);
-                binding.detailThumbsDownImgView.setVisibility(View.VISIBLE);
-            }
-
-            if (info.getLikeCount() >= 0) {
-                binding.detailThumbsUpCountView.setText(Localization.shortCount(activity,
-                        info.getLikeCount()));
-                binding.detailThumbsUpCountView.setVisibility(View.VISIBLE);
-                binding.detailThumbsUpImgView.setVisibility(View.VISIBLE);
-            } else {
-                binding.detailThumbsUpCountView.setVisibility(View.GONE);
-                binding.detailThumbsUpImgView.setVisibility(View.GONE);
-            }
-            binding.detailThumbsDisabledView.setVisibility(View.GONE);
+            binding.detailThumbsUpCountView.setVisibility(View.GONE);
         }
 
         if (info.getDuration() > 0) {

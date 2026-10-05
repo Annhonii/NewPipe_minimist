@@ -169,12 +169,11 @@
             app:elevation="0dp"
             app:layout_behavior="com.google.android.material.appbar.FlingBehavior">
 
-            <!-- CONTENT -->
+            <!-- CONTENT (no scroll flags: stays pinned under the video, only the related list scrolls) -->
             <RelativeLayout
                 android:id="@+id/detail_content_root_layout"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:layout_scrollFlags="scroll">
+                android:layout_height="wrap_content">
 
                 <!-- TITLE -->
                 <FrameLayout

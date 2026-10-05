@@ -119,12 +119,8 @@ public final class MainPlayerUi extends VideoPlayerUi implements View.OnLayoutCh
      * enough for phones, but not for tablets since the mini player can be also shown in landscape.
      */
     private void directlyOpenFullscreenIfNeeded() {
-        if (PlayerHelper.isStartMainPlayerFullscreenEnabled(player.getService())
-                && DeviceUtils.isTablet(player.getService())
-                && PlayerHelper.globalScreenOrientationLocked(player.getService())) {
-            player.getFragmentListener().ifPresent(
-                    PlayerServiceEventListener::onScreenRotationButtonClicked);
-        }
+        // Intentionally empty: like YouTube, the video always starts inline (under the status
+        // bar) and never jumps to fullscreen by itself; use the fullscreen button instead.
     }
 
     @Override
