@@ -101,7 +101,7 @@ public class MainFragment extends BaseFragment implements TabLayout.OnTabSelecte
 
         binding = FragmentMainBinding.bind(rootView);
 
-        // icon-only floating pill: tabs always share the width, no scrolling
+        // floating text pill: tabs always share the width, no scrolling
         binding.mainTabLayout.setFixedModeOnly(true);
         binding.mainTabLayout.setupWithViewPager(binding.pager);
         binding.mainTabLayout.addOnTabSelectedListener(this);
@@ -205,18 +205,18 @@ public class MainFragment extends BaseFragment implements TabLayout.OnTabSelecte
         binding.pager.setAdapter(null);
         binding.pager.setAdapter(pagerAdapter);
 
-        updateTabsIconAndDescription();
+        updateTabsTextAndDescription();
         updateTitleForTab(binding.pager.getCurrentItem());
 
         hasTabsChanged = false;
     }
 
-    private void updateTabsIconAndDescription() {
+    private void updateTabsTextAndDescription() {
         for (int i = 0; i < tabsList.size(); i++) {
             final TabLayout.Tab tabToSet = binding.mainTabLayout.getTabAt(i);
             if (tabToSet != null) {
                 final Tab tab = tabsList.get(i);
-                tabToSet.setIcon(tab.getTabIconRes(requireContext()));
+                tabToSet.setText(tab.getTabName(requireContext()));
                 tabToSet.setContentDescription(tab.getTabName(requireContext()));
             }
         }

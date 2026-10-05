@@ -8,7 +8,7 @@
          A rounded pill that floats at the bottom; the selected tab gets a soft pill behind it. -->
     <org.schabi.newpipe.views.ScrollableTabLayout
         android:id="@+id/main_tab_layout"
-        android:layout_width="420dp"
+        android:layout_width="480dp"
         android:layout_height="56dp"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
@@ -16,15 +16,17 @@
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
         android:background="@drawable/bg_nav_pill"
-        android:elevation="6dp"
+        android:elevation="10dp"
         android:padding="4dp"
         app:tabGravity="fill"
-        app:tabIconTint="@color/tab_icon_tint"
         app:tabBackground="@drawable/nav_pill_tab_bg"
         app:tabIndicatorHeight="0dp"
         app:tabMinWidth="60dp"
         app:tabPaddingEnd="0dp"
         app:tabPaddingStart="0dp"
+        app:tabSelectedTextColor="?attr/colorPrimary"
+        app:tabTextAppearance="@style/TextAppearance.App.Tab"
+        app:tabTextColor="?android:attr/textColorPrimary"
         app:tabRippleColor="@android:color/transparent" />
 
     <androidx.viewpager.widget.ViewPager

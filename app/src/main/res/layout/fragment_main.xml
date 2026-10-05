@@ -4,7 +4,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- A rounded pill that floats at the bottom; the selected tab draws its own soft pill (nav_pill_tab_bg). -->
+    <!-- A white pill with text labels that floats at the bottom; the selected tab draws its own
+         soft grey pill (nav_pill_tab_bg) and turns accent coloured. -->
     <org.schabi.newpipe.views.ScrollableTabLayout
         android:id="@+id/main_tab_layout"
         android:layout_width="match_parent"
@@ -14,15 +15,17 @@
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
         android:background="@drawable/bg_nav_pill"
-        android:elevation="6dp"
+        android:elevation="10dp"
         android:padding="4dp"
         app:tabGravity="fill"
-        app:tabIconTint="@color/tab_icon_tint"
         app:tabBackground="@drawable/nav_pill_tab_bg"
         app:tabIndicatorHeight="0dp"
         app:tabMinWidth="0dp"
         app:tabPaddingEnd="0dp"
         app:tabPaddingStart="0dp"
+        app:tabSelectedTextColor="?attr/colorPrimary"
+        app:tabTextAppearance="@style/TextAppearance.App.Tab"
+        app:tabTextColor="?android:attr/textColorPrimary"
         app:tabRippleColor="@android:color/transparent" />
 
     <androidx.viewpager.widget.ViewPager
