@@ -169,11 +169,13 @@
             app:elevation="0dp"
             app:layout_behavior="com.google.android.material.appbar.FlingBehavior">
 
-            <!-- CONTENT (no scroll flags: stays pinned under the video, only the related list scrolls) -->
+            <!-- CONTENT: only the video is pinned (YouTube style); title, channel, actions, comments and
+                 related videos all scroll together under it -->
             <RelativeLayout
                 android:id="@+id/detail_content_root_layout"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                app:layout_scrollFlags="scroll">
 
                 <!-- TITLE -->
                 <FrameLayout
@@ -564,8 +566,7 @@
                 </LinearLayout>
             </RelativeLayout>
 
-            <!-- Scrolls away together with the related videos list (second AppBar child, the
-                 first one above stays pinned under the video). -->
+            <!-- Scrolls away together with the related videos list -->
             <LinearLayout
                 android:id="@+id/detail_scrolling_extras"
                 android:layout_width="match_parent"

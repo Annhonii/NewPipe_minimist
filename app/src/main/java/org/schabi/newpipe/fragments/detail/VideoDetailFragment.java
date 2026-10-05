@@ -1469,6 +1469,15 @@ public final class VideoDetailFragment
     }
 
     private void setHeightThumbnail(final int newHeight, final DisplayMetrics metrics) {
+        // The thumbnail/player container is wrap_content and the player view inside it is
+        // match_parent: without an explicit height it would grow to the whole screen and push
+        // the video info and related videos out of view. Pin it to the video height (16:9).
+        final ViewGroup.LayoutParams rootParams = binding.detailThumbnailRootLayout
+                .getLayoutParams();
+        if (rootParams != null && rootParams.height != newHeight) {
+            rootParams.height = newHeight;
+            binding.detailThumbnailRootLayout.setLayoutParams(rootParams);
+        }
         binding.detailThumbnailImageView.setLayoutParams(
                 new FrameLayout.LayoutParams(
                         RelativeLayout.LayoutParams.MATCH_PARENT, newHeight));
