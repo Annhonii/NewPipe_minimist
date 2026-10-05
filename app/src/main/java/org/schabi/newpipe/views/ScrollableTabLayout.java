@@ -3,6 +3,8 @@ package org.schabi.newpipe.views;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
 
@@ -35,6 +37,15 @@ public class ScrollableTabLayout extends TabLayout {
     }
 
     @Override
+    protected void onMeasure(final int widthMeasureSpec, final int heightMeasureSpec) {
+        // Done on every measure pass (and not once when tabs get added) because TabLayout resets
+        // the size of its tabs by itself, e.g. when its mode changes.
+        applyPillTabWidths(View.MeasureSpec.getMode(widthMeasureSpec),
+                View.MeasureSpec.getSize(widthMeasureSpec));
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+    }
+
+    @Override
     protected void onLayout(final boolean changed, final int l, final int t, final int r,
                             final int b) {
         super.onLayout(changed, l, t, r, b);
@@ -47,7 +58,6 @@ public class ScrollableTabLayout extends TabLayout {
         super.onSizeChanged(w, h, oldw, oldh);
 
         layoutWidth = w;
-        applyPillTabWidths();
     }
 
     @Override
@@ -55,7 +65,6 @@ public class ScrollableTabLayout extends TabLayout {
         super.addTab(tab, position, setSelected);
 
         hasMultipleTabs();
-        applyPillTabWidths();
 
         // Adding a tab won't decrease total tabs' width so tabMode won't have to change to FIXED
         if (getTabMode() != MODE_SCROLLABLE) {
@@ -68,7 +77,6 @@ public class ScrollableTabLayout extends TabLayout {
         super.removeTabAt(position);
 
         hasMultipleTabs();
-        applyPillTabWidths();
 
         // Removing a tab won't increase total tabs' width
         // so tabMode won't have to change to SCROLLABLE
@@ -120,24 +128,32 @@ public class ScrollableTabLayout extends TabLayout {
         pillVisibleTabs = Math.max(0, visibleTabs);
         if (pillVisibleTabs > 0) {
             setMode(MODE_SCROLLABLE);
-            applyPillTabWidths();
+            requestLayout();
         } else {
             remeasureTabs();
         }
     }
 
-    private void applyPillTabWidths() {
+    private void applyPillTabWidths(final int widthMode, final int availableWidth) {
         final int count = getTabCount();
-        final int viewport = getWidth() - getPaddingLeft() - getPaddingRight();
-        if (pillVisibleTabs <= 0 || count == 0 || viewport <= 0) {
+        final int viewport = availableWidth - getPaddingLeft() - getPaddingRight();
+        if (pillVisibleTabs <= 0 || count == 0 || viewport <= 0
+                || widthMode == View.MeasureSpec.UNSPECIFIED) {
             return;
         }
 
         final int tabWidth = viewport / Math.min(count, pillVisibleTabs);
         for (int i = 0; i < count; i++) {
             final Tab tab = getTabAt(i);
-            if (tab != null && tab.view.getMinimumWidth() != tabWidth) {
-                tab.view.setMinimumWidth(tabWidth);
+            final ViewGroup.LayoutParams params = tab == null ? null : tab.view.getLayoutParams();
+            if (params == null) {
+                continue;
+            }
+            // The params object is changed in place: we are in the middle of a measure pass, so
+            // the tab is measured with the new width right after this, without a new layout pass.
+            params.width = tabWidth;
+            if (params instanceof LinearLayout.LayoutParams) {
+                ((LinearLayout.LayoutParams) params).weight = 0;
             }
         }
     }
