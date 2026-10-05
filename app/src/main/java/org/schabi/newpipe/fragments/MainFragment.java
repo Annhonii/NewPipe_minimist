@@ -47,6 +47,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MainFragment extends BaseFragment implements TabLayout.OnTabSelectedListener {
+    /** How many icons fit in the floating nav pill before it starts to scroll. */
+    private static final int PILL_VISIBLE_TABS = 4;
     private FragmentMainBinding binding;
     private SelectedTabsPagerAdapter pagerAdapter;
 
@@ -102,8 +104,8 @@ public class MainFragment extends BaseFragment implements TabLayout.OnTabSelecte
 
         binding = FragmentMainBinding.bind(rootView);
 
-        // icon-only floating pill: tabs always share the width, no scrolling
-        binding.mainTabLayout.setFixedModeOnly(true);
+        // icon-only floating pill: four icons are visible, more tabs are reached by swiping
+        binding.mainTabLayout.setPillVisibleTabs(PILL_VISIBLE_TABS);
         binding.mainTabLayout.setSelectedTabIndicatorColor(ThemeHelper.resolveColorFromAttr(
                 requireContext(), R.attr.card_item_contrast_color));
         binding.mainTabLayout.setupWithViewPager(binding.pager);

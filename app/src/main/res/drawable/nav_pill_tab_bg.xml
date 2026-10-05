@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Background of one nav pill tab: a full pill highlight, cross-faded when the tab is selected.
+     The outer pill's 4dp padding provides the gap to its edge, so no inset is needed here. -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:enterFadeDuration="220"
+    android:exitFadeDuration="220">
+    <item android:state_selected="true">
+        <shape android:shape="rectangle">
+            <solid android:color="?attr/card_item_contrast_color" />
+            <corners android:radius="100dp" />
+        </shape>
+    </item>
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="@android:color/transparent" />
+            <corners android:radius="100dp" />
+        </shape>
+    </item>
+</selector>

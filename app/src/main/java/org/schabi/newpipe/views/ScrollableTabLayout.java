@@ -18,6 +18,8 @@ public class ScrollableTabLayout extends TabLayout {
     private int layoutWidth = 0;
     private int prevVisibility = View.GONE;
     private boolean fixedModeOnly = false;
+    /** If greater than zero, the tabs are laid out as in the floating nav pill. */
+    private int pillVisibleTabs = 0;
 
     public ScrollableTabLayout(final Context context) {
         super(context);
@@ -45,6 +47,7 @@ public class ScrollableTabLayout extends TabLayout {
         super.onSizeChanged(w, h, oldw, oldh);
 
         layoutWidth = w;
+        applyPillTabWidths();
     }
 
     @Override
@@ -52,6 +55,7 @@ public class ScrollableTabLayout extends TabLayout {
         super.addTab(tab, position, setSelected);
 
         hasMultipleTabs();
+        applyPillTabWidths();
 
         // Adding a tab won't decrease total tabs' width so tabMode won't have to change to FIXED
         if (getTabMode() != MODE_SCROLLABLE) {
@@ -64,6 +68,7 @@ public class ScrollableTabLayout extends TabLayout {
         super.removeTabAt(position);
 
         hasMultipleTabs();
+        applyPillTabWidths();
 
         // Removing a tab won't increase total tabs' width
         // so tabMode won't have to change to SCROLLABLE
@@ -87,9 +92,8 @@ public class ScrollableTabLayout extends TabLayout {
     }
 
     /**
-     * Keep the tabs equally spread over the whole width and never scroll them. Used by the
-     * floating nav pill (icon-only tabs), where scrolling made the selection pill glitch on the
-     * last tab.
+     * Keep the tabs equally spread over the whole width and never scroll them. Superseded
+     * by {@link #setPillVisibleTabs(int)} for the floating nav pill.
      *
      * @param fixedOnly true to always use {@link TabLayout#MODE_FIXED}
      */
@@ -99,6 +103,42 @@ public class ScrollableTabLayout extends TabLayout {
             setMode(MODE_FIXED);
         } else {
             remeasureTabs();
+        }
+    }
+
+    /**
+     * Lays the tabs out like the floating nav pill: at most {@code visibleTabs} tabs are shown at
+     * once, each of them getting the same share of the width. If there are more tabs, the rest is
+     * reached by swiping the tabs sideways. With fewer tabs they share the whole width.
+     *
+     * <p>This view must not have padding, because {@link TabLayout} ignores it when it measures
+     * its tabs and the last tab (and its indicator) would be cut off.</p>
+     *
+     * @param visibleTabs how many tabs fit on screen at once, or 0 to switch this mode off
+     */
+    public void setPillVisibleTabs(final int visibleTabs) {
+        pillVisibleTabs = Math.max(0, visibleTabs);
+        if (pillVisibleTabs > 0) {
+            setMode(MODE_SCROLLABLE);
+            applyPillTabWidths();
+        } else {
+            remeasureTabs();
+        }
+    }
+
+    private void applyPillTabWidths() {
+        final int count = getTabCount();
+        final int viewport = getWidth() - getPaddingLeft() - getPaddingRight();
+        if (pillVisibleTabs <= 0 || count == 0 || viewport <= 0) {
+            return;
+        }
+
+        final int tabWidth = viewport / Math.min(count, pillVisibleTabs);
+        for (int i = 0; i < count; i++) {
+            final Tab tab = getTabAt(i);
+            if (tab != null && tab.view.getMinimumWidth() != tabWidth) {
+                tab.view.setMinimumWidth(tabWidth);
+            }
         }
     }
 
@@ -125,6 +165,10 @@ public class ScrollableTabLayout extends TabLayout {
      * Calculate minimal width required by tabs and set tabMode accordingly.
      */
     private void remeasureTabs() {
+        if (pillVisibleTabs > 0) {
+            setMode(MODE_SCROLLABLE);
+            return;
+        }
         if (fixedModeOnly) {
             setMode(MODE_FIXED);
             return;
