@@ -295,4 +295,65 @@ object YtInnerTube {
         }
         return Page(out.filter { it.name.isNotBlank() }, continuationOf(json))
     }
+
+    // ---------------------------------------------------------------- likes & comments
+
+    private fun allStrings(node: Any?, key: String, out: MutableList<String> = ArrayList()): List<String> {
+        when (node) {
+            is JSONObject -> {
+                val keys = node.keys()
+                while (keys.hasNext()) {
+                    val k = keys.next()
+                    val v = node.opt(k)
+                    if (k == key && v is String && v.isNotEmpty()) out.add(v)
+                    if (v is JSONObject || v is JSONArray) allStrings(v, key, out)
+                }
+            }
+            is JSONArray -> for (i in 0 until node.length()) allStrings(node.opt(i), key, out)
+        }
+        return out
+    }
+
+    /** action: "like", "dislike" or "removelike". */
+    fun rate(session: YtAccountStore.Session, videoId: String, action: String) {
+        val body = JSONObject().put("target", JSONObject().put("videoId", videoId))
+        post("like/$action", body, session)
+    }
+
+    /** "LIKE", "DISLIKE" or "INDIFFERENT"; null when it could not be determined. */
+    fun likeStatus(session: YtAccountStore.Session, videoId: String): String? {
+        val json = post("next", JSONObject().put("videoId", videoId), session)
+        return allStrings(json, "likeStatus").firstOrNull { it in setOf("LIKE", "DISLIKE", "INDIFFERENT") }
+    }
+
+    private fun createCommentParams(session: YtAccountStore.Session, videoId: String): String? {
+        val next = post("next", JSONObject().put("videoId", videoId), session)
+        allStrings(next, "createCommentParams").firstOrNull()?.let { return it }
+
+        val tokens = ArrayList<String>()
+        collect(next, "itemSectionRenderer").forEach { sec ->
+            val sid = sec.optString("sectionIdentifier")
+            val tid = sec.optString("targetId")
+            if (sid == "comment-item-section" || tid.contains("comments-section")) {
+                allStrings(sec, "token").forEach { tokens.add(it) }
+            }
+        }
+        if (tokens.isEmpty()) allStrings(next, "token").forEach { tokens.add(it) }
+
+        for (t in tokens.take(4)) {
+            val r = runCatching { post("next", JSONObject().put("continuation", t), session) }.getOrNull() ?: continue
+            allStrings(r, "createCommentParams").firstOrNull()?.let { return it }
+        }
+        return null
+    }
+
+    fun postComment(session: YtAccountStore.Session, videoId: String, commentText: String) {
+        val params = createCommentParams(session, videoId)
+            ?: throw IOException("Comments are not available for this video")
+        val body = JSONObject().put("createCommentParams", params).put("commentText", commentText)
+        val r = post("comment/create_comment", body, session)
+        if (r.has("error")) {
+            throw IOException(r.optJSONObject("error")?.optString("message").orEmpty().ifBlank { "Comment was rejected" })
+        }
+    }
 }

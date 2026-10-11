@@ -27,6 +27,9 @@ import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.view.Gravity;
+import android.text.InputType;
+import android.content.res.ColorStateList;
 import android.os.Handler;
 import android.os.Looper;
 import android.provider.Settings;
@@ -43,12 +46,15 @@ import android.view.animation.DecelerateInterpolator;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
+import android.widget.EditText;
 
 import androidx.annotation.AttrRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.appcompat.app.AlertDialog;
+import com.google.android.material.color.MaterialColors;
+import androidx.core.widget.ImageViewCompat;
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.appcompat.widget.Toolbar;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
@@ -66,6 +72,8 @@ import com.google.android.material.tabs.TabLayout;
 
 import org.schabi.newpipe.App;
 import org.schabi.newpipe.R;
+import org.schabi.newpipe.extractor.ServiceList;
+import org.schabi.newpipe.account.YtEngagement;
 import org.schabi.newpipe.database.stream.model.StreamEntity;
 import org.schabi.newpipe.databinding.FragmentVideoDetailBinding;
 import org.schabi.newpipe.download.DownloadDialog;
@@ -460,6 +468,115 @@ public final class VideoDetailFragment
     }
 
     /*//////////////////////////////////////////////////////////////////////////
+    // Google account actions: like / dislike / comment
+    //////////////////////////////////////////////////////////////////////////*/
+
+    private String ytLikeState = "INDIFFERENT";
+
+    private boolean isYoutubeInfo(@Nullable final StreamInfo info) {
+        return info != null && info.getServiceId() == ServiceList.YouTube.getServiceId();
+    }
+
+    private void setupYtEngagement(@NonNull final StreamInfo info) {
+        ytLikeState = "INDIFFERENT";
+        applyLikeTint();
+        if (!isYoutubeInfo(info) || !YtEngagement.isLoggedIn(activity)) {
+            return;
+        }
+        disposables.add(YtEngagement.likeStatus(activity, info.getId())
+                .subscribe(state -> {
+                    if (currentInfo == info) {
+                        ytLikeState = state;
+                        applyLikeTint();
+                    }
+                }, e -> { }));
+    }
+
+    private void applyLikeTint() {
+        if (binding == null) {
+            return;
+        }
+        final int accent = MaterialColors.getColor(binding.detailThumbsUpImgView,
+                androidx.appcompat.R.attr.colorPrimary);
+        ImageViewCompat.setImageTintList(binding.detailThumbsUpImgView,
+                "LIKE".equals(ytLikeState) ? ColorStateList.valueOf(accent) : null);
+        ImageViewCompat.setImageTintList(binding.detailThumbsDownImgView,
+                "DISLIKE".equals(ytLikeState) ? ColorStateList.valueOf(accent) : null);
+    }
+
+    private void onRateClicked(final boolean like) {
+        final StreamInfo info = currentInfo;
+        if (!isYoutubeInfo(info)) {
+            return;
+        }
+        if (!YtEngagement.isLoggedIn(activity)) {
+            Toast.makeText(activity, R.string.yt_sign_in_required, Toast.LENGTH_LONG).show();
+            return;
+        }
+        final String previous = ytLikeState;
+        final String target = like ? "LIKE" : "DISLIKE";
+        final String action;
+        final String next;
+        if (target.equals(previous)) {
+            action = "removelike";
+            next = "INDIFFERENT";
+        } else {
+            action = like ? "like" : "dislike";
+            next = target;
+        }
+        ytLikeState = next;
+        applyLikeTint();
+        disposables.add(YtEngagement.rate(activity, info.getId(), action)
+                .subscribe(() -> { }, e -> {
+                    ytLikeState = previous;
+                    applyLikeTint();
+                    Toast.makeText(activity, getString(R.string.yt_rate_failed, e.getMessage()),
+                            Toast.LENGTH_LONG).show();
+                }));
+    }
+
+    private void showAddCommentDialog() {
+        final StreamInfo info = currentInfo;
+        if (!isYoutubeInfo(info)) {
+            return;
+        }
+        if (!YtEngagement.isLoggedIn(activity)) {
+            Toast.makeText(activity, R.string.yt_sign_in_required, Toast.LENGTH_LONG).show();
+            return;
+        }
+        final EditText input = new EditText(activity);
+        input.setHint(R.string.yt_comment_hint);
+        input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE
+                | InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);
+        input.setMinLines(3);
+        input.setMaxLines(8);
+        input.setGravity(Gravity.TOP | Gravity.START);
+        final int pad = (int) (20 * getResources().getDisplayMetrics().density);
+        final FrameLayout holder = new FrameLayout(activity);
+        holder.setPadding(pad, pad / 2, pad, 0);
+        holder.addView(input);
+        new AlertDialog.Builder(activity)
+                .setTitle(R.string.yt_add_comment)
+                .setView(holder)
+                .setPositiveButton(R.string.yt_comment_post, (d, w) -> {
+                    final String text = input.getText().toString().trim();
+                    if (text.isEmpty()) {
+                        return;
+                    }
+                    disposables.add(YtEngagement.postComment(activity, info.getId(), text)
+                            .subscribe(() -> {
+                                Toast.makeText(activity, R.string.yt_comment_posted,
+                                        Toast.LENGTH_SHORT).show();
+                                loadTopCommentPreview();
+                            }, e -> Toast.makeText(activity,
+                                    getString(R.string.yt_comment_failed, e.getMessage()),
+                                    Toast.LENGTH_LONG).show()));
+                })
+                .setNegativeButton(android.R.string.cancel, null)
+                .show();
+    }
+
+    /*//////////////////////////////////////////////////////////////////////////
     // OnClick
     //////////////////////////////////////////////////////////////////////////*/
 
@@ -470,6 +587,9 @@ public final class VideoDetailFragment
             binding.detailToggleSecondaryControlsView.setOnClickListener(
                     v -> toggleTitleAndSecondaryControls());
             binding.detailCommentsCard.setOnClickListener(v -> showCommentsSheet());
+            binding.detailCommentAddButton.setOnClickListener(v -> showAddCommentDialog());
+            binding.detailThumbsUpImgView.setOnClickListener(v -> onRateClicked(true));
+            binding.detailThumbsDownImgView.setOnClickListener(v -> onRateClicked(false));
         } else {
             binding.detailTitleRootLayout.setOnClickListener(
                     v -> toggleTitleAndSecondaryControls());
@@ -1686,6 +1806,7 @@ public final class VideoDetailFragment
         } else {
             binding.detailThumbsUpCountView.setVisibility(View.GONE);
         }
+        setupYtEngagement(info);
 
         if (info.getDuration() > 0) {
             binding.detailDurationView.setText(Localization.getDurationString(info.getDuration()));
