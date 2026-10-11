@@ -42,6 +42,7 @@ public final class SettingsResourceRegistry {
         add(VideoAudioSettingsFragment.class, R.xml.video_audio_settings);
         add(ExoPlayerSettingsFragment.class, R.xml.exoplayer_settings);
         add(BackupRestoreSettingsFragment.class, R.xml.backup_restore_settings);
+        add(GoogleAccountSettingsFragment.class, R.xml.google_account_settings);
     }
 
     private SettingRegistryEntry add(

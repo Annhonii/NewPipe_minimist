@@ -21,6 +21,7 @@ import org.schabi.newpipe.extractor.StreamingService;
 import org.schabi.newpipe.extractor.exceptions.ExtractionException;
 import org.schabi.newpipe.fragments.BlankFragment;
 import org.schabi.newpipe.fragments.list.channel.ChannelFragment;
+import org.schabi.newpipe.fragments.list.home.HomeFeedFragment;
 import org.schabi.newpipe.fragments.list.kiosk.DefaultKioskFragment;
 import org.schabi.newpipe.fragments.list.kiosk.KioskFragment;
 import org.schabi.newpipe.fragments.list.kiosk.TrendingFragment;
@@ -170,7 +171,8 @@ public abstract class Tab {
         CHANNEL(new ChannelTab()),
         PLAYLIST(new PlaylistTab()),
         FEEDGROUP(new FeedGroupTab()),
-        DOWNLOADS(new DownloadsTab());
+        DOWNLOADS(new DownloadsTab()),
+        HOME(new HomeTab());
 
         private final Tab tab;
 
@@ -262,6 +264,31 @@ public abstract class Tab {
         @Override
         public FeedFragment getFragment(final Context context) {
             return new FeedFragment();
+        }
+    }
+
+    public static class HomeTab extends Tab {
+        public static final int ID = 11;
+
+        @Override
+        public int getTabId() {
+            return ID;
+        }
+
+        @Override
+        public String getTabName(final Context context) {
+            return context.getString(R.string.yt_home_title);
+        }
+
+        @DrawableRes
+        @Override
+        public int getTabIconRes(final Context context) {
+            return R.drawable.ic_home;
+        }
+
+        @Override
+        public HomeFeedFragment getFragment(final Context context) {
+            return new HomeFeedFragment();
         }
     }
 

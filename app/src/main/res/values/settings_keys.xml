@@ -1528,4 +1528,11 @@
         <item>@string/image_quality_high_key</item>
     </string-array>
     <string name="use_device_font_key" translatable="false">use_device_font</string>
+
+    <!-- Google account -->
+    <string name="yt_status_key">yt_status</string>
+    <string name="yt_login_web_key">yt_login_web</string>
+    <string name="yt_login_token_key">yt_login_token</string>
+    <string name="yt_sync_key">yt_sync_subscriptions</string>
+    <string name="yt_logout_key">yt_logout</string>
 </resources>

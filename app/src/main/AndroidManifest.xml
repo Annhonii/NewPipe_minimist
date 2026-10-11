@@ -97,6 +97,11 @@
             android:label="@string/settings" />
 
         <activity
+            android:name=".account.YtLoginActivity"
+            android:exported="false"
+            android:label="@string/yt_login_title" />
+
+        <activity
             android:name=".about.AboutActivity"
             android:exported="false"
             android:label="@string/title_activity_about" />
