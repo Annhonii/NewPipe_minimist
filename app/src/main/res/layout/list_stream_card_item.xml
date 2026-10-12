@@ -1,27 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Card in the style of the YouTube app: full-width thumbnail, and under it one row with
+     [round channel logo] [title (2 lines) + "channel • views • time"] [three-dots menu]. -->
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/itemRoot"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingTop="@dimen/channel_item_grid_padding"
-    android:paddingBottom="@dimen/channel_item_grid_padding"
+    android:paddingBottom="18dp"
     android:background="?attr/selectableItemBackground"
     android:clickable="true"
     android:focusable="true">
 
     <ImageView
         android:id="@+id/itemThumbnailView"
-        android:background="@drawable/bg_thumbnail"
-        android:clipToOutline="true"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginStart="2dp"
-        android:layout_marginEnd="2dp"
         android:scaleType="centerCrop"
         android:src="@drawable/placeholder_thumbnail_video"
-        app:layout_constraintBottom_toTopOf="@+id/itemProgressView"
         app:layout_constraintDimensionRatio="16:9"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -31,8 +27,8 @@
         android:id="@+id/itemDurationView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="@dimen/video_item_search_duration_margin"
-        android:layout_marginBottom="@dimen/video_item_search_duration_margin"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
         android:background="@drawable/bg_badge"
         android:paddingHorizontal="@dimen/video_item_search_duration_horizontal_padding"
         android:paddingVertical="@dimen/video_item_search_duration_vertical_padding"
@@ -41,108 +37,8 @@
         android:textColor="@color/duration_text_color"
         android:textSize="@dimen/video_item_search_duration_text_size"
         app:layout_constraintBottom_toBottomOf="@id/itemThumbnailView"
-        app:layout_constraintRight_toRightOf="@id/itemThumbnailView"
+        app:layout_constraintEnd_toEndOf="@id/itemThumbnailView"
         tools:text="1:09:10" />
-
-    <!-- three-dots button on the top right of the thumbnail: opens the same menu as a long press
-         (long press is turned off on these cards). Hidden until a holder wires it up. -->
-    <ImageButton
-        android:id="@+id/itemMoreButton"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:background="@drawable/bg_card_more_button"
-        android:contentDescription="@string/more_options"
-        android:padding="6dp"
-        android:scaleType="fitCenter"
-        android:src="@drawable/ic_more_vert"
-        android:visibility="gone"
-        app:layout_constraintEnd_toEndOf="@id/itemThumbnailView"
-        app:layout_constraintTop_toTopOf="@id/itemThumbnailView"
-        app:tint="@android:color/white" />
-
-    <org.schabi.newpipe.views.NewPipeTextView
-        android:id="@+id/itemVideoTitleView"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/margin_small"
-        android:layout_marginEnd="@dimen/margin_small"
-        android:ellipsize="end"
-        android:maxLines="2"
-        android:layout_marginTop="@dimen/margin_small"
-        android:textAppearance="?textAppearanceListItem"
-        app:layout_constraintEnd_toEndOf="@id/itemThumbnailView"
-        app:layout_constraintStart_toStartOf="@id/itemThumbnailView"
-        app:layout_constraintTop_toBottomOf="@id/itemThumbnailView"
-        tools:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc tristique vitae sem vitae blanditLorem ipsumLorem ipsumLorem ipsumLorem ipsumLorem ipsumLorem ipsumLorem ipsum" />
-
-    <!-- channel row: round channel logo + one line: channel name, views • date.
-         The logo is hidden (gone) for items that have none, and the text then starts at the left edge. -->
-    <LinearLayout
-        android:id="@+id/itemUploaderRow"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/margin_small"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        app:layout_constraintEnd_toEndOf="@id/itemThumbnailView"
-        app:layout_constraintStart_toStartOf="@id/itemThumbnailView"
-        app:layout_constraintTop_toBottomOf="@id/itemVideoTitleView"
-        app:layout_constraintBottom_toBottomOf="parent">
-
-        <ImageView
-            android:id="@+id/itemUploaderAvatarView"
-            android:layout_width="28dp"
-            android:layout_height="28dp"
-            android:layout_marginEnd="10dp"
-            android:background="@drawable/bg_avatar_circle"
-            android:clipToOutline="true"
-            android:importantForAccessibility="no"
-            android:scaleType="centerCrop"
-            android:src="@drawable/placeholder_person"
-            android:visibility="gone" />
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1">
-
-            <!-- one line: channel name, then views • date right after it (name shrinks first) -->
-            <org.schabi.newpipe.views.NewPipeTextView
-                android:id="@+id/itemUploaderView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:ellipsize="end"
-                android:includeFontPadding="false"
-                android:lines="1"
-                android:textAppearance="?android:textAppearanceSmall"
-                app:layout_constrainedWidth="true"
-                app:layout_constraintEnd_toStartOf="@id/itemAdditionalDetails"
-                app:layout_constraintHorizontal_bias="0"
-                app:layout_constraintHorizontal_chainStyle="packed"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"
-                tools:text="Uploader" />
-
-            <org.schabi.newpipe.views.NewPipeTextView
-                android:id="@+id/itemAdditionalDetails"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:ellipsize="end"
-                android:includeFontPadding="false"
-                android:lines="1"
-                android:textAppearance="?android:textAppearanceSmall"
-                app:layout_constrainedWidth="true"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@id/itemUploaderView"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"
-                tools:text="2 years ago • 10M views" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
-    </LinearLayout>
 
     <org.schabi.newpipe.views.AnimatedProgressBar
         android:id="@+id/itemProgressView"
@@ -151,7 +47,105 @@
         android:layout_height="4dp"
         android:progressDrawable="?progress_horizontal_drawable"
         app:layout_constraintBottom_toBottomOf="@id/itemThumbnailView"
-        app:layout_constraintEnd_toEndOf="@+id/itemThumbnailView"
-        app:layout_constraintStart_toStartOf="@+id/itemThumbnailView" />
+        app:layout_constraintEnd_toEndOf="@id/itemThumbnailView"
+        app:layout_constraintStart_toStartOf="@id/itemThumbnailView" />
+
+    <!-- round channel logo (hidden for items that have none) -->
+    <ImageView
+        android:id="@+id/itemUploaderAvatarView"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="12dp"
+        android:background="@drawable/bg_avatar_circle"
+        android:clipToOutline="true"
+        android:importantForAccessibility="no"
+        android:scaleType="centerCrop"
+        android:src="@drawable/placeholder_person"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/itemThumbnailView" />
+
+    <!-- three-dots menu (same menu as a long press, which is off on cards); shown by the holder -->
+    <ImageButton
+        android:id="@+id/itemMoreButton"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="4dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="@string/more_options"
+        android:padding="8dp"
+        android:scaleType="fitCenter"
+        android:src="@drawable/ic_more_vert"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/itemThumbnailView"
+        app:tint="?android:attr/textColorPrimary" />
+
+    <org.schabi.newpipe.views.NewPipeTextView
+        android:id="@+id/itemVideoTitleView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="12dp"
+        android:ellipsize="end"
+        android:maxLines="2"
+        android:textAppearance="?textAppearanceListItem"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toStartOf="@id/itemMoreButton"
+        app:layout_constraintStart_toEndOf="@id/itemUploaderAvatarView"
+        app:layout_constraintTop_toBottomOf="@id/itemThumbnailView"
+        app:layout_goneMarginEnd="12dp"
+        app:layout_goneMarginStart="12dp"
+        tools:text="Jantar Mantar 2.0: Rahul Gandhi ke call par protest mein shamil honge Dhruv Rathee?" />
+
+    <!-- meta line: channel • views • time (channel name shrinks first on narrow screens) -->
+    <org.schabi.newpipe.views.NewPipeTextView
+        android:id="@+id/itemUploaderView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:ellipsize="end"
+        android:includeFontPadding="false"
+        android:lines="1"
+        android:textAppearance="?android:textAppearanceSmall"
+        android:textSize="13sp"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintEnd_toStartOf="@id/itemMetaSeparator"
+        app:layout_constraintHorizontal_bias="0"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toStartOf="@id/itemVideoTitleView"
+        app:layout_constraintTop_toBottomOf="@id/itemVideoTitleView"
+        tools:text="The Lallantop" />
+
+    <org.schabi.newpipe.views.NewPipeTextView
+        android:id="@+id/itemMetaSeparator"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="4dp"
+        android:includeFontPadding="false"
+        android:text="•"
+        android:textAppearance="?android:textAppearanceSmall"
+        android:textSize="13sp"
+        app:layout_constraintBaseline_toBaselineOf="@id/itemUploaderView"
+        app:layout_constraintEnd_toStartOf="@id/itemAdditionalDetails"
+        app:layout_constraintStart_toEndOf="@id/itemUploaderView"
+        tools:ignore="HardcodedText" />
+
+    <org.schabi.newpipe.views.NewPipeTextView
+        android:id="@+id/itemAdditionalDetails"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="12dp"
+        android:ellipsize="end"
+        android:includeFontPadding="false"
+        android:lines="1"
+        android:textAppearance="?android:textAppearanceSmall"
+        android:textSize="13sp"
+        app:layout_constraintBaseline_toBaselineOf="@id/itemUploaderView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/itemMetaSeparator"
+        tools:text="1.4M views • 14 hours ago" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
