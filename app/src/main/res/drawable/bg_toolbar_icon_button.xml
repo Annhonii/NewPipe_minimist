@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Material 3 tonal icon button for the top bar (no outline, filled with surface container highest). -->
+<ripple xmlns:android="http://schemas.android.com/apk/res/android"
+    android:color="?attr/colorControlHighlight">
+    <item>
+        <shape android:shape="oval">
+            <solid android:color="?attr/toolbar_element_color" />
+        </shape>
+    </item>
+</ripple>

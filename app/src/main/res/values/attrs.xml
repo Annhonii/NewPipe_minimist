@@ -22,4 +22,8 @@
     <attr name="switch_track_off_color" format="color" />
     <attr name="surface_bright_color" format="color" />
     <attr name="text_secondary_color" format="color" />
+
+    <!-- Material 3 tonal colours for the top bar (bar background / pill + icon buttons) -->
+    <attr name="toolbar_container_color" format="color" />
+    <attr name="toolbar_element_color" format="color" />
 </resources>

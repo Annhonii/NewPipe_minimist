@@ -50,6 +50,15 @@
     <color name="black_border_color">#25FFFFFF</color>
 
 
+    <!-- Material 3 tonal top bar: bar = surface container, pill/buttons = surface container highest.
+         Change these 6 values to recolour the whole top bar. -->
+    <color name="m3_toolbar_container_light">#DEE5F1</color>
+    <color name="m3_toolbar_element_light">#CBD5E6</color>
+    <color name="m3_toolbar_container_dark">#1C2129</color>
+    <color name="m3_toolbar_element_dark">#2D3541</color>
+    <color name="m3_toolbar_container_black">#12161C</color>
+    <color name="m3_toolbar_element_black">#222934</color>
+
     <!-- Nothing/Music design tokens -->
     <color name="nothing_red">#D71921</color>
     <color name="nothing_red_dim">#AE141B</color>

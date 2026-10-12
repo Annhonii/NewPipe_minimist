@@ -32,6 +32,8 @@
 
     <!-- Light Theme -->
     <style name="Base.V21.LightTheme" parent="Base">
+        <item name="toolbar_container_color">@color/m3_toolbar_container_light</item>
+        <item name="toolbar_element_color">@color/m3_toolbar_element_light</item>
         <item name="colorPrimary">@color/light_youtube_primary_color</item>
         <item name="colorPrimaryDark">@color/light_youtube_primary_color</item>
         <item name="colorAccent">@color/light_youtube_accent_color</item>
@@ -63,6 +65,8 @@
 
     <!-- Dark Theme -->
     <style name="Base.V21.DarkTheme" parent="Base">
+        <item name="toolbar_container_color">@color/m3_toolbar_container_dark</item>
+        <item name="toolbar_element_color">@color/m3_toolbar_element_dark</item>
         <item name="colorPrimary">@color/dark_youtube_primary_color</item>
         <item name="colorPrimaryDark">@color/dark_youtube_primary_color</item>
         <item name="colorAccent">@color/dark_youtube_accent_color</item>
@@ -94,6 +98,8 @@
 
     <!-- Black Theme -->
     <style name="Base.V21.BlackTheme" parent="DarkTheme">
+        <item name="toolbar_container_color">@color/m3_toolbar_container_black</item>
+        <item name="toolbar_element_color">@color/m3_toolbar_element_black</item>
         <item name="android:windowBackground">@color/black_background_color</item>
         <item name="windowBackground">@color/black_background_color</item>
         <item name="android:statusBarColor">@color/black_background_color</item>
@@ -112,6 +118,8 @@
 
     <!-- Dialogs: floating rounded surfaces with accent text buttons -->
     <style name="LightDialogTheme" parent="Theme.AppCompat.DayNight.Dialog">
+        <item name="toolbar_container_color">@color/light_dialog_background_color</item>
+        <item name="toolbar_element_color">@color/light_card_item_background_color</item>
         <item name="colorPrimary">@color/nothing_red</item>
         <item name="colorPrimaryDark">@color/nothing_red</item>
         <item name="colorAccent">@color/nothing_red</item>
@@ -136,6 +144,8 @@
     </style>
 
     <style name="DarkDialogTheme" parent="Theme.AppCompat.DayNight.Dialog">
+        <item name="toolbar_container_color">@color/dark_dialog_background_color</item>
+        <item name="toolbar_element_color">@color/dark_card_item_background_color</item>
         <item name="colorPrimary">@color/nothing_red</item>
         <item name="colorPrimaryDark">@color/nothing_red</item>
         <item name="colorAccent">@color/nothing_red</item>
@@ -160,6 +170,8 @@
     </style>
 
     <style name="LightDialogMinWidthTheme" parent="Theme.AppCompat.DayNight.Dialog.MinWidth">
+        <item name="toolbar_container_color">@color/light_dialog_background_color</item>
+        <item name="toolbar_element_color">@color/light_card_item_background_color</item>
         <item name="colorPrimary">@color/nothing_red</item>
         <item name="colorPrimaryDark">@color/nothing_red</item>
         <item name="colorAccent">@color/nothing_red</item>
@@ -184,6 +196,8 @@
     </style>
 
     <style name="DarkDialogMinWidthTheme" parent="Theme.AppCompat.DayNight.Dialog.MinWidth">
+        <item name="toolbar_container_color">@color/dark_dialog_background_color</item>
+        <item name="toolbar_element_color">@color/dark_card_item_background_color</item>
         <item name="colorPrimary">@color/nothing_red</item>
         <item name="colorPrimaryDark">@color/nothing_red</item>
         <item name="colorAccent">@color/nothing_red</item>
