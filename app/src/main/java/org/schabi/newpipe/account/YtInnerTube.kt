@@ -361,4 +361,111 @@ object YtInnerTube {
             throw IOException(r.optJSONObject("error")?.optString("message").orEmpty().ifBlank { "Comment was rejected" })
         }
     }
+
+    // ---------------------------------------------------------------- comment actions
+
+    /** Server-side action tokens of one comment. like/dislike = [toggle-on, toggle-off]. */
+    class CommentActions(val like: List<String>, val dislike: List<String>, val replyParams: String?)
+
+    private val commentActionCache = HashMap<String, CommentActions>()
+
+    private fun commentTokens(next: JSONObject): List<String> {
+        val tokens = ArrayList<String>()
+        collect(next, "itemSectionRenderer").forEach { sec ->
+            if (sec.optString("sectionIdentifier") == "comment-item-section" ||
+                sec.optString("targetId").contains("comments-section")
+            ) allStrings(sec, "token").forEach { tokens.add(it) }
+        }
+        if (tokens.isEmpty()) allStrings(next, "token").forEach { tokens.add(it) }
+        return tokens.take(4)
+    }
+
+    private fun actionsOf(node: JSONObject, key: String): List<String> {
+        val sub = collect(node, key).firstOrNull() ?: return emptyList()
+        return collect(sub, "performCommentActionEndpoint")
+            .mapNotNull { it.optString("action").takeIf { a -> a.isNotEmpty() } }
+    }
+
+    /** True if the base64 token (url-safe or not) contains [needle] in its decoded bytes. */
+    private fun tokenMentions(token: String, needle: String): Boolean = runCatching {
+        val fixed = token.replace("%3D", "=").replace('-', '+').replace('_', '/')
+        String(android.util.Base64.decode(fixed, android.util.Base64.DEFAULT), Charsets.ISO_8859_1)
+            .contains(needle)
+    }.getOrDefault(false)
+
+    private fun extractActions(page: JSONObject, commentId: String): CommentActions? {
+        // 1) the thread that contains the comment id (classic and view-model layouts)
+        val threads = collect(page, "commentThreadRenderer")
+        for (t in threads) {
+            if (!t.toString().contains("\"$commentId\"")) continue
+            val like = actionsOf(t, "likeButton")
+            val dislike = actionsOf(t, "dislikeButton")
+            val reply = allStrings(t, "createReplyParams").firstOrNull()
+            if (like.isNotEmpty() || dislike.isNotEmpty() || reply != null) {
+                return CommentActions(like, dislike, reply)
+            }
+        }
+        // 2) fallback: tokens that embed the comment id, in document order
+        val mine = collect(page, "performCommentActionEndpoint")
+            .mapNotNull { it.optString("action").takeIf { a -> a.isNotEmpty() } }
+            .filter { tokenMentions(it, commentId) }.distinct()
+        val reply = allStrings(page, "createReplyParams").firstOrNull { tokenMentions(it, commentId) }
+        if (mine.isEmpty() && reply == null) return null
+        val half = (mine.size + 1) / 2
+        return CommentActions(mine.take(half), mine.drop(half), reply)
+    }
+
+    private fun nextPageToken(page: JSONObject): String? =
+        collect(page, "continuationItemRenderer").lastOrNull()
+            ?.let { allStrings(it, "token").firstOrNull() }
+
+    /** Looks the comment up in the signed-in comment pages (top comments, max 8 pages). */
+    @Synchronized
+    private fun findCommentActions(
+        session: YtAccountStore.Session, videoId: String, commentId: String
+    ): CommentActions {
+        commentActionCache[commentId]?.let { return it }
+        val next = post("next", JSONObject().put("videoId", videoId), session)
+        var page: JSONObject? = null
+        for (t in commentTokens(next)) {
+            val r = runCatching { post("next", JSONObject().put("continuation", t), session) }
+                .getOrNull() ?: continue
+            if (collect(r, "commentThreadRenderer").isNotEmpty()) { page = r; break }
+        }
+        var pages = 0
+        while (page != null && pages < 8) {
+            extractActions(page, commentId)?.let { commentActionCache[commentId] = it; return it }
+            val token = nextPageToken(page) ?: break
+            page = post("next", JSONObject().put("continuation", token), session)
+            pages++
+        }
+        throw IOException("Could not find this comment on YouTube")
+    }
+
+    private fun checkError(r: JSONObject) {
+        if (r.has("error")) {
+            throw IOException(r.optJSONObject("error")?.optString("message").orEmpty()
+                .ifBlank { "YouTube rejected the request" })
+        }
+    }
+
+    /** kind: "like", "unlike", "dislike" or "undislike". */
+    fun commentAction(session: YtAccountStore.Session, videoId: String, commentId: String, kind: String) {
+        val a = findCommentActions(session, videoId, commentId)
+        val action = when (kind) {
+            "like" -> a.like.getOrNull(0)
+            "unlike" -> a.like.getOrNull(1)
+            "dislike" -> a.dislike.getOrNull(0)
+            else -> a.dislike.getOrNull(1)
+        } ?: throw IOException("This action is not available for this comment")
+        checkError(post("comment/perform_comment_action",
+            JSONObject().put("actions", JSONArray().put(action)), session))
+    }
+
+    fun replyToComment(session: YtAccountStore.Session, videoId: String, commentId: String, text: String) {
+        val params = findCommentActions(session, videoId, commentId).replyParams
+            ?: throw IOException("Replying is not available for this comment")
+        checkError(post("comment/create_comment_reply",
+            JSONObject().put("createReplyParams", params).put("commentText", text), session))
+    }
 }

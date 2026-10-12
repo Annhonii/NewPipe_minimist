@@ -29,4 +29,15 @@ object YtEngagement {
 
     @JvmStatic
     fun isLoggedIn(context: Context): Boolean = YtAccountStore.isLoggedIn(context)
+
+    /** kind: "like", "unlike", "dislike" or "undislike". */
+    @JvmStatic
+    fun commentAction(context: Context, videoId: String, commentId: String, kind: String): Completable =
+        Completable.fromAction { YtInnerTube.commentAction(session(context), videoId, commentId, kind) }
+            .subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
+
+    @JvmStatic
+    fun replyToComment(context: Context, videoId: String, commentId: String, text: String): Completable =
+        Completable.fromAction { YtInnerTube.replyToComment(session(context), videoId, commentId, text) }
+            .subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
 }

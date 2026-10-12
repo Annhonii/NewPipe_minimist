@@ -980,4 +980,13 @@
     <string name="yt_copy_token_title">Copy token</string>
     <string name="yt_copy_token_summary">Copy your session token to sign in on another device</string>
     <string name="yt_token_copied">Token copied. Keep it private, anyone with it can use your account.</string>
+    <string name="comment_more_options">More options</string>
+    <string name="comment_dislike_description">Dislike</string>
+    <string name="comment_reply">Reply</string>
+    <string name="comment_copy">Copy comment</string>
+    <string name="comment_reply_to">Reply to %1$s</string>
+    <string name="comment_reply_hint">Add a reply…</string>
+    <string name="comment_reply_posted">Reply posted</string>
+    <string name="comment_reply_failed">Could not post reply: %1$s</string>
+    <string name="comment_not_youtube">This action is only available for YouTube comments</string>
 </resources>

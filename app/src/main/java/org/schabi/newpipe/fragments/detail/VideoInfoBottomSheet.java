@@ -42,6 +42,10 @@ public class VideoInfoBottomSheet extends BottomSheetDialogFragment {
     private static final String KIND_DESCRIPTION = "description";
     private static final String TAG = "VideoInfoBottomSheet";
 
+    /** The sheet that is currently shown (it lives in VideoDetailFragment's child manager). */
+    private static java.lang.ref.WeakReference<VideoInfoBottomSheet> current =
+            new java.lang.ref.WeakReference<>(null);
+
     private FragmentManager.OnBackStackChangedListener backStackListener;
     private int initialBackStackCount;
 
@@ -62,10 +66,12 @@ public class VideoInfoBottomSheet extends BottomSheetDialogFragment {
      */
     public static boolean showRepliesIfShown(@NonNull final FragmentActivity activity,
                                              @NonNull final CommentsInfoItem comment) {
-        final FragmentManager fm = activity.getSupportFragmentManager();
-        final androidx.fragment.app.Fragment f = fm.findFragmentByTag(TAG);
-        if (f instanceof VideoInfoBottomSheet && f.isAdded() && !f.isStateSaved()) {
-            ((VideoInfoBottomSheet) f).showReplies(comment);
+        // The sheet is added to the child FragmentManager of VideoDetailFragment, so it can NOT
+        // be found through activity.getSupportFragmentManager(); use the static reference.
+        final VideoInfoBottomSheet sheet = current.get();
+        if (sheet != null && sheet.isAdded() && !sheet.isStateSaved()
+                && sheet.getView() != null) {
+            sheet.showReplies(comment);
             return true;
         }
         return false;
@@ -178,6 +184,7 @@ public class VideoInfoBottomSheet extends BottomSheetDialogFragment {
     @Override
     public void onStart() {
         super.onStart();
+        current = new java.lang.ref.WeakReference<>(this);
         final Dialog dialog = getDialog();
         if (dialog instanceof BottomSheetDialog) {
             final BottomSheetBehavior<FrameLayout> behavior =
@@ -266,6 +273,9 @@ public class VideoInfoBottomSheet extends BottomSheetDialogFragment {
     @Override
     public void onStop() {
         super.onStop();
+        if (current.get() == this) {
+            current = new java.lang.ref.WeakReference<>(null);
+        }
         if (backStackListener != null && getActivity() != null) {
             getActivity().getSupportFragmentManager()
                     .removeOnBackStackChangedListener(backStackListener);

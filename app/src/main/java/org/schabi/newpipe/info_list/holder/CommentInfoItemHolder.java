@@ -3,6 +3,8 @@ package org.schabi.newpipe.info_list.holder;
 import static org.schabi.newpipe.util.ServiceHelper.getServiceById;
 import static org.schabi.newpipe.util.text.TouchUtils.getOffsetForHorizontalLine;
 
+import android.content.res.ColorStateList;
+import android.text.InputType;
 import android.text.Spanned;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
@@ -10,15 +12,27 @@ import android.text.style.URLSpan;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Gravity;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.FrameLayout;
+import android.widget.PopupMenu;
+import android.widget.Toast;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.core.widget.ImageViewCompat;
 import androidx.fragment.app.FragmentActivity;
 
 import org.schabi.newpipe.R;
+import org.schabi.newpipe.account.YtEngagement;
+import org.schabi.newpipe.extractor.ServiceList;
+import org.schabi.newpipe.extractor.exceptions.ParsingException;
+import org.schabi.newpipe.extractor.services.youtube.linkHandler.YoutubeStreamLinkHandlerFactory;
+import org.schabi.newpipe.util.ThemeHelper;
 import org.schabi.newpipe.extractor.InfoItem;
 import org.schabi.newpipe.extractor.comments.CommentsInfoItem;
 import org.schabi.newpipe.info_list.InfoItemBuilder;
@@ -46,6 +60,12 @@ public class CommentInfoItemHolder extends InfoItemHolder {
     private final ImageView itemHeartView;
     private final ImageView itemPinnedView;
     private final Button repliesButton;
+    private final ImageView itemThumbsDownView;
+    private final ImageView itemMoreButton;
+    private CommentsInfoItem boundItem;
+
+    /** "LIKE" / "DISLIKE" per comment id, kept so the tint survives view recycling. */
+    private static final java.util.Map<String, String> RATE_STATE = new java.util.HashMap<>();
 
     @NonNull
     private final TextEllipsizer textEllipsizer;
@@ -63,6 +83,8 @@ public class CommentInfoItemHolder extends InfoItemHolder {
         itemHeartView = itemView.findViewById(R.id.detail_heart_image_view);
         itemPinnedView = itemView.findViewById(R.id.detail_pinned_view);
         repliesButton = itemView.findViewById(R.id.replies_button);
+        itemThumbsDownView = itemView.findViewById(R.id.detail_thumbs_down_img_view);
+        itemMoreButton = itemView.findViewById(R.id.comment_more_button);
 
         commentHorizontalPadding = (int) infoItemBuilder.getContext()
                 .getResources().getDimension(R.dimen.comments_horizontal_padding);
@@ -109,9 +131,13 @@ public class CommentInfoItemHolder extends InfoItemHolder {
                         item.getUploadDate(),
                         item.getTextualUploadDate())));
 
-        // setup bottom row, with likes, heart and replies button
-        itemLikesCountView.setText(
-                Localization.likeCount(itemBuilder.getContext(), item.getLikeCount()));
+        boundItem = item;
+
+        // setup bottom row, with likes, dislike, heart and replies button
+        applyRateState(item);
+        itemThumbsUpView.setOnClickListener(v -> onRate(item, true));
+        itemThumbsDownView.setOnClickListener(v -> onRate(item, false));
+        itemMoreButton.setOnClickListener(v -> showMoreMenu(item));
 
         itemHeartView.setVisibility(item.isHeartedByUploader() ? View.VISIBLE : View.GONE);
 
@@ -170,6 +196,137 @@ public class CommentInfoItemHolder extends InfoItemHolder {
             }
             return true;
         });
+    }
+
+    // ------------------------------------------------------------ like / dislike / reply
+
+    private static String stateOf(final CommentsInfoItem item) {
+        final String s = RATE_STATE.get(item.getCommentId());
+        return s == null ? "" : s;
+    }
+
+    private void applyRateState(@NonNull final CommentsInfoItem item) {
+        final String state = stateOf(item);
+        final int accent = ThemeHelper.resolveColorFromAttr(itemBuilder.getContext(),
+                androidx.appcompat.R.attr.colorAccent);
+        final int normal = androidx.core.content.ContextCompat.getColor(
+                itemBuilder.getContext(), R.color.defaultIconTint);
+        ImageViewCompat.setImageTintList(itemThumbsUpView,
+                ColorStateList.valueOf("LIKE".equals(state) ? accent : normal));
+        ImageViewCompat.setImageTintList(itemThumbsDownView,
+                ColorStateList.valueOf("DISLIKE".equals(state) ? accent : normal));
+        final long base = item.getLikeCount();
+        itemLikesCountView.setText(Localization.likeCount(itemBuilder.getContext(),
+                base >= 0 && "LIKE".equals(state) ? base + 1 : base));
+    }
+
+    /** @return the YouTube video id of the comment, or null (toast shown) if not possible. */
+    private String requireYoutubeVideoId(@NonNull final CommentsInfoItem item) {
+        final android.content.Context ctx = itemBuilder.getContext();
+        if (item.getServiceId() != ServiceList.YouTube.getServiceId()) {
+            Toast.makeText(ctx, R.string.comment_not_youtube, Toast.LENGTH_SHORT).show();
+            return null;
+        }
+        if (!YtEngagement.isLoggedIn(ctx)) {
+            Toast.makeText(ctx, R.string.yt_sign_in_required, Toast.LENGTH_LONG).show();
+            return null;
+        }
+        try {
+            return YoutubeStreamLinkHandlerFactory.getInstance().getId(item.getUrl());
+        } catch (final ParsingException e) {
+            Toast.makeText(ctx, ctx.getString(R.string.yt_rate_failed, e.getMessage()),
+                    Toast.LENGTH_LONG).show();
+            return null;
+        }
+    }
+
+    private void onRate(@NonNull final CommentsInfoItem item, final boolean like) {
+        final String videoId = requireYoutubeVideoId(item);
+        if (videoId == null) {
+            return;
+        }
+        final String id = item.getCommentId();
+        final String previous = stateOf(item);
+        final String target = like ? "LIKE" : "DISLIKE";
+        final String kind;
+        if (target.equals(previous)) {
+            kind = like ? "unlike" : "undislike";
+            RATE_STATE.remove(id);
+        } else {
+            kind = like ? "like" : "dislike";
+            RATE_STATE.put(id, target);
+        }
+        applyRateState(item);
+        final android.content.Context ctx = itemBuilder.getContext();
+        YtEngagement.commentAction(ctx, videoId, id, kind).subscribe(() -> { }, e -> {
+            // revert
+            if (previous.isEmpty()) {
+                RATE_STATE.remove(id);
+            } else {
+                RATE_STATE.put(id, previous);
+            }
+            if (boundItem == item) {
+                applyRateState(item);
+            }
+            Toast.makeText(ctx, ctx.getString(R.string.yt_rate_failed, e.getMessage()),
+                    Toast.LENGTH_LONG).show();
+        });
+    }
+
+    private void showMoreMenu(@NonNull final CommentsInfoItem item) {
+        final PopupMenu menu = new PopupMenu(itemBuilder.getContext(), itemMoreButton);
+        menu.getMenu().add(0, 1, 0, R.string.comment_reply);
+        menu.getMenu().add(0, 2, 1, R.string.comment_copy);
+        menu.setOnMenuItemClickListener(mi -> {
+            if (mi.getItemId() == 1) {
+                showReplyDialog(item);
+            } else {
+                final CharSequence text = itemContentView.getText();
+                if (text != null) {
+                    ShareUtils.copyToClipboard(itemBuilder.getContext(), text.toString());
+                }
+            }
+            return true;
+        });
+        menu.show();
+    }
+
+    private void showReplyDialog(@NonNull final CommentsInfoItem item) {
+        final String videoId = requireYoutubeVideoId(item);
+        if (videoId == null) {
+            return;
+        }
+        final android.content.Context ctx = itemBuilder.getContext();
+        final EditText input = new EditText(ctx);
+        input.setHint(R.string.comment_reply_hint);
+        input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE
+                | InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);
+        input.setMinLines(3);
+        input.setMaxLines(8);
+        input.setGravity(Gravity.TOP | Gravity.START);
+        final int pad = DeviceUtils.dpToPx(20, ctx);
+        final FrameLayout holder = new FrameLayout(ctx);
+        holder.setPadding(pad, pad / 2, pad, 0);
+        holder.addView(input);
+        new AlertDialog.Builder(ctx)
+                .setTitle(ctx.getString(R.string.comment_reply_to,
+                        Localization.localizeUserName(item.getUploaderName())))
+                .setView(holder)
+                .setPositiveButton(R.string.yt_comment_post, (d, w) -> {
+                    final String text = input.getText().toString().trim();
+                    if (text.isEmpty()) {
+                        return;
+                    }
+                    YtEngagement.replyToComment(ctx, videoId, item.getCommentId(), text)
+                            .subscribe(() -> Toast.makeText(ctx, R.string.comment_reply_posted,
+                                    Toast.LENGTH_SHORT).show(),
+                                    e -> Toast.makeText(ctx,
+                                            ctx.getString(R.string.comment_reply_failed,
+                                                    e.getMessage()),
+                                            Toast.LENGTH_LONG).show());
+                })
+                .setNegativeButton(android.R.string.cancel, null)
+                .show();
     }
 
     private void openCommentAuthor(@NonNull final CommentsInfoItem item) {

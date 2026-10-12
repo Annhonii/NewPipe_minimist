@@ -37,12 +37,26 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
+        android:layout_toStartOf="@+id/comment_more_button"
         android:layout_toEndOf="@+id/detail_pinned_view"
         android:ellipsize="end"
         android:lines="1"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:textSize="@dimen/comment_item_title_text_size"
         tools:text="Author Name, Lorem ipsum • 5 months ago" />
+
+    <ImageView
+        android:id="@+id/comment_more_button"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="-8dp"
+        android:layout_marginEnd="-8dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="@string/comment_more_options"
+        android:padding="6dp"
+        android:src="@drawable/ic_more_vert" />
 
     <org.schabi.newpipe.views.NewPipeTextView
         android:id="@+id/itemCommentContentView"
@@ -62,6 +76,7 @@
         android:layout_below="@id/itemCommentContentView"
         android:layout_alignBottom="@+id/replies_button"
         android:layout_toEndOf="@+id/itemThumbnailView"
+        android:background="?attr/selectableItemBackgroundBorderless"
         android:contentDescription="@string/detail_likes_img_view_description"
         android:src="@drawable/ic_thumb_up" />
 
@@ -80,13 +95,25 @@
         tools:text="12M" />
 
     <ImageView
+        android:id="@+id/detail_thumbs_down_img_view"
+        android:layout_width="@dimen/video_item_detail_like_image_width"
+        android:layout_height="@dimen/video_item_detail_like_image_height"
+        android:layout_alignTop="@id/detail_thumbs_up_img_view"
+        android:layout_alignBottom="@id/detail_thumbs_up_img_view"
+        android:layout_marginStart="20dp"
+        android:layout_toEndOf="@id/detail_thumbs_up_count_view"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="@string/comment_dislike_description"
+        android:src="@drawable/ic_thumb_down" />
+
+    <ImageView
         android:id="@+id/detail_heart_image_view"
         android:layout_width="@dimen/video_item_detail_heart_image_size"
         android:layout_height="@dimen/video_item_detail_heart_image_size"
         android:layout_alignTop="@id/detail_thumbs_up_img_view"
         android:layout_alignBottom="@id/detail_thumbs_up_img_view"
         android:layout_marginStart="@dimen/video_item_detail_heart_margin"
-        android:layout_toEndOf="@+id/detail_thumbs_up_count_view"
+        android:layout_toEndOf="@+id/detail_thumbs_down_img_view"
         android:contentDescription="@string/detail_heart_img_view_description"
         android:src="@drawable/ic_heart" />
 
