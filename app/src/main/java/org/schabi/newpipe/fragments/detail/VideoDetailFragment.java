@@ -2979,10 +2979,12 @@ public final class VideoDetailFragment
         }
         final float margin = getResources().getDimension(R.dimen.mini_player_margin);
         final float cardHeight = getResources().getDimension(R.dimen.mini_player_height);
-        // smooth corners on the left AND right: the video is flush in the card, so both of its
-        // left corners use the card radius, and its right corners are rounded the same way
-        final float cardRadius = 14 * getResources().getDisplayMetrics().density;
-        final float videoRadius = cardRadius;
+        // the card is a full pill (corner radius = half its height); the video is flush on the
+        // left, so its left corners must follow the same pill curve. Its right corners (inside
+        // the card) get a small rounding.
+        final float cardRadius = cardHeight / 2f;
+        final float videoLeftRadius = cardRadius;
+        final float videoRightRadius = 14 * getResources().getDisplayMetrics().density;
 
         final View video = binding.detailThumbnailRootLayout;
         final float left = video.getTranslationX();
@@ -2993,7 +2995,7 @@ public final class VideoDetailFragment
         mask.setColor(ThemeHelper.resolveColorFromAttr(
                 requireContext(), R.attr.card_item_background_color));
         mask.setGeometry(margin, 0f, root.getWidth() - margin, cardHeight, cardRadius,
-                left, top, right, bottom, videoRadius);
+                left, top, right, bottom, videoLeftRadius, videoRightRadius);
         mask.setAlpha(1f - slide);
         mask.setVisibility(View.VISIBLE);
     }
