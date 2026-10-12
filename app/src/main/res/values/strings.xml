@@ -967,4 +967,5 @@
     <string name="dynamic_color_summary">Use your wallpaper colors as the accent (Android 12+)</string>
     <string name="disable_animations_title">Disable animations</string>
     <string name="disable_animations_summary">Turn off screen transition animations</string>
+    <string name="tabs_limit_reached">The navigation bar holds at most %1$d tabs. Remove one first.</string>
 </resources>

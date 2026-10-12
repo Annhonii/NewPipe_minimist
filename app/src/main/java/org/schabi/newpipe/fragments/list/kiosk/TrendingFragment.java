@@ -1,22 +1,31 @@
 package org.schabi.newpipe.fragments.list.kiosk;
 
+import android.content.Context;
+import android.graphics.Color;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.graphics.ColorUtils;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentStatePagerAdapter;
+
+import com.google.android.material.tabs.TabLayout;
 
 import org.schabi.newpipe.BaseFragment;
 import org.schabi.newpipe.R;
 import org.schabi.newpipe.databinding.FragmentTrendingBinding;
 import org.schabi.newpipe.fragments.BlankFragment;
+import org.schabi.newpipe.util.DeviceUtils;
 import org.schabi.newpipe.util.ServiceHelper;
+import org.schabi.newpipe.util.ThemeHelper;
 
 /**
  * YouTube Trending page with tabs inside it: Live, Gaming, Movies and Podcasts.
@@ -58,6 +67,55 @@ public class TrendingFragment extends BaseFragment {
         binding.trendingPager.setAdapter(new TrendingPagerAdapter(this,
                 getChildFragmentManager(), ServiceHelper.getSelectedServiceId(requireContext())));
         binding.trendingTabs.setupWithViewPager(binding.trendingPager);
+        setupChips(binding.trendingTabs);
+    }
+
+    /** Turns the tabs into soft, rounded "bubble" chips (tonal when idle, accent when selected). */
+    private void setupChips(final TabLayout tabs) {
+        for (int i = 0; i < tabs.getTabCount(); i++) {
+            final TabLayout.Tab tab = tabs.getTabAt(i);
+            if (tab == null) {
+                continue;
+            }
+            final CharSequence title = tab.getText();
+            tab.setCustomView(R.layout.item_trending_chip);
+            final View custom = tab.getCustomView();
+            if (custom != null) {
+                ((TextView) custom.findViewById(R.id.trending_chip_text)).setText(title);
+            }
+            styleChip(tab, tab.isSelected());
+        }
+        tabs.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(final TabLayout.Tab tab) {
+                styleChip(tab, true);
+            }
+
+            @Override
+            public void onTabUnselected(final TabLayout.Tab tab) {
+                styleChip(tab, false);
+            }
+
+            @Override
+            public void onTabReselected(final TabLayout.Tab tab) { }
+        });
+    }
+
+    private void styleChip(final TabLayout.Tab tab, final boolean selected) {
+        final View custom = tab.getCustomView();
+        if (custom == null) {
+            return;
+        }
+        final TextView text = custom.findViewById(R.id.trending_chip_text);
+        final Context context = text.getContext();
+        final int primary = ThemeHelper.resolveColorFromAttr(context,
+                androidx.appcompat.R.attr.colorPrimary);
+        final GradientDrawable background = new GradientDrawable();
+        background.setCornerRadius(DeviceUtils.dpToPx(100, context));
+        background.setColor(selected ? primary : ColorUtils.setAlphaComponent(primary, 0x2E));
+        text.setBackground(background);
+        text.setTextColor(selected ? Color.WHITE
+                : ThemeHelper.resolveColorFromAttr(context, android.R.attr.textColorPrimary));
     }
 
     @Override

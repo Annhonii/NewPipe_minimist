@@ -9,10 +9,16 @@
         android:id="@+id/trending_tabs"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:clipToPadding="false"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
         app:tabGravity="start"
-        app:tabIndicatorColor="?attr/colorAccent"
+        app:tabIndicatorHeight="0dp"
+        app:tabMinWidth="0dp"
         app:tabMode="scrollable"
-        app:tabSelectedTextColor="?attr/colorAccent" />
+        app:tabPaddingEnd="0dp"
+        app:tabPaddingStart="0dp"
+        app:tabRippleColor="@android:color/transparent" />
 
     <androidx.viewpager.widget.ViewPager
         android:id="@+id/trending_pager"

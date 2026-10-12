@@ -159,12 +159,28 @@ public class ChooseTabsFragment extends Fragment {
         });
     }
 
+    private boolean isTabLimitReached() {
+        if (tabList.size() >= TabsManager.MAX_TABS) {
+            android.widget.Toast.makeText(requireContext(),
+                    getString(R.string.tabs_limit_reached, TabsManager.MAX_TABS),
+                    android.widget.Toast.LENGTH_SHORT).show();
+            return true;
+        }
+        return false;
+    }
+
     private void addTab(final Tab tab) {
+        if (isTabLimitReached()) {
+            return;
+        }
         tabList.add(tab);
         selectedTabsAdapter.notifyDataSetChanged();
     }
 
     private void addTab(final int tabId) {
+        if (isTabLimitReached()) {
+            return;
+        }
         final Tab.Type type = typeFrom(tabId);
 
         if (type == null) {

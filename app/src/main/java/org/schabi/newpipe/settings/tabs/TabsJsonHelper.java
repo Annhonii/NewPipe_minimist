@@ -24,8 +24,7 @@ public final class TabsJsonHelper {
             Tab.Type.HOME.getTab(),
             Tab.Type.DEFAULT_KIOSK.getTab(),
             Tab.Type.FEED.getTab(),
-            Tab.Type.DOWNLOADS.getTab(),
-            Tab.Type.BOOKMARKS.getTab());
+            Tab.Type.DOWNLOADS.getTab());
 
     private TabsJsonHelper() { }
 
