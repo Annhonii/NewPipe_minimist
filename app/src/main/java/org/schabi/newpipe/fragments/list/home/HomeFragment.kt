@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.core.graphics.ColorUtils
 import androidx.fragment.app.Fragment
 import org.schabi.newpipe.BaseFragment
 import org.schabi.newpipe.R
@@ -129,27 +130,29 @@ class HomeFragment : BaseFragment() {
         return fragment
     }
 
-    /** Dark: dark grey pill with a thin border, selected = white. Light: the inverse. */
+    /**
+     * Material 3 style filter chips, coloured from the app theme (so every theme works):
+     * idle = tonal pill (same colour as the buttons of the top bar) with a thin outline,
+     * selected = filled with the accent colour.
+     */
     private fun updateChipStyles() {
         val context = context ?: return
-        val light = ThemeHelper.isLightThemeSelected(context)
         val density = context.resources.displayMetrics.density
 
-        val idleFill = if (light) 0xFFF2F2F2.toInt() else 0xFF242424.toInt()
-        val idleStroke = if (light) 0xFFD6D6D6.toInt() else 0xFF4A4A4A.toInt()
-        val idleText = if (light) 0xFF0F0F0F.toInt() else Color.WHITE
-        val selectedFill = if (light) 0xFF0F0F0F.toInt() else Color.WHITE
-        val selectedText = if (light) Color.WHITE else 0xFF0F0F0F.toInt()
+        val idleFill = ThemeHelper.resolveColorFromAttr(context, R.attr.toolbar_element_color)
+        val onSurface = ThemeHelper.resolveColorFromAttr(context, android.R.attr.textColorPrimary)
+        val idleStroke = ColorUtils.setAlphaComponent(onSurface, 0x33)
+        val accent = ThemeHelper.resolveColorFromAttr(context, androidx.appcompat.R.attr.colorPrimary)
 
         chips.forEachIndexed { index, chip ->
             val isSelected = index == selected
             chip.background = GradientDrawable().apply {
                 cornerRadius = DeviceUtils.dpToPx(100, context).toFloat()
-                setColor(if (isSelected) selectedFill else idleFill)
-                // the selected pill has no border, like a filled button
+                setColor(if (isSelected) accent else idleFill)
+                // the selected pill is a filled pill without outline
                 setStroke(if (isSelected) 0 else Math.round(density), idleStroke)
             }
-            chip.setTextColor(if (isSelected) selectedText else idleText)
+            chip.setTextColor(if (isSelected) Color.WHITE else onSurface)
             chip.isSelected = isSelected
         }
     }
