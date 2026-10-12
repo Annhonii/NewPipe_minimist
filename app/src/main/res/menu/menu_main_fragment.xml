@@ -11,6 +11,14 @@
         app:showAsAction="always" />
 
     <item
+        android:id="@+id/action_account"
+        android:icon="@drawable/ic_person"
+        android:orderInCategory="3"
+        android:title="@string/yt_account_title"
+        app:actionLayout="@layout/menu_action_account"
+        app:showAsAction="always" />
+
+    <item
         android:id="@+id/action_settings"
         android:icon="@drawable/ic_settings"
         android:orderInCategory="2"

@@ -65,6 +65,8 @@ import java.util.concurrent.TimeUnit;
 public class SettingsActivity extends AppCompatActivity implements
         PreferenceFragmentCompat.OnPreferenceStartFragmentCallback,
         PreferenceSearchResultListener {
+    /** Class name of a settings fragment to open directly instead of the main settings list. */
+    public static final String EXTRA_OPEN_FRAGMENT = "open_settings_fragment";
     private static final String TAG = "SettingsActivity";
     private static final boolean DEBUG = MainActivity.DEBUG;
 
@@ -110,8 +112,11 @@ public class SettingsActivity extends AppCompatActivity implements
                 }
             }
         } else {
+            final String openFragment = getIntent().getStringExtra(EXTRA_OPEN_FRAGMENT);
+            final Fragment firstFragment = openFragment != null
+                    ? instantiateFragment(openFragment) : new MainSettingsFragment();
             getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.settings_fragment_holder, new MainSettingsFragment())
+                    .replace(R.id.settings_fragment_holder, firstFragment)
                     .commit();
         }
 

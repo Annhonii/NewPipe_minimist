@@ -1,44 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- History header: the sort switch (Most played / Last played) on the left and a
-     "Clear history" button on the right. -->
+     "Clear history" button on the right, both are the same kind of pill. -->
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:paddingTop="8dp"
+    android:paddingBottom="8dp">
 
-    <RelativeLayout
+    <LinearLayout
         android:id="@+id/sortButton"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="32dp"
         android:layout_alignParentStart="true"
-        android:background="?attr/selectableItemBackground"
+        android:layout_centerVertical="true"
+        android:layout_marginStart="16dp"
+        android:background="@drawable/bg_feed_chip"
         android:clickable="true"
-        android:focusable="true">
+        android:focusable="true"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="10dp"
+        android:paddingEnd="14dp">
 
         <ImageView
             android:id="@+id/sortButtonIcon"
-            android:layout_width="48dp"
-            android:layout_height="28dp"
-            android:layout_alignParentLeft="true"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="12dp"
-            android:layout_marginRight="12dp"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:importantForAccessibility="no"
             android:src="@drawable/ic_filter_list"
-            tools:ignore="ContentDescription,RtlHardcoded" />
+            android:tint="?android:attr/textColorPrimary" />
 
         <org.schabi.newpipe.views.NewPipeTextView
             android:id="@+id/sortButtonText"
             android:layout_width="wrap_content"
-            android:layout_height="50dp"
-            android:layout_toRightOf="@id/sortButtonIcon"
-            android:gravity="left|center"
-            android:paddingEnd="12dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="6dp"
+            android:includeFontPadding="false"
+            android:maxLines="1"
             android:text="@string/title_most_played"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:textSize="15sp"
-            android:textStyle="bold"
-            tools:ignore="RtlHardcoded,RtlSymmetry" />
-    </RelativeLayout>
+            android:textColor="?android:attr/textColorPrimary"
+            android:textSize="13sp" />
+    </LinearLayout>
 
     <TextView
         android:id="@+id/clearHistoryButton"
