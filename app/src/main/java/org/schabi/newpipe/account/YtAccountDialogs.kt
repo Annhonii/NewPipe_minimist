@@ -66,6 +66,7 @@ object YtAccountDialogs {
             .setMessage(R.string.yt_logout_message)
             .setPositiveButton(R.string.yt_logout_title) { _, _ ->
                 YtAccountStore.clear(activity)
+                YtAvatar.clear(activity)
                 activity.invalidateOptionsMenu()
             }
             .setNegativeButton(android.R.string.cancel, null)

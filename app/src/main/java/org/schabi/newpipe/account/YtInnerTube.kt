@@ -111,7 +111,8 @@ object YtInnerTube {
         val header = collect(json, "activeAccountHeaderRenderer").firstOrNull() ?: return null
         val name = text(header.optJSONObject("accountName")).orEmpty()
         val email = text(header.optJSONObject("email")).orEmpty()
-        val avatar = lastThumb(header.optJSONObject("accountPhoto")?.optJSONArray("thumbnails")).orEmpty()
+        val photo = header.optJSONObject("accountPhoto") ?: collect(json, "accountPhoto").firstOrNull()
+        val avatar = lastThumb(photo?.optJSONArray("thumbnails")).orEmpty()
         if (name.isBlank() && email.isBlank() && avatar.isBlank()) null
         else AccountInfo(name, email, avatar)
     }.getOrNull()

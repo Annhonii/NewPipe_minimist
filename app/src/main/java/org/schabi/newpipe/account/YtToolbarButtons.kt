@@ -7,7 +7,6 @@ import android.widget.ImageButton
 import android.widget.ImageView
 import androidx.core.util.Consumer
 import org.schabi.newpipe.R
-import org.schabi.newpipe.util.image.CoilHelper
 
 /**
  * Tonal buttons in the top bar: a wide search pill, settings, and the account button
@@ -41,23 +40,40 @@ object YtToolbarButtons {
         image.setOnClickListener(open)
 
         val session = YtAccountStore.load(activity)
-        if (session != null && session.avatar.isNotBlank()) {
-            image.setPadding(0, 0, 0, 0)
-            image.scaleType = ImageView.ScaleType.CENTER_CROP
-            CoilHelper.loadAvatar(image, session.avatar)
-        } else {
+        if (session == null) {
+            // signed out: the same tonal circle as the settings button, with a person icon
             val pad = (11 * activity.resources.displayMetrics.density).toInt()
             image.setPadding(pad, pad, pad, pad)
             image.scaleType = ImageView.ScaleType.CENTER_INSIDE
             image.setImageResource(R.drawable.ic_person)
-            if (session != null && !profileRefreshTried) {
-                // signed in before photos were stored: fetch it once
-                profileRefreshTried = true
-                YtAccountActions.refreshProfile(activity).subscribe(
-                    { changed -> if (changed) activity.invalidateOptionsMenu() },
+            return
+        }
+
+        // signed in: the Google photo fills the whole 44dp circle (same size as settings)
+        image.setPadding(0, 0, 0, 0)
+        image.scaleType = ImageView.ScaleType.CENTER_CROP
+        val label = session.name.ifBlank { session.email }
+        val cached = if (session.avatar.isBlank()) null else YtAvatar.cached(activity, session.avatar)
+        if (cached != null) {
+            image.setImageBitmap(cached)
+        } else {
+            // until the photo is there: the first letter of the name, never a grey box
+            image.setImageDrawable(InitialAvatarDrawable(label))
+            if (session.avatar.isNotBlank()) {
+                YtAvatar.fetch(activity, session.avatar).subscribe(
+                    { bitmap -> image.setImageBitmap(bitmap) },
                     { }
                 )
             }
+        }
+
+        if (session.avatar.isBlank() && !profileRefreshTried) {
+            // signed in before photos were stored (or the lookup failed): fetch it once
+            profileRefreshTried = true
+            YtAccountActions.refreshProfile(activity).subscribe(
+                { changed -> if (changed) activity.invalidateOptionsMenu() },
+                { }
+            )
         }
     }
 }

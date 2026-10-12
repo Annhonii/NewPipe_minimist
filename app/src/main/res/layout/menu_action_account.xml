@@ -16,6 +16,7 @@
         android:background="@drawable/bg_icon_button"
         android:clickable="true"
         android:clipToOutline="true"
+        android:outlineProvider="background"
         android:focusable="true">
 
         <ImageView

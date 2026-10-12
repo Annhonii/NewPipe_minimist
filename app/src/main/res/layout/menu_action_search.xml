@@ -3,6 +3,7 @@
      The outer frame carries a 4dp gutter on each side, so neighbouring top bar buttons end up
      exactly 8dp apart (the action bar ignores margins on the root of an action layout). -->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="wrap_content"
     android:layout_height="match_parent"
     android:paddingStart="4dp"
@@ -40,6 +41,7 @@
             android:layout_marginStart="8dp"
             android:importantForAccessibility="no"
             android:scaleType="fitCenter"
-            android:src="@drawable/ic_search" />
+            android:src="@drawable/ic_search"
+            app:tint="?attr/colorPrimary" />
     </LinearLayout>
 </FrameLayout>
