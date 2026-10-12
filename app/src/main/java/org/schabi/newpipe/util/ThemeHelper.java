@@ -73,7 +73,6 @@ public final class ThemeHelper {
      */
     public static void setTheme(final Context context, final int serviceId) {
         context.setTheme(getThemeForService(context, serviceId));
-        FontHelper.applyFontOverlay(context);
         AppearanceHelper.applyOverlays(context);
     }
 

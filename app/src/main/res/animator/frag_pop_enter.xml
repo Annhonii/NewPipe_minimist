@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Going back: the previous screen glides in from the left -->
+<set xmlns:android="http://schemas.android.com/apk/res/android"
+    android:ordering="together">
+    <objectAnimator
+        android:duration="220"
+        android:interpolator="@interpolator/standard"
+        android:propertyName="alpha"
+        android:startOffset="60"
+        android:valueFrom="0.0f"
+        android:valueTo="1.0f" />
+    <objectAnimator
+        android:duration="380"
+        android:interpolator="@interpolator/emphasized_decelerate"
+        android:propertyName="translationX"
+        android:valueFrom="-36dp"
+        android:valueTo="0dp"
+        android:valueType="floatType" />
+</set>

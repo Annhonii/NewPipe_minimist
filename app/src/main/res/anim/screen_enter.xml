@@ -1,7 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- New screen: slides up/in from the right edge with a faint scale-up and a soft fade -->
 <set xmlns:android="http://schemas.android.com/apk/res/android"
-    android:duration="300"
-    android:interpolator="@android:interpolator/decelerate_quint">
-    <alpha android:fromAlpha="0" android:toAlpha="1" />
-    <translate android:fromYDelta="4%" android:toYDelta="0%" />
+    android:duration="380"
+    android:interpolator="@interpolator/emphasized_decelerate">
+    <alpha
+        android:duration="240"
+        android:fromAlpha="0"
+        android:toAlpha="1" />
+    <translate
+        android:fromXDelta="8%"
+        android:toXDelta="0%" />
+    <scale
+        android:fromXScale="0.97"
+        android:fromYScale="0.97"
+        android:pivotX="50%"
+        android:pivotY="50%"
+        android:toXScale="1"
+        android:toYScale="1" />
 </set>

@@ -32,7 +32,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
-import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
@@ -258,6 +257,8 @@ class FeedFragment : BaseStateFragment<FeedState>() {
         super.initListeners()
         feedBinding.refreshRootView.setOnClickListener { reloadContent() }
         feedBinding.swipeRefreshLayout.setOnRefreshListener { reloadContent() }
+        feedBinding.feedFilterChip.setOnClickListener { showStreamVisibilityDialog() }
+        feedBinding.feedModeChip.setOnClickListener { showModeDialog() }
         feedBinding.newItemsLoadedButton.setOnClickListener {
             hideNewItemsLoaded(true)
             feedBinding.itemsList.scrollToPosition(0)
@@ -274,36 +275,29 @@ class FeedFragment : BaseStateFragment<FeedState>() {
         activity.supportActionBar?.setDisplayShowTitleEnabled(true)
         activity.supportActionBar?.setTitle(R.string.fragment_feed_title)
         activity.supportActionBar?.subtitle = groupName
-
-        inflater.inflate(R.menu.menu_feed_fragment, menu)
+        // Filter and Mode are chips inside the tab now, so no toolbar items / 3-dot menu here
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.itemId == R.id.menu_item_feed_help) {
-            val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
+    /** "Mode" chip: explains and toggles the fast (dedicated) feed loading method. */
+    private fun showModeDialog() {
+        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
 
-            val usingDedicatedMethod = sharedPreferences
-                .getBoolean(getString(R.string.feed_use_dedicated_fetch_method_key), false)
-            val enableDisableButtonText = when {
-                usingDedicatedMethod -> R.string.feed_use_dedicated_fetch_method_disable_button
-                else -> R.string.feed_use_dedicated_fetch_method_enable_button
-            }
-
-            AlertDialog.Builder(requireContext())
-                .setMessage(R.string.feed_use_dedicated_fetch_method_help_text)
-                .setNeutralButton(enableDisableButtonText) { _, _ ->
-                    sharedPreferences.edit {
-                        putBoolean(getString(R.string.feed_use_dedicated_fetch_method_key), !usingDedicatedMethod)
-                    }
-                }
-                .setPositiveButton(resources.getString(R.string.ok), null)
-                .show()
-            return true
-        } else if (item.itemId == R.id.menu_item_feed_toggle_played_items) {
-            showStreamVisibilityDialog()
+        val usingDedicatedMethod = sharedPreferences
+            .getBoolean(getString(R.string.feed_use_dedicated_fetch_method_key), false)
+        val enableDisableButtonText = when {
+            usingDedicatedMethod -> R.string.feed_use_dedicated_fetch_method_disable_button
+            else -> R.string.feed_use_dedicated_fetch_method_enable_button
         }
 
-        return super.onOptionsItemSelected(item)
+        AlertDialog.Builder(requireContext())
+            .setMessage(R.string.feed_use_dedicated_fetch_method_help_text)
+            .setNeutralButton(enableDisableButtonText) { _, _ ->
+                sharedPreferences.edit {
+                    putBoolean(getString(R.string.feed_use_dedicated_fetch_method_key), !usingDedicatedMethod)
+                }
+            }
+            .setPositiveButton(resources.getString(R.string.ok), null)
+            .show()
     }
 
     private fun showStreamVisibilityDialog() {

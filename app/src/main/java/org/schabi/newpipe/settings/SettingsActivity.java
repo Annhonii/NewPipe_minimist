@@ -88,7 +88,6 @@ public class SettingsActivity extends AppCompatActivity implements
     @Override
     protected void onCreate(final Bundle savedInstanceBundle) {
         setTheme(ThemeHelper.getSettingsThemeStyle(this));
-        org.schabi.newpipe.util.FontHelper.applyFontOverlay(this);
         org.schabi.newpipe.util.AppearanceHelper.applyOverlays(this);
 
         super.onCreate(savedInstanceBundle);
@@ -182,8 +181,8 @@ public class SettingsActivity extends AppCompatActivity implements
 
     private void showSettingsFragment(final Fragment fragment) {
         getSupportFragmentManager().beginTransaction()
-                .setCustomAnimations(R.animator.custom_fade_in, R.animator.custom_fade_out,
-                        R.animator.custom_fade_in, R.animator.custom_fade_out)
+                .setCustomAnimations(R.animator.frag_enter, R.animator.frag_exit,
+                        R.animator.frag_pop_enter, R.animator.frag_pop_exit)
                 .replace(FRAGMENT_HOLDER_ID, fragment)
                 .addToBackStack(null)
                 .commit();

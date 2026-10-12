@@ -1,7 +1,6 @@
 package org.schabi.newpipe.util;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.view.View;
 import android.widget.TextView;
@@ -9,11 +8,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
-import androidx.preference.PreferenceManager;
 
-import org.schabi.newpipe.R;
-
-/** Device-default font option and the Ntype82 font for screen titles. */
+/** Optional Ntype82 font for screen titles (the app otherwise uses the device font). */
 public final class FontHelper {
     private static final String[] TITLE_FONT_FILES = {"fonts/ntype82.ttf", "fonts/ntype82.otf"};
     @Nullable
@@ -23,18 +19,6 @@ public final class FontHelper {
     private static final boolean USE_TITLE_FONT = false;
 
     private FontHelper() { }
-
-    public static boolean useDeviceFont(@NonNull final Context context) {
-        final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        return prefs.getBoolean(context.getString(R.string.use_device_font_key), false);
-    }
-
-    /** Applies the "device default font" overlay on top of the app theme when enabled. */
-    public static void applyFontOverlay(@NonNull final Context context) {
-        if (useDeviceFont(context)) {
-            context.getTheme().applyStyle(R.style.DeviceFontOverlay, true);
-        }
-    }
 
     @Nullable
     public static synchronized Typeface getTitleTypeface(@NonNull final Context context) {

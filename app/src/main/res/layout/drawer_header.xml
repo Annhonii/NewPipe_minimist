@@ -51,7 +51,6 @@
                 android:gravity="start|center_vertical"
                 android:hyphenationFrequency="full"
                 android:maxLines="1"
-                android:fontFamily="@font/poppins"
                 android:text="@string/app_name"
                 android:textColor="@color/drawer_header_font_color"
                 android:textStyle="bold"

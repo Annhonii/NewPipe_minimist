@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Filled pill (wide rounded) button, used for the search action in the top bar. -->
+<ripple xmlns:android="http://schemas.android.com/apk/res/android"
+    android:color="?attr/colorControlHighlight">
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="?attr/card_item_background_color" />
+            <corners android:radius="100dp" />
+        </shape>
+    </item>
+</ripple>

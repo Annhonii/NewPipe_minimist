@@ -346,8 +346,8 @@ public final class NavigationHelper {
     @SuppressLint("CommitTransaction")
     private static FragmentTransaction defaultTransaction(final FragmentManager fragmentManager) {
         return fragmentManager.beginTransaction()
-                .setCustomAnimations(R.animator.custom_fade_in, R.animator.custom_fade_out,
-                        R.animator.custom_fade_in, R.animator.custom_fade_out);
+                .setCustomAnimations(R.animator.frag_enter, R.animator.frag_exit,
+                        R.animator.frag_pop_enter, R.animator.frag_pop_exit);
     }
 
     public static void gotoMainFragment(final FragmentManager fragmentManager) {

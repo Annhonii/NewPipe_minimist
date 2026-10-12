@@ -13,7 +13,6 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.content.res.ResourcesCompat;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceCategory;
 import androidx.preference.PreferenceGroup;
@@ -65,8 +64,8 @@ final class SegmentedPreferenceAdapter extends PreferenceGroupAdapter {
                                @NonNull final Context ctx) {
         super(preferenceGroup);
         this.context = ctx;
-        this.regular = ResourcesCompat.getFont(ctx, R.font.poppins);
-        this.medium = ResourcesCompat.getFont(ctx, R.font.poppins);
+        this.regular = Typeface.DEFAULT;
+        this.medium = Typeface.create(Typeface.DEFAULT, Typeface.BOLD);
     }
 
     @Override

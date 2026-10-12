@@ -19,8 +19,6 @@
         <item name="floatingActionButtonStyle">@style/FloatingActionButtonTheme</item>
         <item name="toolbarSearchColor">@color/white</item>
         <item name="colorControlActivated">?attr/colorPrimary</item>
-        <item name="android:fontFamily">@font/poppins</item>
-        <item name="fontFamily">@font/poppins</item>
 
         <!-- Nothing / Music component styles (see styles_nothing.xml) -->
         <item name="switchStyle">@style/Widget.App.Switch</item>
@@ -119,8 +117,6 @@
         <item name="colorAccent">@color/nothing_red</item>
         <item name="android:windowBackground">@drawable/bg_dialog</item>
         <item name="android:windowAnimationStyle">@style/Animation.App.Dialog</item>
-        <item name="android:fontFamily">@font/poppins</item>
-        <item name="fontFamily">@font/poppins</item>
         <item name="android:textColorPrimary">@color/text_primary_light</item>
         <item name="android:textColorSecondary">@color/text_secondary_light</item>
         <item name="android:textColorHint">@color/on_surface_variant_light</item>
@@ -145,8 +141,6 @@
         <item name="colorAccent">@color/nothing_red</item>
         <item name="android:windowBackground">@drawable/bg_dialog</item>
         <item name="android:windowAnimationStyle">@style/Animation.App.Dialog</item>
-        <item name="android:fontFamily">@font/poppins</item>
-        <item name="fontFamily">@font/poppins</item>
         <item name="android:textColorPrimary">@color/text_primary_dark</item>
         <item name="android:textColorSecondary">@color/text_secondary_dark</item>
         <item name="android:textColorHint">@color/on_surface_variant_dark</item>
@@ -171,8 +165,6 @@
         <item name="colorAccent">@color/nothing_red</item>
         <item name="android:windowBackground">@drawable/bg_dialog</item>
         <item name="android:windowAnimationStyle">@style/Animation.App.Dialog</item>
-        <item name="android:fontFamily">@font/poppins</item>
-        <item name="fontFamily">@font/poppins</item>
         <item name="android:textColorPrimary">@color/text_primary_light</item>
         <item name="android:textColorSecondary">@color/text_secondary_light</item>
         <item name="android:textColorHint">@color/on_surface_variant_light</item>
@@ -197,8 +189,6 @@
         <item name="colorAccent">@color/nothing_red</item>
         <item name="android:windowBackground">@drawable/bg_dialog</item>
         <item name="android:windowAnimationStyle">@style/Animation.App.Dialog</item>
-        <item name="android:fontFamily">@font/poppins</item>
-        <item name="fontFamily">@font/poppins</item>
         <item name="android:textColorPrimary">@color/text_primary_dark</item>
         <item name="android:textColorSecondary">@color/text_secondary_dark</item>
         <item name="android:textColorHint">@color/on_surface_variant_dark</item>
@@ -255,9 +245,4 @@
     <style name="RouterActivityThemeDark" parent="Base.RouterActivityThemeDark" />
 
 
-    <!-- Applied on top of the theme when "Use device default font" is on -->
-    <style name="DeviceFontOverlay">
-        <item name="android:fontFamily">sans-serif</item>
-        <item name="fontFamily">sans-serif</item>
-    </style>
 </resources>

@@ -10,8 +10,8 @@ import org.schabi.newpipe.R
 import org.schabi.newpipe.util.image.CoilHelper
 
 /**
- * Round tonal buttons in the top bar: search, the account button (Google photo once signed in)
- * and settings on the far right.
+ * Tonal buttons in the top bar: a wide search pill, settings, and the account button
+ * (Google photo once signed in) on the far right.
  */
 object YtToolbarButtons {
     private var profileRefreshTried = false
@@ -21,11 +21,14 @@ object YtToolbarButtons {
         listOf(R.id.action_search, R.id.action_settings).forEach { id ->
             val item = menu.findItem(id) ?: return@forEach
             val view = item.actionView ?: return@forEach
-            view.findViewById<ImageButton>(R.id.menu_action_button)?.apply {
+            val button = view.findViewById<ImageButton>(R.id.menu_action_button)
+            button?.apply {
                 setImageDrawable(item.icon)
                 contentDescription = item.title
                 setOnClickListener { onSelect.accept(item) }
             }
+            // the empty space around the button should work as a tap target too
+            view.setOnClickListener { onSelect.accept(item) }
         }
 
         val account = menu.findItem(R.id.action_account) ?: return
@@ -33,6 +36,7 @@ object YtToolbarButtons {
         val image = view.findViewById<ImageView>(R.id.account_avatar) ?: return
         val open = android.view.View.OnClickListener { YtAccountDialogs.show(activity) }
         view.setOnClickListener(open)
+        view.findViewById<android.view.View>(R.id.account_button)?.setOnClickListener(open)
         image.setOnClickListener(open)
 
         val session = YtAccountStore.load(activity)

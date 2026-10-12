@@ -7,13 +7,13 @@
         android:icon="@drawable/ic_search"
         android:orderInCategory="1"
         android:title="@string/search"
-        app:actionLayout="@layout/menu_action_icon_button"
+        app:actionLayout="@layout/menu_action_search"
         app:showAsAction="always" />
 
     <item
         android:id="@+id/action_account"
         android:icon="@drawable/ic_person"
-        android:orderInCategory="2"
+        android:orderInCategory="3"
         android:title="@string/yt_account_title"
         app:actionLayout="@layout/menu_action_account"
         app:showAsAction="always" />
@@ -21,7 +21,7 @@
     <item
         android:id="@+id/action_settings"
         android:icon="@drawable/ic_settings"
-        android:orderInCategory="3"
+        android:orderInCategory="2"
         android:title="@string/settings"
         app:actionLayout="@layout/menu_action_icon_button"
         app:showAsAction="always" />

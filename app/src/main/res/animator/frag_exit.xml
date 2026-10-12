@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Screen being covered: drifts left a little and fades out -->
+<set xmlns:android="http://schemas.android.com/apk/res/android"
+    android:ordering="together">
+    <objectAnimator
+        android:duration="140"
+        android:interpolator="@interpolator/emphasized_accelerate"
+        android:propertyName="alpha"
+        android:valueFrom="1.0f"
+        android:valueTo="0.0f" />
+    <objectAnimator
+        android:duration="300"
+        android:interpolator="@interpolator/emphasized_accelerate"
+        android:propertyName="translationX"
+        android:valueFrom="0dp"
+        android:valueTo="-36dp"
+        android:valueType="floatType" />
+</set>

@@ -759,6 +759,8 @@
 \n
 \nSo the choice boils down to what you prefer: speed or precise information.</string>
     <string name="feed_hide_streams_title">Show the following streams</string>
+    <string name="feed_filter">Filter</string>
+    <string name="feed_mode">Mode</string>
     <string name="feed_show_hide_streams">Show/Hide streams</string>
     <string name="feed_fetch_channel_tabs">Fetch channel tabs</string>
     <string name="feed_fetch_channel_tabs_summary">Tabs to fetch when updating the feed. This option has no effect if a channel is updated using fast mode.</string>
@@ -939,7 +941,7 @@
     <string name="yt_login_title">Sign in to Google</string>
     <string name="yt_login_hint">Sign in with your Google account. This window closes by itself once you are signed in to YouTube.</string>
     <string name="yt_login_action">Sign in</string>
-    <string name="yt_token_message">Paste the cookie string (it must contain SAPISID) or the full Metrolist token text.</string>
+    <string name="yt_token_message">If you don\'t have a token, log in manually first, then copy the token from Settings &gt; Google account to log in with it in the future.</string>
     <string name="yt_token_hint">SID=...; SAPISID=...; ...</string>
     <string name="yt_token_invalid">That token has no SAPISID cookie, so it cannot be used</string>
     <string name="yt_sync_title">Sync subscriptions now</string>
