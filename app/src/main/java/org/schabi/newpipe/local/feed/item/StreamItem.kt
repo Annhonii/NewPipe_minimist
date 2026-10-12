@@ -3,6 +3,7 @@ package org.schabi.newpipe.local.feed.item
 import android.content.Context
 import android.text.TextUtils
 import android.view.View
+import android.widget.ImageView
 import androidx.core.content.ContextCompat
 import androidx.preference.PreferenceManager
 import com.xwray.groupie.viewbinding.BindableItem
@@ -39,6 +40,12 @@ data class StreamItem(
      * Can be used e.g. for highlighting a item.
      */
     var execBindEnd: Consumer<ListStreamItemBinding>? = null
+
+    /**
+     * Returns the channel logo url for the channel url of this stream (set by the feed, which
+     * knows the subscriptions). When it is not set, or returns nothing, the logo stays hidden.
+     */
+    var avatarLookup: ((String?) -> String?)? = null
 
     override fun getId(): Long = stream.uid
 
@@ -102,6 +109,17 @@ data class StreamItem(
         }
 
         CoilHelper.loadThumbnail(viewBinding.itemThumbnailView, stream.thumbnailUrl)
+
+        // channel logo (only the card and grid layouts have this view)
+        viewBinding.root.findViewById<ImageView>(R.id.itemUploaderAvatarView)?.let { avatar ->
+            val avatarUrl = avatarLookup?.invoke(stream.uploaderUrl)
+            if (avatarUrl.isNullOrBlank()) {
+                avatar.visibility = View.GONE
+            } else {
+                avatar.visibility = View.VISIBLE
+                CoilHelper.loadAvatar(avatar, avatarUrl)
+            }
+        }
 
         if (itemVersion != ItemVersion.MINI) {
             viewBinding.itemAdditionalDetails.text =

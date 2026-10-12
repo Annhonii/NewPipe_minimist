@@ -165,6 +165,7 @@ class FeedFragment : BaseStateFragment<FeedState>() {
         feedBinding.itemsList.adapter = groupAdapter
         setupListViewMode()
         setupChannelsRow()
+        loadChannelAvatars()
     }
 
     /**
@@ -192,6 +193,26 @@ class FeedFragment : BaseStateFragment<FeedState>() {
                     _feedBinding?.channelsRow?.isVisible = list.isNotEmpty()
                     channelsAdapter.submit(list)
                 }, { throwable -> Log.e(TAG, "Could not load subscribed channels", throwable) })
+        )
+    }
+
+    /** channel url -> logo url, filled from the subscriptions; used for the logo on each video. */
+    private var channelAvatars: Map<String, String> = emptyMap()
+    private val avatarLookup: (String?) -> String? = { url -> url?.let { channelAvatars[it] } }
+
+    private fun loadChannelAvatars() {
+        disposables.add(
+            SubscriptionManager(requireContext()).subscriptions()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({ list ->
+                    channelAvatars = list.mapNotNull { sub ->
+                        val url = sub.url
+                        val avatar = sub.avatarUrl
+                        if (url != null && !avatar.isNullOrBlank()) url to avatar else null
+                    }.toMap()
+                    if (_feedBinding != null) groupAdapter.notifyDataSetChanged()
+                }, { throwable -> Log.e(TAG, "Could not load channel logos", throwable) })
         )
     }
 
@@ -474,7 +495,10 @@ class FeedFragment : BaseStateFragment<FeedState>() {
             ItemViewMode.CARD -> StreamItem.ItemVersion.CARD
             else -> StreamItem.ItemVersion.NORMAL
         }
-        loadedState.items.forEach { it.itemVersion = itemVersion }
+        loadedState.items.forEach {
+            it.itemVersion = itemVersion
+            it.avatarLookup = avatarLookup
+        }
 
         // This need to be saved in a variable as the update occurs async
         val oldOldestSubscriptionUpdate = oldestSubscriptionUpdate
