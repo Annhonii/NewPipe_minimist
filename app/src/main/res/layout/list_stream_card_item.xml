@@ -59,34 +59,60 @@
         app:layout_constraintTop_toBottomOf="@id/itemThumbnailView"
         tools:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc tristique vitae sem vitae blanditLorem ipsumLorem ipsumLorem ipsumLorem ipsumLorem ipsumLorem ipsumLorem ipsum" />
 
-    <org.schabi.newpipe.views.NewPipeTextView
-        android:id="@+id/itemUploaderView"
+    <!-- channel row: round channel logo + (channel name / views • date), centred on the logo.
+         The logo is hidden (gone) for items that have none, and the text then starts at the left edge. -->
+    <LinearLayout
+        android:id="@+id/itemUploaderRow"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/spacing_micro"
-        android:layout_marginEnd="@dimen/margin_small"
-        android:ellipsize="end"
-        android:lines="1"
-        android:includeFontPadding="false"
-        android:textAppearance="?android:textAppearanceSmall"
-        app:layout_constraintEnd_toStartOf="@id/itemAdditionalDetails"
-        app:layout_constraintStart_toStartOf="@id/itemVideoTitleView"
-        app:layout_constraintTop_toBottomOf="@+id/itemVideoTitleView"
-        tools:text="Uploader" />
+        android:layout_marginTop="@dimen/margin_small"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="@id/itemThumbnailView"
+        app:layout_constraintStart_toStartOf="@id/itemThumbnailView"
+        app:layout_constraintTop_toBottomOf="@id/itemVideoTitleView"
+        app:layout_constraintBottom_toBottomOf="parent">
 
-    <org.schabi.newpipe.views.NewPipeTextView
-        android:id="@+id/itemAdditionalDetails"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:ellipsize="end"
-        android:lines="1"
-        android:includeFontPadding="false"
-        android:textAppearance="?android:textAppearanceSmall"
-        app:layout_constraintBottom_toBottomOf="@id/itemUploaderView"
-        app:layout_constraintEnd_toEndOf="@+id/itemVideoTitleView"
-        app:layout_constraintStart_toEndOf="@id/itemUploaderView"
-        app:layout_constraintTop_toTopOf="@id/itemUploaderView"
-        tools:text="2 years ago • 10M views" />
+        <ImageView
+            android:id="@+id/itemUploaderAvatarView"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginEnd="10dp"
+            android:background="@drawable/bg_avatar_circle"
+            android:clipToOutline="true"
+            android:importantForAccessibility="no"
+            android:scaleType="centerCrop"
+            android:src="@drawable/placeholder_person"
+            android:visibility="gone" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <org.schabi.newpipe.views.NewPipeTextView
+                android:id="@+id/itemUploaderView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:includeFontPadding="false"
+                android:lines="1"
+                android:textAppearance="?android:textAppearanceSmall"
+                tools:text="Uploader" />
+
+            <org.schabi.newpipe.views.NewPipeTextView
+                android:id="@+id/itemAdditionalDetails"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:ellipsize="end"
+                android:includeFontPadding="false"
+                android:lines="1"
+                android:textAppearance="?android:textAppearanceSmall"
+                tools:text="2 years ago • 10M views" />
+        </LinearLayout>
+    </LinearLayout>
 
     <org.schabi.newpipe.views.AnimatedProgressBar
         android:id="@+id/itemProgressView"

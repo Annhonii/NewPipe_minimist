@@ -5,6 +5,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 
 import org.schabi.newpipe.R;
@@ -27,6 +28,9 @@ public class StreamMiniInfoItemHolder extends InfoItemHolder {
     public final TextView itemVideoTitleView;
     public final TextView itemUploaderView;
     public final TextView itemDurationView;
+    /** Round channel logo; only present in the card and grid layouts, so it can be null. */
+    @Nullable
+    private final ImageView itemUploaderAvatarView;
     private final AnimatedProgressBar itemProgressView;
 
     StreamMiniInfoItemHolder(final InfoItemBuilder infoItemBuilder, final int layoutId,
@@ -37,6 +41,7 @@ public class StreamMiniInfoItemHolder extends InfoItemHolder {
         itemVideoTitleView = itemView.findViewById(R.id.itemVideoTitleView);
         itemUploaderView = itemView.findViewById(R.id.itemUploaderView);
         itemDurationView = itemView.findViewById(R.id.itemDurationView);
+        itemUploaderAvatarView = itemView.findViewById(R.id.itemUploaderAvatarView);
         itemProgressView = itemView.findViewById(R.id.itemProgressView);
     }
 
@@ -88,6 +93,16 @@ public class StreamMiniInfoItemHolder extends InfoItemHolder {
 
         // Default thumbnail is shown on error, while loading and if the url is empty
         CoilHelper.INSTANCE.loadThumbnail(itemThumbnailView, item.getThumbnails());
+
+        // Channel logo next to the channel name (hidden when the item has no logo)
+        if (itemUploaderAvatarView != null) {
+            if (item.getUploaderAvatars().isEmpty()) {
+                itemUploaderAvatarView.setVisibility(View.GONE);
+            } else {
+                itemUploaderAvatarView.setVisibility(View.VISIBLE);
+                CoilHelper.INSTANCE.loadAvatar(itemUploaderAvatarView, item.getUploaderAvatars());
+            }
+        }
 
         itemView.setOnClickListener(view -> {
             if (itemBuilder.getOnStreamSelectedListener() != null) {
