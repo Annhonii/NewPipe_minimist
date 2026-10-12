@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="rss_button_title">RSS</string>
+    <!-- fixed toolbar title of the main tabs (Home, New, Downloads, History) -->
+    <string name="main_toolbar_title">NewPipe</string>
     <string name="vlc_package">org.videolan.vlc</string>
     <string name="kore_package">org.xbmc.kore</string>
     <string name="peertube_instance_list_url">https://joinpeertube.org/instances#instances-list</string>

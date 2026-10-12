@@ -266,7 +266,8 @@ public class MainFragment extends BaseFragment implements TabLayout.OnTabSelecte
     }
 
     private void updateTitleForTab(final int tabPosition) {
-        setTitle(tabsList.get(tabPosition).getTabName(requireContext()));
+        // the toolbar title is the same for every main tab
+        setTitle(getString(R.string.main_toolbar_title));
     }
 
     public void commitPlaylistTabs() {

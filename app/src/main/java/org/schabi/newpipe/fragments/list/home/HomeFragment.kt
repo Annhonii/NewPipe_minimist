@@ -73,7 +73,7 @@ class HomeFragment : BaseFragment() {
 
     override fun onResume() {
         super.onResume()
-        setTitle(getString(R.string.yt_home_title))
+        setTitle(getString(R.string.main_toolbar_title))
     }
 
     override fun onDestroyView() {

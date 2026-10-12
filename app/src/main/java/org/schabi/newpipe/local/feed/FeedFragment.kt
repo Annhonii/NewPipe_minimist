@@ -290,7 +290,9 @@ class FeedFragment : BaseStateFragment<FeedState>() {
         super.onCreateOptionsMenu(menu, inflater)
 
         activity.supportActionBar?.setDisplayShowTitleEnabled(true)
-        activity.supportActionBar?.setTitle(R.string.fragment_feed_title)
+        activity.supportActionBar?.setTitle(
+            if (useAsFrontPage) R.string.main_toolbar_title else R.string.fragment_feed_title
+        )
         activity.supportActionBar?.subtitle = groupName
     }
 

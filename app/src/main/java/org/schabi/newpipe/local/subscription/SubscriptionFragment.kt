@@ -117,7 +117,9 @@ class SubscriptionFragment : BaseStateFragment<SubscriptionState>() {
         super.onCreateOptionsMenu(menu, inflater)
 
         activity.supportActionBar?.setDisplayShowTitleEnabled(true)
-        activity.supportActionBar?.setTitle(R.string.tab_subscriptions)
+        activity.supportActionBar?.setTitle(
+            if (useAsFrontPage) R.string.main_toolbar_title else R.string.tab_subscriptions
+        )
 
         buildImportExportMenu(menu)
     }
