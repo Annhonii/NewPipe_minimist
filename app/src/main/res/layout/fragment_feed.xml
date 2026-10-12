@@ -18,47 +18,60 @@
         android:visibility="gone"
         tools:visibility="visible" />
 
-    <!-- Filter / Mode actions live inside the tab instead of the toolbar's 3-dot menu -->
+    <!-- Filter / Mode actions: two equal tonal buttons that span the row, aligned with the list
+         content, each with a drop-down arrow so they read as pickers. -->
     <LinearLayout
         android:id="@+id/feed_actions_row"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/channels_row"
+        android:baselineAligned="false"
         android:orientation="horizontal"
-        android:paddingHorizontal="12dp"
-        android:paddingVertical="6dp">
+        android:paddingHorizontal="16dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="4dp">
 
         <TextView
             android:id="@+id/feed_filter_chip"
-            android:stateListAnimator="@animator/press_scale"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="40dp"
+            android:layout_weight="1"
             android:background="@drawable/bg_feed_chip"
             android:clickable="true"
             android:drawablePadding="8dp"
             android:drawableStart="@drawable/ic_filter_list"
+            android:drawableEnd="@drawable/ic_arrow_drop_down"
             android:drawableTint="?android:attr/textColorPrimary"
+            android:ellipsize="end"
             android:focusable="true"
-            android:gravity="center_vertical"
-            android:paddingHorizontal="16dp"
+            android:gravity="center"
+            android:maxLines="1"
+            android:paddingStart="12dp"
+            android:paddingEnd="8dp"
+            android:stateListAnimator="@animator/press_scale"
             android:text="@string/feed_filter"
             android:textColor="?android:attr/textColorPrimary"
             android:textSize="14sp" />
 
         <TextView
             android:id="@+id/feed_mode_chip"
-            android:stateListAnimator="@animator/press_scale"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="40dp"
             android:layout_marginStart="8dp"
+            android:layout_weight="1"
             android:background="@drawable/bg_feed_chip"
             android:clickable="true"
             android:drawablePadding="8dp"
-            android:drawableStart="@drawable/ic_help"
+            android:drawableStart="@drawable/ic_bolt"
+            android:drawableEnd="@drawable/ic_arrow_drop_down"
             android:drawableTint="?android:attr/textColorPrimary"
+            android:ellipsize="end"
             android:focusable="true"
-            android:gravity="center_vertical"
-            android:paddingHorizontal="16dp"
+            android:gravity="center"
+            android:maxLines="1"
+            android:paddingStart="12dp"
+            android:paddingEnd="8dp"
+            android:stateListAnimator="@animator/press_scale"
             android:text="@string/fast_mode"
             android:textColor="?android:attr/textColorPrimary"
             android:textSize="14sp" />
@@ -120,14 +133,6 @@
             android:src="@drawable/ic_refresh"
             tools:ignore="ContentDescription" />
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_below="@+id/refresh_info_container"
-            android:layout_marginLeft="8dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginRight="8dp"
-            android:background="?attr/separator_color" />
     </RelativeLayout>
 
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -153,7 +158,7 @@
         android:layout_height="wrap_content"
         android:layout_alignBottom="@id/swipeRefreshLayout"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="5sp"
+        android:layout_marginBottom="96dp"
         android:text="@string/feed_new_items"
         android:textSize="12sp"
         android:theme="@style/ServiceColoredButton"

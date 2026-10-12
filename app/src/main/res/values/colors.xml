@@ -13,7 +13,7 @@
     <color name="light_background_color">#F2F2F2</color>
     <color name="light_dialog_background_color">#FAFAFA</color>
     <color name="light_settings_accent_color">#D71921</color>
-    <color name="light_separator_color">#1A000000</color>
+    <color name="light_separator_color">#12000000</color>
     <color name="light_ripple_color">#26000000</color>
     <color name="light_selected_color">#2a868686</color>
     <color name="light_contrast_background_color">#14000000</color>
@@ -28,7 +28,7 @@
     <color name="dark_background_color">#131313</color>
     <color name="dark_dialog_background_color">#1F1F1F</color>
     <color name="dark_settings_accent_color">#D71921</color>
-    <color name="dark_separator_color">#33FFFFFF</color>
+    <color name="dark_separator_color">#1AFFFFFF</color>
     <color name="dark_ripple_color">#26FFFFFF</color>
     <color name="dark_selected_color">#2affffff</color>
     <color name="dark_contrast_background_color">#1FFFFFFF</color>
@@ -43,7 +43,7 @@
     <!-- Black Theme -->
     <color name="black_background_color">#000000</color>
     <color name="black_settings_accent_color">@color/dark_settings_accent_color</color>
-    <color name="black_separator_color">#29FFFFFF</color>
+    <color name="black_separator_color">#1AFFFFFF</color>
     <color name="black_contrast_background_color">#1FFFFFFF</color>
     <color name="black_card_item_background_color">#121212</color>
     <color name="black_card_item_contrast_color">#232323</color>

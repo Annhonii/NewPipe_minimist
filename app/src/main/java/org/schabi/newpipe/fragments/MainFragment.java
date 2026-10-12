@@ -17,14 +17,18 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
+import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentStatePagerAdapterMenuWorkaround;
 import androidx.preference.PreferenceManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
 
 import com.google.android.material.tabs.TabLayout;
@@ -57,6 +61,24 @@ public class MainFragment extends BaseFragment implements TabLayout.OnTabSelecte
 
     private boolean hasTabsChanged = false;
 
+    /** Extra bottom space (px) for the mini player, on top of the nav pill's own space. */
+    private int miniPlayerInset = 0;
+    /**
+     * The pages run behind the floating nav pill, so every vertical list that is created inside
+     * them gets a bottom inset, which lets the last item scroll up above the pill.
+     */
+    private final FragmentManager.FragmentLifecycleCallbacks pageInsetCallbacks =
+            new FragmentManager.FragmentLifecycleCallbacks() {
+                @Override
+                public void onFragmentViewCreated(@NonNull final FragmentManager fm,
+                                                  @NonNull final Fragment f,
+                                                  @NonNull final View v,
+                                                  @Nullable final Bundle savedInstanceState) {
+                    // posted, so that the page has set up its layout managers by then
+                    v.post(() -> applyBottomInset(v));
+                }
+            };
+
     private SharedPreferences prefs;
     private boolean youtubeRestrictedModeEnabled;
     private String youtubeRestrictedModeEnabledKey;
@@ -71,6 +93,7 @@ public class MainFragment extends BaseFragment implements TabLayout.OnTabSelecte
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+        getChildFragmentManager().registerFragmentLifecycleCallbacks(pageInsetCallbacks, true);
         tabsManager = TabsManager.getManager(activity);
         tabsManager.setSavedTabsListener(() -> {
             if (DEBUG) {
@@ -155,6 +178,7 @@ public class MainFragment extends BaseFragment implements TabLayout.OnTabSelecte
     @Override
     public void onDestroy() {
         super.onDestroy();
+        getChildFragmentManager().unregisterFragmentLifecycleCallbacks(pageInsetCallbacks);
         tabsManager.unsetSavedTabsListener();
         if (binding != null) {
             binding.pager.setAdapter(null);
@@ -260,12 +284,61 @@ public class MainFragment extends BaseFragment implements TabLayout.OnTabSelecte
         if (binding == null) {
             return;
         }
-        final ViewPager pager = binding.pager;
-        pager.setClipToPadding(false);
-        if (pager.getPaddingBottom() != bottomPx) {
-            pager.setPadding(pager.getPaddingLeft(), pager.getPaddingTop(),
-                    pager.getPaddingRight(), bottomPx);
+        if (miniPlayerInset != bottomPx) {
+            miniPlayerInset = bottomPx;
+            applyBottomInset(binding.pager);
         }
+    }
+
+    /** Bottom space the page lists keep free: the nav pill, plus the mini player if shown. */
+    private int totalBottomInset() {
+        return getResources().getDimensionPixelSize(R.dimen.nav_pill_content_inset)
+                + miniPlayerInset;
+    }
+
+    /**
+     * Gives every vertical scrolling list below {@code root} a bottom padding that is not clipped,
+     * so the content scrolls behind the nav pill but can still be pulled up above it.
+     * The padding the list had before is remembered in a tag, so this can safely run again.
+     */
+    private void applyBottomInset(@Nullable final View root) {
+        if (root == null || binding == null || !isAdded()) {
+            return;
+        }
+        final boolean scrolling = root instanceof RecyclerView
+                || root instanceof ScrollView || root instanceof NestedScrollView;
+        if (scrolling && isVerticalScroller(root)) {
+            final ViewGroup list = (ViewGroup) root;
+            Object base = list.getTag(R.id.main_inset_base);
+            if (base == null) {
+                base = list.getPaddingBottom();
+                list.setTag(R.id.main_inset_base, base);
+            }
+            final int bottom = (Integer) base + totalBottomInset();
+            list.setClipToPadding(false);
+            if (list.getPaddingBottom() != bottom) {
+                list.setPadding(list.getPaddingLeft(), list.getPaddingTop(),
+                        list.getPaddingRight(), bottom);
+            }
+            return;
+        }
+        if (root instanceof ViewGroup) {
+            final ViewGroup group = (ViewGroup) root;
+            for (int i = 0; i < group.getChildCount(); i++) {
+                applyBottomInset(group.getChildAt(i));
+            }
+        }
+    }
+
+    private static boolean isVerticalScroller(final View view) {
+        if (view instanceof RecyclerView) {
+            final RecyclerView.LayoutManager manager = ((RecyclerView) view).getLayoutManager();
+            // horizontal rows (e.g. the channel logos) must keep their size
+            return !(manager instanceof LinearLayoutManager)
+                    || ((LinearLayoutManager) manager).getOrientation()
+                            == LinearLayoutManager.VERTICAL;
+        }
+        return true;
     }
 
     private void updateTabLayoutPosition() {
@@ -280,8 +353,9 @@ public class MainFragment extends BaseFragment implements TabLayout.OnTabSelecte
 
         tabParams.removeRule(ALIGN_PARENT_TOP);
         tabParams.addRule(ALIGN_PARENT_BOTTOM);
+        // the pager fills the screen and runs behind the pill (see applyBottomInset)
         pagerParams.removeRule(BELOW);
-        pagerParams.addRule(ABOVE, R.id.main_tab_layout);
+        pagerParams.removeRule(ABOVE);
         tabLayout.setSelectedTabIndicatorGravity(INDICATOR_GRAVITY_STRETCH);
 
         tabLayout.setLayoutParams(tabParams);

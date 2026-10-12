@@ -4,22 +4,28 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <!-- The pages fill the whole screen: their lists scroll behind the floating nav pill. -->
+    <androidx.viewpager.widget.ViewPager
+        android:id="@+id/pager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
     <!-- Landscape: the pill has a fixed width and is centered, so the tabs are evenly spaced.
          A rounded pill that floats at the bottom; the selected tab gets a soft pill behind it. -->
     <org.schabi.newpipe.views.ScrollableTabLayout
         android:id="@+id/main_tab_layout"
-        android:layout_width="480dp"
-        android:layout_height="56dp"
+        android:layout_width="560dp"
+        android:layout_height="@dimen/nav_pill_height"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="16dp"
+        android:layout_marginStart="@dimen/nav_pill_margin_side"
+        android:layout_marginEnd="@dimen/nav_pill_margin_side"
+        android:layout_marginBottom="@dimen/nav_pill_margin_bottom"
         android:background="@drawable/bg_nav_pill"
         android:clipToOutline="true"
-        android:elevation="6dp"
-        android:outlineAmbientShadowColor="#14000000"
-        android:outlineSpotShadowColor="#26000000"
+        android:elevation="10dp"
+        android:outlineAmbientShadowColor="#26000000"
+        android:outlineSpotShadowColor="#40000000"
         app:tabGravity="fill"
         app:tabIconTint="@color/tab_icon_tint"
         app:tabIndicator="@drawable/nav_pill_indicator"
@@ -31,11 +37,5 @@
         app:tabPaddingEnd="0dp"
         app:tabPaddingStart="0dp"
         app:tabRippleColor="@android:color/transparent" />
-
-    <androidx.viewpager.widget.ViewPager
-        android:id="@+id/pager"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_above="@id/main_tab_layout" />
 
 </RelativeLayout>

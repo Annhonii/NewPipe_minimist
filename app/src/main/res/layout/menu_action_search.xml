@@ -1,19 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Search action: wide pill. The outer frame carries the spacing, because the action bar
-     ignores margins on the root of an action layout. -->
+<!-- Search action: a wide pill that reads "Search" with the search icon at its far right.
+     The outer frame carries a 4dp gutter on each side, so neighbouring top bar buttons end up
+     exactly 8dp apart (the action bar ignores margins on the root of an action layout). -->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="match_parent"
-    android:minWidth="112dp">
+    android:paddingStart="4dp"
+    android:paddingEnd="4dp">
 
-    <ImageButton
+    <LinearLayout
         android:id="@+id/menu_action_button"
-        android:stateListAnimator="@animator/press_scale"
-        android:layout_width="92dp"
+        android:layout_width="136dp"
         android:layout_height="44dp"
         android:layout_gravity="center"
         android:background="@drawable/bg_pill_button"
-        android:contentDescription="@null"
-        android:padding="11dp"
-        android:scaleType="centerInside" />
+        android:clickable="true"
+        android:focusable="true"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="18dp"
+        android:paddingEnd="14dp"
+        android:stateListAnimator="@animator/press_scale">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:ellipsize="end"
+            android:importantForAccessibility="no"
+            android:maxLines="1"
+            android:text="@string/search"
+            android:textColor="?android:attr/textColorSecondary"
+            android:textSize="15sp" />
+
+        <ImageView
+            android:id="@+id/menu_action_search_icon"
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:layout_marginStart="8dp"
+            android:importantForAccessibility="no"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_search" />
+    </LinearLayout>
 </FrameLayout>

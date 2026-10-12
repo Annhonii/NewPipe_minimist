@@ -21,9 +21,10 @@ object YtToolbarButtons {
         listOf(R.id.action_search, R.id.action_settings).forEach { id ->
             val item = menu.findItem(id) ?: return@forEach
             val view = item.actionView ?: return@forEach
-            val button = view.findViewById<ImageButton>(R.id.menu_action_button)
+            // the settings button is an ImageButton, the search one is a pill (text + icon)
+            val button = view.findViewById<android.view.View>(R.id.menu_action_button)
             button?.apply {
-                setImageDrawable(item.icon)
+                (this as? ImageButton)?.setImageDrawable(item.icon)
                 contentDescription = item.title
                 setOnClickListener { onSelect.accept(item) }
             }
