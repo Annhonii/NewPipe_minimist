@@ -11,10 +11,8 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.preference.PreferenceManager;
 
 import org.schabi.newpipe.R;
-import org.schabi.newpipe.databinding.RelatedItemsHeaderBinding;
 import org.schabi.newpipe.error.UserAction;
 import org.schabi.newpipe.extractor.InfoItem;
 import org.schabi.newpipe.extractor.ListExtractor;
@@ -40,8 +38,6 @@ public class RelatedItemsFragment extends BaseListInfoFragment<InfoItem, Related
     // Views
     //////////////////////////////////////////////////////////////////////////*/
 
-    private RelatedItemsHeaderBinding headerBinding;
-
     public static RelatedItemsFragment getInstance(final StreamInfo info) {
         final RelatedItemsFragment instance = new RelatedItemsFragment();
         instance.setInitialData(info);
@@ -65,28 +61,13 @@ public class RelatedItemsFragment extends BaseListInfoFragment<InfoItem, Related
 
     @Override
     public void onDestroyView() {
-        headerBinding = null;
         super.onDestroyView();
     }
 
     @Override
     protected Supplier<View> getListHeaderSupplier() {
-        if (relatedItemsInfo == null || relatedItemsInfo.getRelatedItems() == null) {
-            return null;
-        }
-
-        headerBinding = RelatedItemsHeaderBinding
-                .inflate(activity.getLayoutInflater(), itemsList, false);
-
-        final SharedPreferences pref = PreferenceManager
-                .getDefaultSharedPreferences(requireContext());
-        final boolean autoplay = pref.getBoolean(getString(R.string.auto_queue_key), false);
-        headerBinding.autoplaySwitch.setChecked(autoplay);
-        headerBinding.autoplaySwitch.setOnCheckedChangeListener((compoundButton, b) ->
-                PreferenceManager.getDefaultSharedPreferences(requireContext()).edit()
-                        .putBoolean(getString(R.string.auto_queue_key), b).apply());
-
-        return headerBinding::getRoot;
+        // no "Next" title / autoplay toggle above the related videos
+        return null;
     }
 
     @Override
@@ -106,18 +87,12 @@ public class RelatedItemsFragment extends BaseListInfoFragment<InfoItem, Related
     @Override
     public void showLoading() {
         super.showLoading();
-        if (headerBinding != null) {
-            headerBinding.getRoot().setVisibility(View.INVISIBLE);
-        }
     }
 
     @Override
     public void handleResult(@NonNull final RelatedItemsInfo result) {
         super.handleResult(result);
 
-        if (headerBinding != null) {
-            headerBinding.getRoot().setVisibility(View.VISIBLE);
-        }
         ViewUtils.slideUp(requireView(), 120, 96, 0.06f);
 
     }
@@ -162,9 +137,7 @@ public class RelatedItemsFragment extends BaseListInfoFragment<InfoItem, Related
     @Override
     public void onSharedPreferenceChanged(final SharedPreferences sharedPreferences,
                                           final String key) {
-        if (headerBinding != null && getString(R.string.auto_queue_key).equals(key)) {
-            headerBinding.autoplaySwitch.setChecked(sharedPreferences.getBoolean(key, false));
-        }
+        // nothing to update anymore
     }
 
     @Override

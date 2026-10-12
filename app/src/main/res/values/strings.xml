@@ -989,4 +989,5 @@
     <string name="comment_reply_posted">Reply posted</string>
     <string name="comment_reply_failed">Could not post reply: %1$s</string>
     <string name="comment_not_youtube">This action is only available for YouTube comments</string>
+    <string name="comment_input_hint">Comment…</string>
 </resources>

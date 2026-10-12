@@ -77,6 +77,20 @@ object YtAvatar {
         }.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
     }
 
+    /** Shows the signed-in account photo in [view] (placeholder when signed out). */
+    @JvmStatic
+    fun loadInto(view: android.widget.ImageView): io.reactivex.rxjava3.disposables.Disposable? {
+        val ctx = view.context
+        val session = YtAccountStore.load(ctx)
+        if (session == null || session.avatar.isBlank()) {
+            view.setImageResource(org.schabi.newpipe.R.drawable.placeholder_person)
+            return null
+        }
+        cached(ctx, session.avatar)?.let { view.setImageBitmap(it); return null }
+        view.setImageDrawable(InitialAvatarDrawable(session.name.ifBlank { session.email }))
+        return fetch(ctx, session.avatar).subscribe({ view.setImageBitmap(it) }, { })
+    }
+
     /** Removes the stored photo, e.g. on sign out. */
     fun clear(context: Context) {
         context.filesDir.listFiles { f -> f.name.startsWith(FILE_PREFIX) }?.forEach { it.delete() }

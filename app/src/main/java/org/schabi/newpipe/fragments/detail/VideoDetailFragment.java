@@ -59,7 +59,6 @@ import androidx.appcompat.content.res.AppCompatResources;
 import androidx.appcompat.widget.Toolbar;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.content.ContextCompat;
-import androidx.core.text.HtmlCompat;
 import androidx.fragment.app.Fragment;
 import androidx.preference.PreferenceManager;
 
@@ -73,6 +72,7 @@ import com.google.android.material.tabs.TabLayout;
 import org.schabi.newpipe.App;
 import org.schabi.newpipe.R;
 import org.schabi.newpipe.extractor.ServiceList;
+import org.schabi.newpipe.account.YtAvatar;
 import org.schabi.newpipe.account.YtEngagement;
 import org.schabi.newpipe.database.stream.model.StreamEntity;
 import org.schabi.newpipe.databinding.FragmentVideoDetailBinding;
@@ -587,7 +587,7 @@ public final class VideoDetailFragment
             binding.detailToggleSecondaryControlsView.setOnClickListener(
                     v -> toggleTitleAndSecondaryControls());
             binding.detailCommentsCard.setOnClickListener(v -> showCommentsSheet());
-            binding.detailCommentAddButton.setOnClickListener(v -> showAddCommentDialog());
+            binding.detailCommentInput.setOnClickListener(v -> showAddCommentDialog());
             binding.detailThumbsUpImgView.setOnClickListener(v -> onRateClicked(true));
             binding.detailThumbsDownImgView.setOnClickListener(v -> onRateClicked(false));
         } else {
@@ -1201,8 +1201,13 @@ public final class VideoDetailFragment
         }
         binding.detailCommentsCard.setVisibility(View.VISIBLE);
         binding.detailCommentsCard.setEnabled(true);
-        binding.detailCommentPreviewAvatar.setVisibility(View.GONE);
-        binding.detailCommentPreviewText.setText("...");
+        binding.detailCommentInput.setText(R.string.comment_input_hint);
+        binding.detailCommentsCount.setVisibility(View.GONE);
+        final io.reactivex.rxjava3.disposables.Disposable avatarLoad =
+                YtAvatar.loadInto(binding.detailCommentOwnAvatar);
+        if (avatarLoad != null) {
+            disposables.add(avatarLoad);
+        }
 
         disposables.add(ExtractorHelper.getCommentsInfo(serviceId, url, false)
                 .subscribeOn(Schedulers.io())
@@ -1212,24 +1217,18 @@ public final class VideoDetailFragment
                         return;
                     }
                     if (commentsInfo.isCommentsDisabled()) {
-                        binding.detailCommentPreviewText.setText(R.string.comments_are_disabled);
+                        binding.detailCommentInput.setText(R.string.comments_are_disabled);
+                        binding.detailCommentInput.setEnabled(false);
                         binding.detailCommentsCard.setEnabled(false);
                         return;
                     }
-                    if (commentsInfo.getRelatedItems().isEmpty()) {
-                        binding.detailCommentPreviewText.setText(R.string.no_comments);
-                        return;
+                    binding.detailCommentInput.setEnabled(true);
+                    final int count = commentsInfo.getCommentCount();
+                    if (count > 0) {
+                        binding.detailCommentsCount.setText(
+                                Localization.shortCount(activity, count));
+                        binding.detailCommentsCount.setVisibility(View.VISIBLE);
                     }
-                    final CommentsInfoItem top = commentsInfo.getRelatedItems().get(0);
-                    CoilHelper.INSTANCE.loadAvatar(binding.detailCommentPreviewAvatar,
-                            top.getUploaderAvatars());
-                    binding.detailCommentPreviewAvatar.setVisibility(View.VISIBLE);
-                    final String text = top.getCommentText() == null ? ""
-                            : HtmlCompat.fromHtml(
-                                    top.getCommentText().content(),
-                                    HtmlCompat.FROM_HTML_MODE_LEGACY)
-                                    .toString().trim();
-                    binding.detailCommentPreviewText.setText(text);
                 }, throwable -> {
                     if (binding != null && binding.detailCommentsCard != null) {
                         // comments could not be loaded: hide the card instead of showing an error
