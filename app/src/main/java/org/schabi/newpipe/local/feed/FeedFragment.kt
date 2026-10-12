@@ -79,7 +79,6 @@ import org.schabi.newpipe.local.feed.item.StreamItem
 import org.schabi.newpipe.local.feed.service.FeedLoadService
 import org.schabi.newpipe.local.subscription.SubscriptionManager
 import org.schabi.newpipe.util.DeviceUtils
-import org.schabi.newpipe.util.Localization
 import org.schabi.newpipe.util.NavigationHelper
 import org.schabi.newpipe.util.ThemeHelper.getGridSpanCountStreams
 import org.schabi.newpipe.util.ThemeHelper.getItemViewMode
@@ -276,10 +275,7 @@ class FeedFragment : BaseStateFragment<FeedState>() {
 
     override fun initListeners() {
         super.initListeners()
-        feedBinding.refreshRootView.setOnClickListener { reloadContent() }
         feedBinding.swipeRefreshLayout.setOnRefreshListener { reloadContent() }
-        feedBinding.feedFilterChip.setOnClickListener { showStreamVisibilityDialog() }
-        feedBinding.feedModeChip.setOnClickListener { showModeDialog() }
         feedBinding.newItemsLoadedButton.setOnClickListener {
             hideNewItemsLoaded(true)
             feedBinding.itemsList.scrollToPosition(0)
@@ -296,56 +292,6 @@ class FeedFragment : BaseStateFragment<FeedState>() {
         activity.supportActionBar?.setDisplayShowTitleEnabled(true)
         activity.supportActionBar?.setTitle(R.string.fragment_feed_title)
         activity.supportActionBar?.subtitle = groupName
-        // Filter and Mode are chips inside the tab now, so no toolbar items / 3-dot menu here
-    }
-
-    /** "Mode" chip: explains and toggles the fast (dedicated) feed loading method. */
-    private fun showModeDialog() {
-        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
-
-        val usingDedicatedMethod = sharedPreferences
-            .getBoolean(getString(R.string.feed_use_dedicated_fetch_method_key), false)
-        val enableDisableButtonText = when {
-            usingDedicatedMethod -> R.string.feed_use_dedicated_fetch_method_disable_button
-            else -> R.string.feed_use_dedicated_fetch_method_enable_button
-        }
-
-        AlertDialog.Builder(requireContext())
-            .setMessage(R.string.feed_use_dedicated_fetch_method_help_text)
-            .setNeutralButton(enableDisableButtonText) { _, _ ->
-                sharedPreferences.edit {
-                    putBoolean(getString(R.string.feed_use_dedicated_fetch_method_key), !usingDedicatedMethod)
-                }
-            }
-            .setPositiveButton(resources.getString(R.string.ok), null)
-            .show()
-    }
-
-    private fun showStreamVisibilityDialog() {
-        val dialogItems = arrayOf(
-            getString(R.string.feed_show_watched),
-            getString(R.string.feed_show_partially_watched),
-            getString(R.string.feed_show_upcoming)
-        )
-
-        val checkedDialogItems = booleanArrayOf(
-            viewModel.getShowPlayedItemsFromPreferences(),
-            viewModel.getShowPartiallyPlayedItemsFromPreferences(),
-            viewModel.getShowFutureItemsFromPreferences()
-        )
-
-        AlertDialog.Builder(requireContext())
-            .setTitle(R.string.feed_hide_streams_title)
-            .setMultiChoiceItems(dialogItems, checkedDialogItems) { _, which, isChecked ->
-                checkedDialogItems[which] = isChecked
-            }
-            .setPositiveButton(R.string.ok) { _, _ ->
-                viewModel.setSaveShowPlayedItems(checkedDialogItems[0])
-                viewModel.setSaveShowPartiallyPlayedItems(checkedDialogItems[1])
-                viewModel.setSaveShowFutureItems(checkedDialogItems[2])
-            }
-            .setNegativeButton(R.string.cancel, null)
-            .show()
     }
 
     override fun onDestroyOptionsMenu() {
@@ -392,7 +338,6 @@ class FeedFragment : BaseStateFragment<FeedState>() {
     override fun showLoading() {
         super.showLoading()
         feedBinding.itemsList.animateHideRecyclerViewAllowingScrolling()
-        feedBinding.refreshRootView.animate(false, 0)
         feedBinding.loadingProgressText.animate(true, 200)
         feedBinding.swipeRefreshLayout.isRefreshing = true
         isRefreshing = true
@@ -401,7 +346,6 @@ class FeedFragment : BaseStateFragment<FeedState>() {
     override fun hideLoading() {
         super.hideLoading()
         feedBinding.itemsList.animate(true, 0)
-        feedBinding.refreshRootView.animate(true, 200)
         feedBinding.loadingProgressText.animate(false, 0)
         feedBinding.swipeRefreshLayout.isRefreshing = false
         isRefreshing = false
@@ -410,7 +354,6 @@ class FeedFragment : BaseStateFragment<FeedState>() {
     override fun showEmptyState() {
         super.showEmptyState()
         feedBinding.itemsList.animateHideRecyclerViewAllowingScrolling()
-        feedBinding.refreshRootView.animate(true, 200)
         feedBinding.loadingProgressText.animate(false, 0)
         feedBinding.swipeRefreshLayout.isRefreshing = false
     }
@@ -421,14 +364,11 @@ class FeedFragment : BaseStateFragment<FeedState>() {
             is FeedState.LoadedState -> handleLoadedState(result)
             is FeedState.ErrorState -> if (handleErrorState(result)) return
         }
-
-        updateRefreshViewState()
     }
 
     override fun handleError() {
         super.handleError()
         feedBinding.itemsList.animateHideRecyclerViewAllowingScrolling()
-        feedBinding.refreshRootView.animate(false, 0)
         feedBinding.loadingProgressText.animate(false, 0)
         feedBinding.swipeRefreshLayout.isRefreshing = false
         isRefreshing = false
@@ -515,15 +455,6 @@ class FeedFragment : BaseStateFragment<FeedState>() {
         listState?.run {
             feedBinding.itemsList.layoutManager?.onRestoreInstanceState(listState)
             listState = null
-        }
-
-        val feedsNotLoaded = loadedState.notLoadedCount > 0
-        feedBinding.refreshSubtitleText.isVisible = feedsNotLoaded
-        if (feedsNotLoaded) {
-            feedBinding.refreshSubtitleText.text = getString(
-                R.string.feed_subscription_not_loaded_count,
-                loadedState.notLoadedCount
-            )
         }
 
         if (oldestSubscriptionUpdate != loadedState.oldestUpdate ||
@@ -626,18 +557,10 @@ class FeedFragment : BaseStateFragment<FeedState>() {
     }
 
     private fun updateRelativeTimeViews() {
-        updateRefreshViewState()
         groupAdapter.notifyItemRangeChanged(
             0,
             groupAdapter.itemCount,
             StreamItem.UPDATE_RELATIVE_TIME
-        )
-    }
-
-    private fun updateRefreshViewState() {
-        feedBinding.refreshText.text = getString(
-            R.string.feed_oldest_subscription_update,
-            oldestSubscriptionUpdate?.let { Localization.relativeTime(it) } ?: "—"
         )
     }
 
