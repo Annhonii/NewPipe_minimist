@@ -46,4 +46,19 @@ object YtEngagement {
     fun commentCount(videoId: String): Maybe<String> =
         Maybe.fromCallable<String> { YtInnerTube.commentCountText(videoId) }
             .subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
+
+    @JvmStatic
+    fun editComment(context: Context, videoId: String, commentId: String, text: String): Completable =
+        Completable.fromAction { YtInnerTube.editComment(session(context), videoId, commentId, text) }
+            .subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
+
+    /** True if the comment was (most likely) written by the signed-in account. */
+    @JvmStatic
+    fun isOwnComment(context: Context, uploaderName: String?): Boolean {
+        val s = YtAccountStore.load(context.applicationContext) ?: return false
+        fun norm(x: String) = x.trim().removePrefix("@").lowercase()
+        val me = norm(s.name)
+        if (me.isEmpty()) return true // account name unknown: let the server decide
+        return norm(uploaderName.orEmpty()) == me
+    }
 }

@@ -495,6 +495,40 @@
                             android:textSize="13sp"
                             android:textStyle="bold" />
 
+                        <org.schabi.newpipe.views.NewPipeTextView
+                            android:id="@+id/detail_controls_share"
+                            android:layout_width="wrap_content"
+                            android:layout_height="36dp"
+                            android:layout_marginEnd="8dp"
+                            android:background="@drawable/bg_like_pill"
+                            android:clickable="true"
+                            android:contentDescription="@string/share"
+                            android:drawableStart="@drawable/ic_share"
+                            android:drawablePadding="8dp"
+                            android:focusable="true"
+                            android:gravity="center"
+                            android:paddingHorizontal="14dp"
+                            android:text="@string/share"
+                            android:textSize="13sp"
+                            android:textStyle="bold" />
+
+                        <org.schabi.newpipe.views.NewPipeTextView
+                            android:id="@+id/detail_controls_open_in_browser"
+                            android:layout_width="wrap_content"
+                            android:layout_height="36dp"
+                            android:layout_marginEnd="8dp"
+                            android:background="@drawable/bg_like_pill"
+                            android:clickable="true"
+                            android:contentDescription="@string/open_in_browser"
+                            android:drawableStart="@drawable/ic_language"
+                            android:drawablePadding="8dp"
+                            android:focusable="true"
+                            android:gravity="center"
+                            android:paddingHorizontal="14dp"
+                            android:text="@string/open_in_browser"
+                            android:textSize="13sp"
+                            android:textStyle="bold" />
+
                             <!-- kept (hidden): the page code still wires it up -->
                             <ImageView
                                 android:id="@+id/detail_controls_playlist_append"
@@ -517,40 +551,6 @@
                         android:paddingBottom="@dimen/detail_control_padding"
                         android:visibility="gone"
                         tools:visibility="visible">
-
-                        <org.schabi.newpipe.views.NewPipeTextView
-                            android:id="@+id/detail_controls_share"
-                            android:layout_width="@dimen/detail_control_width"
-                            android:layout_height="@dimen/detail_control_height"
-                            android:layout_gravity="center_vertical"
-                            android:layout_weight="1"
-                            android:layout_margin="4dp"
-                            android:background="@drawable/bg_action_btn"
-                            android:clickable="true"
-                            android:contentDescription="@string/share"
-                            android:drawableTop="@drawable/ic_share"
-                            android:focusable="true"
-                            android:gravity="center"
-                            android:paddingVertical="@dimen/detail_control_padding"
-                            android:text="@string/share"
-                            android:textSize="@dimen/detail_control_text_size" />
-
-                        <org.schabi.newpipe.views.NewPipeTextView
-                            android:id="@+id/detail_controls_open_in_browser"
-                            android:layout_width="@dimen/detail_control_width"
-                            android:layout_height="@dimen/detail_control_height"
-                            android:layout_gravity="center_vertical"
-                            android:layout_weight="1"
-                            android:layout_margin="4dp"
-                            android:background="@drawable/bg_action_btn"
-                            android:clickable="true"
-                            android:contentDescription="@string/open_in_browser"
-                            android:drawableTop="@drawable/ic_language"
-                            android:focusable="true"
-                            android:gravity="center"
-                            android:paddingVertical="@dimen/detail_control_padding"
-                            android:text="@string/open_in_browser"
-                            android:textSize="@dimen/detail_control_text_size" />
 
                         <org.schabi.newpipe.views.NewPipeTextView
                             android:id="@+id/detail_controls_play_with_kodi"

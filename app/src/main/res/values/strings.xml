@@ -990,4 +990,9 @@
     <string name="comment_reply_failed">Could not post reply: %1$s</string>
     <string name="comment_not_youtube">This action is only available for YouTube comments</string>
     <string name="comment_input_hint">Comment…</string>
+    <string name="comment_edit">Edit</string>
+    <string name="comment_edit_title">Edit comment</string>
+    <string name="comment_edit_save">Save</string>
+    <string name="comment_edit_done">Comment updated</string>
+    <string name="comment_edit_failed">Could not edit comment: %1$s</string>
 </resources>

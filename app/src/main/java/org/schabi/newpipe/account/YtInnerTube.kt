@@ -365,7 +365,12 @@ object YtInnerTube {
     // ---------------------------------------------------------------- comment actions
 
     /** Server-side action tokens of one comment. like/dislike = [toggle-on, toggle-off]. */
-    class CommentActions(val like: List<String>, val dislike: List<String>, val replyParams: String?)
+    class CommentActions(
+        val like: List<String>,
+        val dislike: List<String>,
+        val replyParams: String?,
+        val editParams: String? = null
+    )
 
     private val commentActionCache = HashMap<String, CommentActions>()
 
@@ -401,8 +406,9 @@ object YtInnerTube {
             val like = actionsOf(t, "likeButton")
             val dislike = actionsOf(t, "dislikeButton")
             val reply = allStrings(t, "createReplyParams").firstOrNull()
+            val edit = allStrings(t, "updateCommentParams").firstOrNull()
             if (like.isNotEmpty() || dislike.isNotEmpty() || reply != null) {
-                return CommentActions(like, dislike, reply)
+                return CommentActions(like, dislike, reply, edit)
             }
         }
         // 2) fallback: tokens that embed the comment id, in document order
@@ -410,9 +416,10 @@ object YtInnerTube {
             .mapNotNull { it.optString("action").takeIf { a -> a.isNotEmpty() } }
             .filter { tokenMentions(it, commentId) }.distinct()
         val reply = allStrings(page, "createReplyParams").firstOrNull { tokenMentions(it, commentId) }
+        val edit = allStrings(page, "updateCommentParams").firstOrNull { tokenMentions(it, commentId) }
         if (mine.isEmpty() && reply == null) return null
         val half = (mine.size + 1) / 2
-        return CommentActions(mine.take(half), mine.drop(half), reply)
+        return CommentActions(mine.take(half), mine.drop(half), reply, edit)
     }
 
     private fun nextPageToken(page: JSONObject): String? =
@@ -503,5 +510,14 @@ object YtInnerTube {
         val entry = collect(next, "commentsEntryPointHeaderRenderer").firstOrNull()
         val count = entry?.optJSONObject("commentCount")
         return text(count)?.trim()?.takeIf { it.isNotEmpty() }
+    }
+
+    /** Edits one of the signed-in user's own comments. */
+    fun editComment(session: YtAccountStore.Session, videoId: String, commentId: String, text: String) {
+        commentActionCache.remove(commentId) // always use fresh tokens for an edit
+        val params = findCommentActions(session, videoId, commentId).editParams
+            ?: throw IOException("Only your own comments can be edited")
+        checkError(post("comment/update_comment",
+            JSONObject().put("updateCommentParams", params).put("commentText", text), session))
     }
 }

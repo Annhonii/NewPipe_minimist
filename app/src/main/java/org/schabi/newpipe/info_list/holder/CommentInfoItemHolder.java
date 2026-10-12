@@ -64,6 +64,9 @@ public class CommentInfoItemHolder extends InfoItemHolder {
     private final ImageView itemMoreButton;
     private CommentsInfoItem boundItem;
 
+    /** Text of comments edited in this session, so a recycled row still shows the new text. */
+    private static final java.util.Map<String, String> EDITED_TEXT = new java.util.HashMap<>();
+
     /** "LIKE" / "DISLIKE" per comment id, kept so the tint survives view recycling. */
     private static final java.util.Map<String, String> RATE_STATE = new java.util.HashMap<>();
 
@@ -155,6 +158,10 @@ public class CommentInfoItemHolder extends InfoItemHolder {
         textEllipsizer.setStreamUrl(item.getUrl());
         textEllipsizer.setContent(item.getCommentText());
         textEllipsizer.ellipsize();
+        final String edited = EDITED_TEXT.get(item.getCommentId());
+        if (edited != null) {
+            itemContentView.setText(edited);
+        }
 
         //noinspection ClickableViewAccessibility
         itemContentView.setOnTouchListener((v, event) -> {
@@ -277,9 +284,17 @@ public class CommentInfoItemHolder extends InfoItemHolder {
         final PopupMenu menu = new PopupMenu(itemBuilder.getContext(), itemMoreButton);
         menu.getMenu().add(0, 1, 0, R.string.comment_reply);
         menu.getMenu().add(0, 2, 1, R.string.comment_copy);
+        final android.content.Context mctx = itemBuilder.getContext();
+        if (item.getServiceId() == ServiceList.YouTube.getServiceId()
+                && YtEngagement.isLoggedIn(mctx)
+                && YtEngagement.isOwnComment(mctx, item.getUploaderName())) {
+            menu.getMenu().add(0, 3, 2, R.string.comment_edit);
+        }
         menu.setOnMenuItemClickListener(mi -> {
             if (mi.getItemId() == 1) {
                 showReplyDialog(item);
+            } else if (mi.getItemId() == 3) {
+                showEditDialog(item);
             } else {
                 final CharSequence text = itemContentView.getText();
                 if (text != null) {
@@ -324,6 +339,51 @@ public class CommentInfoItemHolder extends InfoItemHolder {
                                             ctx.getString(R.string.comment_reply_failed,
                                                     e.getMessage()),
                                             Toast.LENGTH_LONG).show());
+                })
+                .setNegativeButton(android.R.string.cancel, null)
+                .show();
+    }
+
+    private void showEditDialog(@NonNull final CommentsInfoItem item) {
+        final String videoId = requireYoutubeVideoId(item);
+        if (videoId == null) {
+            return;
+        }
+        final android.content.Context ctx = itemBuilder.getContext();
+        final String original = item.getCommentText() == null ? ""
+                : androidx.core.text.HtmlCompat.fromHtml(item.getCommentText().content(),
+                        androidx.core.text.HtmlCompat.FROM_HTML_MODE_LEGACY).toString().trim();
+        final EditText input = new EditText(ctx);
+        input.setText(original);
+        input.setSelection(input.getText().length());
+        input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE
+                | InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);
+        input.setMinLines(3);
+        input.setMaxLines(8);
+        input.setGravity(Gravity.TOP | Gravity.START);
+        final int pad = DeviceUtils.dpToPx(20, ctx);
+        final FrameLayout holder = new FrameLayout(ctx);
+        holder.setPadding(pad, pad / 2, pad, 0);
+        holder.addView(input);
+        new AlertDialog.Builder(ctx)
+                .setTitle(R.string.comment_edit_title)
+                .setView(holder)
+                .setPositiveButton(R.string.comment_edit_save, (d, w) -> {
+                    final String text = input.getText().toString().trim();
+                    if (text.isEmpty() || text.equals(original)) {
+                        return;
+                    }
+                    YtEngagement.editComment(ctx, videoId, item.getCommentId(), text)
+                            .subscribe(() -> {
+                                EDITED_TEXT.put(item.getCommentId(), text);
+                                if (boundItem == item) {
+                                    itemContentView.setText(text);
+                                }
+                                Toast.makeText(ctx, R.string.comment_edit_done,
+                                        Toast.LENGTH_SHORT).show();
+                            }, e -> Toast.makeText(ctx,
+                                    ctx.getString(R.string.comment_edit_failed, e.getMessage()),
+                                    Toast.LENGTH_LONG).show());
                 })
                 .setNegativeButton(android.R.string.cancel, null)
                 .show();
