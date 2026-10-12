@@ -2979,12 +2979,11 @@ public final class VideoDetailFragment
         }
         final float margin = getResources().getDimension(R.dimen.mini_player_margin);
         final float cardHeight = getResources().getDimension(R.dimen.mini_player_height);
-        // the card is a full pill (corner radius = half its height); the video is flush on the
-        // left, so its left corners must follow the same pill curve. Its right corners (inside
-        // the card) get a small rounding.
-        final float cardRadius = cardHeight / 2f;
+        // squarish card: the card background (bg_mini_player, 14dp) and the video corners use
+        // the same radius, so the video sits flush inside the card without sticking out
+        final float cardRadius = 14 * getResources().getDisplayMetrics().density;
         final float videoLeftRadius = cardRadius;
-        final float videoRightRadius = 14 * getResources().getDisplayMetrics().density;
+        final float videoRightRadius = cardRadius;
 
         final View video = binding.detailThumbnailRootLayout;
         final float left = video.getTranslationX();
