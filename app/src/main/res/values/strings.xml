@@ -342,6 +342,7 @@
     <string name="pause">Pause</string>
     <string name="create">Create</string>
     <string name="delete">Delete</string>
+    <string name="remove_from_history">Remove from history</string>
     <string name="delete_file">Delete file</string>
     <string name="save_to_internal_storage">Save to internal storage</string>
     <string name="saved_to_internal_storage">Saved to internal storage</string>

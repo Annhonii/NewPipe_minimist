@@ -122,6 +122,16 @@ public class LocalStatisticStreamItemHolder extends LocalItemHolder {
         }
         avatar.setTag(R.id.itemUploaderAvatarView, uploaderUrl);
         avatar.setVisibility(View.VISIBLE);
+        if (avatar.getLayoutParams() instanceof ViewGroup.MarginLayoutParams) {
+            // logo starts exactly under the left edge of the thumbnail (16dp), not at the screen edge
+            final ViewGroup.MarginLayoutParams lp =
+                    (ViewGroup.MarginLayoutParams) avatar.getLayoutParams();
+            final int start = Math.round(16 * avatar.getResources().getDisplayMetrics().density);
+            if (lp.getMarginStart() != start) {
+                lp.setMarginStart(start);
+                avatar.setLayoutParams(lp);
+            }
+        }
         if (uploaderUrl == null || uploaderUrl.isEmpty()) {
             CoilHelper.INSTANCE.loadAvatar(avatar, (String) null);
             return;

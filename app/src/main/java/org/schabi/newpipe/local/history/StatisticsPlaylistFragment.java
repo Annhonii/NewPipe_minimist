@@ -170,7 +170,7 @@ public class StatisticsPlaylistFragment
             @Override
             public void held(final LocalItem selectedItem) {
                 if (selectedItem instanceof StreamStatisticsEntry) {
-                    showInfoItemDialog((StreamStatisticsEntry) selectedItem);
+                    showHistoryItemMenu((StreamStatisticsEntry) selectedItem);
                 }
             }
         });
@@ -329,6 +329,30 @@ public class StatisticsPlaylistFragment
 
     private PlayQueue getPlayQueueStartingAt(final StreamStatisticsEntry infoItem) {
         return getPlayQueue(Math.max(itemListAdapter.getItemsList().indexOf(infoItem), 0));
+    }
+
+    /** Three-dots menu of a history card: remove this video, or the usual options. */
+    private void showHistoryItemMenu(final StreamStatisticsEntry item) {
+        final Context context = getContext();
+        if (context == null) {
+            return;
+        }
+        final CharSequence[] options = {
+                getString(R.string.remove_from_history),
+                getString(R.string.more_options)
+        };
+        new androidx.appcompat.app.AlertDialog.Builder(context)
+                .setItems(options, (dialog, which) -> {
+                    if (which == 0) {
+                        final int index = itemListAdapter.getItemsList().indexOf(item);
+                        if (index >= 0) {
+                            deleteEntry(index);
+                        }
+                    } else {
+                        showInfoItemDialog(item);
+                    }
+                })
+                .show();
     }
 
     private void showInfoItemDialog(final StreamStatisticsEntry item) {
