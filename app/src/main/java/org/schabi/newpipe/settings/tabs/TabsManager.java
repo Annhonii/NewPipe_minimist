@@ -14,6 +14,7 @@ public final class TabsManager {
     /** The floating nav pill holds at most this many tabs. */
     public static final int MAX_TABS = 4;
     private static final String HOME_TAB_MIGRATED_KEY = "home_tab_added_v1";
+    private static final String TRENDING_TAB_REMOVED_KEY = "trending_tab_removed_v1";
     private final SharedPreferences sharedPreferences;
     private final String savedTabsKey;
     private final Context context;
@@ -34,7 +35,8 @@ public final class TabsManager {
         final String savedJson = sharedPreferences.getString(savedTabsKey, null);
         try {
             final List<Tab> tabs = TabsJsonHelper.getTabsFromJson(savedJson);
-            return limitTabs(addHomeTabOnce(tabs, savedJson != null));
+            return limitTabs(removeTrendingTabOnce(addHomeTabOnce(tabs, savedJson != null),
+                    savedJson != null));
         } catch (final TabsJsonHelper.InvalidJsonException e) {
             Toast.makeText(context, R.string.saved_tabs_invalid_json, Toast.LENGTH_SHORT).show();
             return getDefaultTabs();
@@ -63,6 +65,39 @@ public final class TabsManager {
         final List<Tab> limited = limitTabs(withHome);
         saveTabs(limited);
         return limited;
+    }
+
+    /**
+     * The Trending tab is gone from the nav bar: its categories (Gaming, Podcast, Music, ...) are
+     * now the pills at the top of the Home page. Existing installs still have the tab saved, so
+     * it is replaced once by the History tab (or just dropped if History is already there).
+     */
+    private List<Tab> removeTrendingTabOnce(final List<Tab> tabs, final boolean hadSavedTabs) {
+        if (sharedPreferences.getBoolean(TRENDING_TAB_REMOVED_KEY, false)) {
+            return tabs;
+        }
+        sharedPreferences.edit().putBoolean(TRENDING_TAB_REMOVED_KEY, true).apply();
+        if (!hadSavedTabs) {
+            return tabs; // fresh install: the defaults do not contain it
+        }
+        final Tab history = Tab.Type.HISTORY.getTab();
+        final java.util.ArrayList<Tab> result = new java.util.ArrayList<>(tabs.size());
+        boolean changed = false;
+        for (final Tab tab : tabs) {
+            if (tab.getTabId() == Tab.DefaultKioskTab.ID) {
+                changed = true;
+                if (!tabs.contains(history) && !result.contains(history)) {
+                    result.add(history);
+                }
+            } else {
+                result.add(tab);
+            }
+        }
+        if (!changed) {
+            return tabs;
+        }
+        saveTabs(result);
+        return result;
     }
 
     /** Keeps only the first {@link #MAX_TABS} tabs (and stores the trimmed list). */

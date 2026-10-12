@@ -21,7 +21,7 @@ import org.schabi.newpipe.extractor.StreamingService;
 import org.schabi.newpipe.extractor.exceptions.ExtractionException;
 import org.schabi.newpipe.fragments.BlankFragment;
 import org.schabi.newpipe.fragments.list.channel.ChannelFragment;
-import org.schabi.newpipe.fragments.list.home.HomeFeedFragment;
+import org.schabi.newpipe.fragments.list.home.HomeFragment;
 import org.schabi.newpipe.fragments.list.kiosk.DefaultKioskFragment;
 import org.schabi.newpipe.fragments.list.kiosk.KioskFragment;
 import org.schabi.newpipe.fragments.list.kiosk.TrendingFragment;
@@ -287,8 +287,9 @@ public abstract class Tab {
         }
 
         @Override
-        public HomeFeedFragment getFragment(final Context context) {
-            return new HomeFeedFragment();
+        public HomeFragment getFragment(final Context context) {
+            // the home feed with the category pills (All, Gaming, Podcast, ...) on top
+            return new HomeFragment();
         }
     }
 

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- One category pill of the Home page. Colours and shape are set in HomeFragment. -->
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="32dp"
+    android:layout_marginEnd="8dp"
+    android:gravity="center"
+    android:includeFontPadding="false"
+    android:minWidth="48dp"
+    android:paddingStart="12dp"
+    android:paddingEnd="12dp"
+    android:singleLine="true"
+    android:textSize="14sp" />
