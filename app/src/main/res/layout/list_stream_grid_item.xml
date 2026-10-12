@@ -55,7 +55,7 @@
         app:layout_constraintTop_toBottomOf="@+id/itemProgressView"
         tools:text="@tools:sample/lorem[10]" />
 
-    <!-- channel row: round channel logo + (channel name / views • date), centred on the logo.
+    <!-- channel row: round channel logo + one line: channel name, views • date.
          The logo is hidden (gone) for items that have none, and the text then starts at the left edge. -->
     <LinearLayout
         android:id="@+id/itemUploaderRow"
@@ -71,8 +71,8 @@
 
         <ImageView
             android:id="@+id/itemUploaderAvatarView"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
             android:layout_marginEnd="10dp"
             android:background="@drawable/bg_avatar_circle"
             android:clipToOutline="true"
@@ -81,33 +81,45 @@
             android:src="@drawable/placeholder_person"
             android:visibility="gone" />
 
-        <LinearLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical">
+            android:layout_weight="1">
 
+            <!-- one line: channel name, then views • date right after it (name shrinks first) -->
             <org.schabi.newpipe.views.NewPipeTextView
                 android:id="@+id/itemUploaderView"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
                 android:includeFontPadding="false"
                 android:lines="1"
                 android:textAppearance="?android:textAppearanceSmall"
+                app:layout_constrainedWidth="true"
+                app:layout_constraintEnd_toStartOf="@id/itemAdditionalDetails"
+                app:layout_constraintHorizontal_bias="0"
+                app:layout_constraintHorizontal_chainStyle="packed"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
                 tools:text="Uploader" />
 
             <org.schabi.newpipe.views.NewPipeTextView
                 android:id="@+id/itemAdditionalDetails"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
+                android:layout_marginStart="8dp"
                 android:ellipsize="end"
                 android:includeFontPadding="false"
                 android:lines="1"
                 android:textAppearance="?android:textAppearanceSmall"
+                app:layout_constrainedWidth="true"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/itemUploaderView"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
                 tools:text="2 years ago • 10M views" />
-        </LinearLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
     </LinearLayout>
 
     <org.schabi.newpipe.views.AnimatedProgressBar
