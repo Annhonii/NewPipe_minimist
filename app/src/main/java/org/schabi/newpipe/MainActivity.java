@@ -200,8 +200,6 @@ public class MainActivity extends AppCompatActivity {
             // Schedule worker for checking for new streams and creating corresponding notifications
             // if this is enabled by the user.
             NotificationWorker.initialize(this);
-            // notification permission is already settled (or not needed): continue with overlay
-            askOverlayPermissionOnFirstLaunch();
         }
         if (!UpdateSettingsFragment.wasUserAskedForConsent(this)
                 && !App.getInstance().isFirstRun()
@@ -710,32 +708,11 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    /**
-     * Asks (only once, right after the notification permission step) for the permission to
-     * display over other apps, which the popup player needs.
-     */
-    private void askOverlayPermissionOnFirstLaunch() {
-        final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        final String key = "initial_overlay_permission_asked";
-        if (prefs.getBoolean(key, false)) {
-            return;
-        }
-        prefs.edit().putBoolean(key, true).apply();
-        if (!android.provider.Settings.canDrawOverlays(this)) {
-            PermissionHelper.checkSystemAlertWindowPermission(this);
-        }
-    }
-
     @Override
     public void onRequestPermissionsResult(final int requestCode,
                                            @NonNull final String[] permissions,
                                            @NonNull final int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == PermissionHelper.POST_NOTIFICATIONS_REQUEST_CODE) {
-            // first launch: after the notification prompt (granted or not) ask for the
-            // "display over other apps" permission needed by the popup player
-            askOverlayPermissionOnFirstLaunch();
-        }
         for (final int i : grantResults) {
             if (i == PackageManager.PERMISSION_DENIED) {
                 return;
