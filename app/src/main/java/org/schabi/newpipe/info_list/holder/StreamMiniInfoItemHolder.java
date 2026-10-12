@@ -31,6 +31,9 @@ public class StreamMiniInfoItemHolder extends InfoItemHolder {
     /** Round channel logo; only present in the card and grid layouts, so it can be null. */
     @Nullable
     private final ImageView itemUploaderAvatarView;
+    /** Three-dots button (card and grid layouts): opens the same menu as a long press. */
+    @Nullable
+    private final View itemMoreButton;
     private final AnimatedProgressBar itemProgressView;
 
     StreamMiniInfoItemHolder(final InfoItemBuilder infoItemBuilder, final int layoutId,
@@ -42,6 +45,7 @@ public class StreamMiniInfoItemHolder extends InfoItemHolder {
         itemUploaderView = itemView.findViewById(R.id.itemUploaderView);
         itemDurationView = itemView.findViewById(R.id.itemDurationView);
         itemUploaderAvatarView = itemView.findViewById(R.id.itemUploaderAvatarView);
+        itemMoreButton = itemView.findViewById(R.id.itemMoreButton);
         itemProgressView = itemView.findViewById(R.id.itemProgressView);
     }
 
@@ -154,6 +158,18 @@ public class StreamMiniInfoItemHolder extends InfoItemHolder {
     }
 
     private void enableLongClick(final StreamInfoItem item) {
+        if (itemMoreButton != null) {
+            // card / grid: the three-dots button replaces the long press
+            itemView.setLongClickable(false);
+            itemView.setOnLongClickListener(null);
+            itemMoreButton.setVisibility(View.VISIBLE);
+            itemMoreButton.setOnClickListener(view -> {
+                if (itemBuilder.getOnStreamSelectedListener() != null) {
+                    itemBuilder.getOnStreamSelectedListener().held(item);
+                }
+            });
+            return;
+        }
         itemView.setLongClickable(true);
         itemView.setOnLongClickListener(view -> {
             if (itemBuilder.getOnStreamSelectedListener() != null) {
@@ -166,5 +182,9 @@ public class StreamMiniInfoItemHolder extends InfoItemHolder {
     private void disableLongClick() {
         itemView.setLongClickable(false);
         itemView.setOnLongClickListener(null);
+        if (itemMoreButton != null) {
+            itemMoreButton.setVisibility(View.GONE);
+            itemMoreButton.setOnClickListener(null);
+        }
     }
 }

@@ -47,6 +47,11 @@ data class StreamItem(
      */
     var avatarLookup: ((String?) -> String?)? = null
 
+    /** Called when the three-dots button of the card / grid layout is tapped. */
+    var onMoreClick: ((StreamEntity) -> Unit)? = null
+
+    private val hasMoreButton get() = itemVersion == ItemVersion.CARD || itemVersion == ItemVersion.GRID
+
     override fun getId(): Long = stream.uid
 
     enum class ItemVersion { NORMAL, MINI, GRID, CARD }
@@ -110,6 +115,18 @@ data class StreamItem(
 
         CoilHelper.loadThumbnail(viewBinding.itemThumbnailView, stream.thumbnailUrl)
 
+        // three-dots button replaces the long press on the card and grid layouts
+        viewBinding.root.findViewById<View>(R.id.itemMoreButton)?.let { more ->
+            val callback = onMoreClick
+            if (hasMoreButton && callback != null && streamSupportsMenu()) {
+                more.visibility = View.VISIBLE
+                more.setOnClickListener { callback(stream) }
+            } else {
+                more.visibility = View.GONE
+                more.setOnClickListener(null)
+            }
+        }
+
         // channel logo (only the card and grid layouts have this view)
         viewBinding.root.findViewById<ImageView>(R.id.itemUploaderAvatarView)?.let { avatar ->
             val avatarUrl = avatarLookup?.invoke(stream.uploaderUrl)
@@ -129,10 +146,13 @@ data class StreamItem(
         execBindEnd?.accept(viewBinding)
     }
 
-    override fun isLongClickable() = when (stream.streamType) {
+    private fun streamSupportsMenu() = when (stream.streamType) {
         AUDIO_STREAM, VIDEO_STREAM, LIVE_STREAM, AUDIO_LIVE_STREAM, POST_LIVE_STREAM, POST_LIVE_AUDIO_STREAM -> true
         else -> false
     }
+
+    // long press is only used where there is no three-dots button (normal list, mini)
+    override fun isLongClickable() = !hasMoreButton && streamSupportsMenu()
 
     private fun getStreamInfoDetailLine(context: Context): String {
         var viewsAndDate = ""

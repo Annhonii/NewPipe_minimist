@@ -498,6 +498,9 @@ class FeedFragment : BaseStateFragment<FeedState>() {
         loadedState.items.forEach {
             it.itemVersion = itemVersion
             it.avatarLookup = avatarLookup
+            it.onMoreClick = { stream ->
+                if (!isRefreshing) showInfoItemDialog(stream.toStreamInfoItem())
+            }
         }
 
         // This need to be saved in a variable as the update occurs async

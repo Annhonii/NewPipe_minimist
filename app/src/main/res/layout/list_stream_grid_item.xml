@@ -41,6 +41,24 @@
         app:layout_constraintEnd_toEndOf="@+id/itemThumbnailView"
         tools:text="1:09:10" />
 
+    <!-- three-dots button on the top right of the thumbnail: opens the same menu as a long press
+         (long press is turned off on these cards). Hidden until a holder wires it up. -->
+    <ImageButton
+        android:id="@+id/itemMoreButton"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:background="@drawable/bg_card_more_button"
+        android:contentDescription="@string/more_options"
+        android:padding="6dp"
+        android:scaleType="fitCenter"
+        android:src="@drawable/ic_more_vert"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="@id/itemThumbnailView"
+        app:layout_constraintTop_toTopOf="@id/itemThumbnailView"
+        app:tint="@android:color/white" />
+
     <org.schabi.newpipe.views.NewPipeTextView
         android:id="@+id/itemVideoTitleView"
         android:layout_width="0dp"
