@@ -205,11 +205,19 @@ class FeedFragment : BaseStateFragment<FeedState>() {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({ list ->
-                    channelAvatars = list.mapNotNull { sub ->
+                    val byUrl = list.mapNotNull { sub ->
                         val url = sub.url
                         val avatar = sub.avatarUrl
                         if (url != null && !avatar.isNullOrBlank()) url to avatar else null
                     }.toMap()
+                    // fallback for videos whose channel url differs from the saved one:
+                    // match the channel name
+                    val byName = list.mapNotNull { sub ->
+                        val name = sub.name
+                        val avatar = sub.avatarUrl
+                        if (!name.isNullOrBlank() && !avatar.isNullOrBlank()) name to avatar else null
+                    }.toMap()
+                    channelAvatars = byName + byUrl
                     if (_feedBinding != null) groupAdapter.notifyDataSetChanged()
                 }, { throwable -> Log.e(TAG, "Could not load channel logos", throwable) })
         )

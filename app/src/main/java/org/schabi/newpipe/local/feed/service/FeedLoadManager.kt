@@ -293,6 +293,14 @@ class FeedLoadManager(private val context: Context) {
                         notification.isOnNext -> {
                             val info = notification.value!!
 
+                            // the logo of a video is found through its channel url: make sure
+                            // every new video has one (channel tabs often leave it empty)
+                            info.streams.forEach { stream ->
+                                if (stream.uploaderUrl.isNullOrBlank()) {
+                                    stream.uploaderUrl = info.url
+                                }
+                            }
+
                             notification.value!!.newStreams = filterNewStreams(info.streams)
 
                             feedDatabaseManager.upsertAll(info.uid, info.streams)

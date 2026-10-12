@@ -130,6 +130,8 @@ data class StreamItem(
         // channel logo (only the card and grid layouts have this view)
         viewBinding.root.findViewById<ImageView>(R.id.itemUploaderAvatarView)?.let { avatar ->
             val avatarUrl = avatarLookup?.invoke(stream.uploaderUrl)
+                ?.takeIf { it.isNotBlank() }
+                ?: avatarLookup?.invoke(stream.uploader)
             if (avatarUrl.isNullOrBlank()) {
                 avatar.visibility = View.GONE
             } else {
