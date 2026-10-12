@@ -222,6 +222,7 @@
     <string name="export_data_summary">Export history, subscriptions, playlists and settings</string>
     <string name="clear_cookie_summary">Clear cookies that NewPipe stores when you solve a reCAPTCHA</string>
     <string name="clear_views_history_title">Clear watch history</string>
+    <string name="history_clear_button">Clear history</string>
     <string name="clear_views_history_summary">Deletes the history of played streams and the playback positions</string>
     <string name="delete_view_history_alert">Delete entire watch history?</string>
     <string name="watch_history_deleted">Watch history deleted</string>

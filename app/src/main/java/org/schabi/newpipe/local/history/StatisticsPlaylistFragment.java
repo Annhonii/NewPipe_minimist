@@ -4,8 +4,6 @@ import android.content.Context;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,7 +21,6 @@ import org.schabi.newpipe.R;
 import org.schabi.newpipe.database.LocalItem;
 import org.schabi.newpipe.database.stream.StreamStatisticsEntry;
 import org.schabi.newpipe.database.stream.model.StreamEntity;
-import org.schabi.newpipe.databinding.PlaylistControlBinding;
 import org.schabi.newpipe.databinding.StatisticPlaylistControlBinding;
 import org.schabi.newpipe.error.ErrorInfo;
 import org.schabi.newpipe.error.UserAction;
@@ -37,7 +34,6 @@ import org.schabi.newpipe.player.playqueue.SinglePlayQueue;
 import org.schabi.newpipe.settings.HistorySettingsFragment;
 import org.schabi.newpipe.util.NavigationHelper;
 import org.schabi.newpipe.util.OnClickGesture;
-import org.schabi.newpipe.util.PlayButtonHelper;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -59,7 +55,6 @@ public class StatisticsPlaylistFragment
     private StatisticSortMode sortMode = StatisticSortMode.LAST_PLAYED;
 
     private StatisticPlaylistControlBinding headerBinding;
-    private PlaylistControlBinding playlistControlBinding;
 
     /* Used for independent events */
     private Subscription databaseSubscription;
@@ -106,13 +101,6 @@ public class StatisticsPlaylistFragment
         }
     }
 
-    @Override
-    public void onCreateOptionsMenu(@NonNull final Menu menu,
-                                    @NonNull final MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.menu_history, menu);
-    }
-
     ///////////////////////////////////////////////////////////////////////////
     // Fragment LifeCycle - Views
     ///////////////////////////////////////////////////////////////////////////
@@ -129,7 +117,10 @@ public class StatisticsPlaylistFragment
     protected Supplier<View> getListHeaderSupplier() {
         headerBinding = StatisticPlaylistControlBinding.inflate(activity.getLayoutInflater(),
                 itemsList, false);
-        playlistControlBinding = headerBinding.playlistControl;
+        // "Clear history" button on the right of the sort button
+        headerBinding.clearHistoryButton.setOnClickListener(view ->
+                HistorySettingsFragment.openDeleteWatchHistoryDialog(
+                        requireContext(), recordManager, disposables));
 
         return headerBinding::getRoot;
     }
@@ -200,7 +191,6 @@ public class StatisticsPlaylistFragment
         }
 
         headerBinding = null;
-        playlistControlBinding = null;
 
         if (databaseSubscription != null) {
             databaseSubscription.cancel();
@@ -259,8 +249,6 @@ public class StatisticsPlaylistFragment
             return;
         }
 
-        playlistControlBinding.getRoot().setVisibility(View.VISIBLE);
-
         itemListAdapter.clearStreamItemList();
 
         if (result.isEmpty()) {
@@ -273,8 +261,6 @@ public class StatisticsPlaylistFragment
             itemsList.getLayoutManager().onRestoreInstanceState(itemsListState);
             itemsListState = null;
         }
-
-        PlayButtonHelper.initPlaylistControlClickListener(activity, playlistControlBinding, this);
 
         headerBinding.sortButton.setOnClickListener(view -> toggleSortMode());
 

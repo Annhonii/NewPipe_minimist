@@ -207,6 +207,12 @@ public class MainFragment extends BaseFragment implements TabLayout.OnTabSelecte
         inflater.inflate(R.menu.menu_main_fragment, menu);
         org.schabi.newpipe.account.YtToolbarButtons.bind(activity, menu, this::onOptionsItemSelected);
 
+        // the settings button is only shown on the History tab
+        final MenuItem settingsItem = menu.findItem(R.id.action_settings);
+        if (settingsItem != null) {
+            settingsItem.setVisible(isHistoryTabSelected());
+        }
+
         final ActionBar supportActionBar = activity.getSupportActionBar();
         if (supportActionBar != null) {
             supportActionBar.setDisplayHomeAsUpEnabled(false);
@@ -363,12 +369,28 @@ public class MainFragment extends BaseFragment implements TabLayout.OnTabSelecte
         viewPager.setLayoutParams(pagerParams);
     }
 
+    private boolean isHistoryTabSelected() {
+        if (binding == null) {
+            return false;
+        }
+        int position = binding.mainTabLayout.getSelectedTabPosition();
+        if (position < 0) {
+            position = binding.pager.getCurrentItem();
+        }
+        return position >= 0 && position < tabsList.size()
+                && tabsList.get(position).getTabId() == Tab.HistoryTab.ID;
+    }
+
     @Override
     public void onTabSelected(final TabLayout.Tab selectedTab) {
         if (DEBUG) {
             Log.d(TAG, "onTabSelected() called with: selectedTab = [" + selectedTab + "]");
         }
         updateTitleForTab(selectedTab.getPosition());
+        // show / hide the settings button of the top bar
+        if (activity != null) {
+            activity.invalidateOptionsMenu();
+        }
     }
 
     @Override
