@@ -1322,6 +1322,24 @@ public final class VideoDetailFragment
     }
 
     /**
+     * Called when the user minimises the main player (swipe down, back button or opening another
+     * page). Instead of leaving a paused mini player behind, the video keeps playing in the
+     * floating popup player. Falls back to the plain mini player when the "display over other
+     * apps" permission is missing or there is nothing to hand over.
+     */
+    private void startPopupPlayerOnMinimise() {
+        if (activity == null
+                || !isPlayerAvailable()
+                || !player.videoPlayerSelected()
+                || player.getPlayQueue() == null
+                || !Settings.canDrawOverlays(activity)) {
+            return;
+        }
+        player.setRecovery();
+        NavigationHelper.playOnPopupPlayer(activity, player.getPlayQueue(), true);
+    }
+
+    /**
      * Opens the video player, in fullscreen if needed. In order to open fullscreen, the activity
      * is toggled to landscape orientation (which will then cause fullscreen mode).
      *
@@ -2763,6 +2781,11 @@ public final class VideoDetailFragment
         bottomSheetCallback = new BottomSheetBehavior.BottomSheetCallback() {
             @Override
             public void onStateChanged(@NonNull final View bottomSheet, final int newState) {
+                // remember where we came from, so that we can tell a real "minimise by the user"
+                // (expanded -> collapsed) apart from the mini player simply being (re)created
+                final boolean minimisedByUser =
+                        newState == BottomSheetBehavior.STATE_COLLAPSED
+                                && lastStableBottomSheetState == BottomSheetBehavior.STATE_EXPANDED;
                 updateBottomSheetState(newState);
 
                 switch (newState) {
@@ -2811,6 +2834,9 @@ public final class VideoDetailFragment
                                     .ifPresent(MainPlayerUi::closeItemsList);
                         }
                         setOverlayLook(binding.appBarLayout, behavior, 0);
+                        if (minimisedByUser) {
+                            startPopupPlayerOnMinimise();
+                        }
                         break;
                     case BottomSheetBehavior.STATE_DRAGGING:
                     case BottomSheetBehavior.STATE_SETTLING:
