@@ -215,7 +215,7 @@ public class CommentInfoItemHolder extends InfoItemHolder {
                 ColorStateList.valueOf("LIKE".equals(state) ? accent : normal));
         ImageViewCompat.setImageTintList(itemThumbsDownView,
                 ColorStateList.valueOf("DISLIKE".equals(state) ? accent : normal));
-        final long base = item.getLikeCount();
+        final int base = item.getLikeCount();
         itemLikesCountView.setText(Localization.likeCount(itemBuilder.getContext(),
                 base >= 0 && "LIKE".equals(state) ? base + 1 : base));
     }
