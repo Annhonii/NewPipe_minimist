@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Account button: person icon when signed out, Google photo when signed in.
-     The outer frame carries a 4dp gutter per side, so neighbouring buttons are 8dp apart. -->
+     The outer frame carries a 4dp gutter per side, so neighbouring buttons are 8dp apart.
+     The button is exactly as big as the settings button (44dp); the photo sits 2dp inside it,
+     like a framed avatar, so both circles read as the same size. -->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="match_parent"
@@ -9,20 +11,19 @@
 
     <FrameLayout
         android:id="@+id/account_button"
-        android:stateListAnimator="@animator/press_scale"
         android:layout_width="44dp"
         android:layout_height="44dp"
         android:layout_gravity="center"
         android:background="@drawable/bg_icon_button"
         android:clickable="true"
-        android:clipToOutline="true"
-        android:outlineProvider="background"
-        android:focusable="true">
+        android:focusable="true"
+        android:stateListAnimator="@animator/press_scale">
 
         <ImageView
             android:id="@+id/account_avatar"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:background="@null"
             android:contentDescription="@string/yt_account_title"
             android:padding="11dp"
             android:scaleType="centerInside"

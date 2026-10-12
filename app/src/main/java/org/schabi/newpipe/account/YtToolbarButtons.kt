@@ -14,6 +14,7 @@ import org.schabi.newpipe.R
  */
 object YtToolbarButtons {
     private var profileRefreshTried = false
+    private var photoErrorShown = false
 
     @JvmStatic
     fun bind(activity: Activity, menu: Menu, onSelect: Consumer<MenuItem>) {
@@ -49,9 +50,14 @@ object YtToolbarButtons {
             return
         }
 
-        // signed in: the Google photo fills the whole 44dp circle (same size as settings)
-        image.setPadding(0, 0, 0, 0)
-        image.scaleType = ImageView.ScaleType.CENTER_CROP
+        // signed in: the Google photo sits 2dp inside the 44dp circle (same size as settings).
+        // The photo / letter avatar is already round, so nothing may tint or clip it.
+        val inset = (2 * activity.resources.displayMetrics.density).toInt()
+        image.setPadding(inset, inset, inset, inset)
+        image.scaleType = ImageView.ScaleType.FIT_CENTER
+        image.imageTintList = null
+        image.clearColorFilter()
+        image.alpha = 1f
         val label = session.name.ifBlank { session.email }
         val cached = if (session.avatar.isBlank()) null else YtAvatar.cached(activity, session.avatar)
         if (cached != null) {
@@ -62,7 +68,16 @@ object YtToolbarButtons {
             if (session.avatar.isNotBlank()) {
                 YtAvatar.fetch(activity, session.avatar).subscribe(
                     { bitmap -> image.setImageBitmap(bitmap) },
-                    { }
+                    { e ->
+                        if (!photoErrorShown) {
+                            photoErrorShown = true
+                            android.widget.Toast.makeText(
+                                activity.applicationContext,
+                                "Profile photo failed: ${e.message ?: e.javaClass.simpleName}",
+                                android.widget.Toast.LENGTH_LONG
+                            ).show()
+                        }
+                    }
                 )
             }
         }
