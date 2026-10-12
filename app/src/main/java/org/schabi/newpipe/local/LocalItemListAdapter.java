@@ -111,6 +111,11 @@ public class LocalItemListAdapter extends RecyclerView.Adapter<RecyclerView.View
         localItemBuilder.setOnItemSelectedListener(null);
     }
 
+    public void setAvatarLookup(final java.util.function.Function<String, String> lookup) {
+        localItemBuilder.setAvatarLookup(lookup);
+        notifyDataSetChanged();
+    }
+
     public void addItems(@Nullable final List<? extends LocalItem> data) {
         if (data == null) {
             return;

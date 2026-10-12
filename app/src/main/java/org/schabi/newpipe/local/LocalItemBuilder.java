@@ -29,6 +29,7 @@ public class LocalItemBuilder {
     private final Context context;
 
     private OnClickGesture<LocalItem> onSelectedListener;
+    private java.util.function.Function<String, String> avatarLookup;
 
     public LocalItemBuilder(final Context context) {
         this.context = context;
@@ -44,5 +45,14 @@ public class LocalItemBuilder {
 
     public void setOnItemSelectedListener(final OnClickGesture<LocalItem> listener) {
         this.onSelectedListener = listener;
+    }
+
+    /** Maps a channel url to its logo url (e.g. from the subscriptions), or null if unknown. */
+    public java.util.function.Function<String, String> getAvatarLookup() {
+        return avatarLookup;
+    }
+
+    public void setAvatarLookup(final java.util.function.Function<String, String> lookup) {
+        this.avatarLookup = lookup;
     }
 }

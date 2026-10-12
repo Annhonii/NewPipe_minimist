@@ -86,6 +86,32 @@ public class StatisticsPlaylistFragment
         recordManager = new HistoryRecordManager(getContext());
     }
 
+    /** History looks like the Home page: always the card layout, whatever the list setting. */
+    @Override
+    protected org.schabi.newpipe.info_list.ItemViewMode getPreferredItemViewMode() {
+        return org.schabi.newpipe.info_list.ItemViewMode.CARD;
+    }
+
+    /** Channel logos of the subscribed channels, so most history cards show the logo at once. */
+    private void loadSubscriptionAvatars() {
+        disposables.add(new org.schabi.newpipe.local.subscription.SubscriptionManager(
+                requireContext()).subscriptions()
+                .subscribeOn(io.reactivex.rxjava3.schedulers.Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(list -> {
+                    final java.util.Map<String, String> avatars = new java.util.HashMap<>();
+                    for (final var sub : list) {
+                        if (sub.getUrl() != null && sub.getAvatarUrl() != null
+                                && !sub.getAvatarUrl().isEmpty()) {
+                            avatars.put(sub.getUrl(), sub.getAvatarUrl());
+                        }
+                    }
+                    if (itemListAdapter != null) {
+                        itemListAdapter.setAvatarLookup(avatars::get);
+                    }
+                }, throwable -> { }));
+    }
+
     @Override
     public View onCreateView(@NonNull final LayoutInflater inflater,
                              @Nullable final ViewGroup container,
@@ -108,6 +134,7 @@ public class StatisticsPlaylistFragment
     @Override
     protected void initViews(final View rootView, final Bundle savedInstanceState) {
         super.initViews(rootView, savedInstanceState);
+        loadSubscriptionAvatars();
         if (!useAsFrontPage) {
             setTitle(getString(R.string.title_last_played));
         }
@@ -185,6 +212,7 @@ public class StatisticsPlaylistFragment
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        disposables.clear();
 
         if (itemListAdapter != null) {
             itemListAdapter.unsetSelectedListener();

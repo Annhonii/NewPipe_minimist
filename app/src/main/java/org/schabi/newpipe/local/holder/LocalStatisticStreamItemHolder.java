@@ -17,11 +17,19 @@ import org.schabi.newpipe.local.history.HistoryRecordManager;
 import org.schabi.newpipe.util.DependentPreferenceHelper;
 import org.schabi.newpipe.util.Localization;
 import org.schabi.newpipe.util.ServiceHelper;
+import org.schabi.newpipe.util.ExtractorHelper;
 import org.schabi.newpipe.util.image.CoilHelper;
+import org.schabi.newpipe.util.image.ImageStrategy;
 import org.schabi.newpipe.views.AnimatedProgressBar;
 
 import java.time.format.DateTimeFormatter;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
+
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 
 /*
  * Created by Christian Schabesberger on 01.08.16.
@@ -51,6 +59,17 @@ public class LocalStatisticStreamItemHolder extends LocalItemHolder {
     @Nullable
     public final TextView itemAdditionalDetails;
     private final AnimatedProgressBar itemProgressView;
+    /** Only the card layout (same as the Home page) has the channel logo and the three dots. */
+    @Nullable
+    private final ImageView itemUploaderAvatarView;
+    @Nullable
+    private final View itemMoreButton;
+
+    /** channel url -> logo url, for channels that are not subscribed (fetched once). */
+    private static final Map<String, String> AVATAR_CACHE = new ConcurrentHashMap<>();
+    private static final Set<String> AVATAR_PENDING = ConcurrentHashMap.newKeySet();
+    private static final Set<String> AVATAR_FAILED = ConcurrentHashMap.newKeySet();
+    private static final int MAX_PARALLEL_AVATAR_REQUESTS = 3;
 
     public LocalStatisticStreamItemHolder(final LocalItemBuilder itemBuilder,
                                           final ViewGroup parent) {
@@ -67,6 +86,85 @@ public class LocalStatisticStreamItemHolder extends LocalItemHolder {
         itemDurationView = itemView.findViewById(R.id.itemDurationView);
         itemAdditionalDetails = itemView.findViewById(R.id.itemAdditionalDetails);
         itemProgressView = itemView.findViewById(R.id.itemProgressView);
+        itemUploaderAvatarView = itemView.findViewById(R.id.itemUploaderAvatarView);
+        itemMoreButton = itemView.findViewById(R.id.itemMoreButton);
+    }
+
+    /** Same "views • time ago" line as the Home page, falling back to the old history line. */
+    private String getCardDetailLine(final StreamStatisticsEntry entry,
+                                     final DateTimeFormatter dateTimeFormatter) {
+        final var stream = entry.getStreamEntity();
+        String views = "";
+        if (stream.getViewCount() != null && stream.getViewCount() >= 0) {
+            views = Localization.shortViewCount(itemBuilder.getContext(), stream.getViewCount());
+        }
+        String when = null;
+        if (stream.getUploadDate() != null) {
+            when = Localization.relativeTime(stream.getUploadDate());
+        } else if (stream.getTextualUploadDate() != null
+                && !stream.getTextualUploadDate().isEmpty()) {
+            when = stream.getTextualUploadDate();
+        }
+        if (!views.isEmpty() && when != null) {
+            return Localization.concatenateStrings(views, when);
+        } else if (!views.isEmpty()) {
+            return views;
+        } else if (when != null) {
+            return when;
+        }
+        return getStreamInfoDetailLine(entry, dateTimeFormatter);
+    }
+
+    private void bindAvatar(final int serviceId, @Nullable final String uploaderUrl) {
+        final ImageView avatar = itemUploaderAvatarView;
+        if (avatar == null) {
+            return;
+        }
+        avatar.setTag(R.id.itemUploaderAvatarView, uploaderUrl);
+        avatar.setVisibility(View.VISIBLE);
+        if (uploaderUrl == null || uploaderUrl.isEmpty()) {
+            CoilHelper.INSTANCE.loadAvatar(avatar, (String) null);
+            return;
+        }
+
+        String url = null;
+        final var lookup = itemBuilder.getAvatarLookup();
+        if (lookup != null) {
+            url = lookup.apply(uploaderUrl);
+        }
+        if (url == null || url.isEmpty()) {
+            url = AVATAR_CACHE.get(uploaderUrl);
+        }
+        if (url != null && !url.isEmpty()) {
+            CoilHelper.INSTANCE.loadAvatar(avatar, url);
+            return;
+        }
+
+        // unknown logo: show the placeholder and fetch the channel once
+        CoilHelper.INSTANCE.loadAvatar(avatar, (String) null);
+        if (AVATAR_FAILED.contains(uploaderUrl) || AVATAR_PENDING.contains(uploaderUrl)
+                || AVATAR_PENDING.size() >= MAX_PARALLEL_AVATAR_REQUESTS) {
+            return;
+        }
+        AVATAR_PENDING.add(uploaderUrl);
+        ExtractorHelper.getChannelInfo(serviceId, uploaderUrl, false)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(info -> {
+                    AVATAR_PENDING.remove(uploaderUrl);
+                    final String found = ImageStrategy.INSTANCE.imageListToDbUrl(info.getAvatars());
+                    if (found == null || found.isEmpty()) {
+                        AVATAR_FAILED.add(uploaderUrl);
+                        return;
+                    }
+                    AVATAR_CACHE.put(uploaderUrl, found);
+                    if (uploaderUrl.equals(avatar.getTag(R.id.itemUploaderAvatarView))) {
+                        CoilHelper.INSTANCE.loadAvatar(avatar, found);
+                    }
+                }, throwable -> {
+                    AVATAR_PENDING.remove(uploaderUrl);
+                    AVATAR_FAILED.add(uploaderUrl);
+                });
     }
 
     private String getStreamInfoDetailLine(final StreamStatisticsEntry entry,
@@ -94,8 +192,10 @@ public class LocalStatisticStreamItemHolder extends LocalItemHolder {
         if (item.getStreamEntity().getDuration() > 0) {
             itemDurationView.
                     setText(Localization.getDurationString(item.getStreamEntity().getDuration()));
-            itemDurationView.setBackgroundColor(ContextCompat.getColor(itemBuilder.getContext(),
-                    R.color.duration_background_color));
+            if (itemMoreButton == null) {
+                itemDurationView.setBackgroundColor(ContextCompat.getColor(
+                        itemBuilder.getContext(), R.color.duration_background_color));
+            }
             itemDurationView.setVisibility(View.VISIBLE);
 
             if (DependentPreferenceHelper.getPositionsInListsEnabled(itemProgressView.getContext())
@@ -113,8 +213,12 @@ public class LocalStatisticStreamItemHolder extends LocalItemHolder {
         }
 
         if (itemAdditionalDetails != null) {
-            itemAdditionalDetails.setText(getStreamInfoDetailLine(item, dateTimeFormatter));
+            itemAdditionalDetails.setText(itemMoreButton != null
+                    ? getCardDetailLine(item, dateTimeFormatter)
+                    : getStreamInfoDetailLine(item, dateTimeFormatter));
         }
+
+        bindAvatar(item.getStreamEntity().getServiceId(), item.getStreamEntity().getUploaderUrl());
 
         // Default thumbnail is shown on error, while loading and if the url is empty
         CoilHelper.INSTANCE.loadThumbnail(itemThumbnailView,
@@ -125,6 +229,19 @@ public class LocalStatisticStreamItemHolder extends LocalItemHolder {
                 itemBuilder.getOnItemSelectedListener().selected(item);
             }
         });
+
+        if (itemMoreButton != null) {
+            // card layout: the three dots replace the long press
+            itemView.setLongClickable(false);
+            itemView.setOnLongClickListener(null);
+            itemMoreButton.setVisibility(View.VISIBLE);
+            itemMoreButton.setOnClickListener(view -> {
+                if (itemBuilder.getOnItemSelectedListener() != null) {
+                    itemBuilder.getOnItemSelectedListener().held(item);
+                }
+            });
+            return;
+        }
 
         itemView.setLongClickable(true);
         itemView.setOnLongClickListener(view -> {

@@ -89,8 +89,13 @@ public abstract class BaseLocalListFragment<I, N> extends BaseStateFragment<I>
     /**
      * Updates the item view mode based on user preference.
      */
+    /** Subclasses can force a layout (e.g. History always uses the card layout of Home). */
+    protected ItemViewMode getPreferredItemViewMode() {
+        return getItemViewMode(requireContext());
+    }
+
     private void refreshItemViewMode() {
-        final ItemViewMode itemViewMode = getItemViewMode(requireContext());
+        final ItemViewMode itemViewMode = getPreferredItemViewMode();
         itemsList.setLayoutManager((itemViewMode == ItemViewMode.GRID)
                 ? getGridLayoutManager() : getListLayoutManager());
         itemListAdapter.setItemViewMode(itemViewMode);

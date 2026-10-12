@@ -11,8 +11,6 @@ import org.schabi.newpipe.R;
 import java.util.List;
 
 public final class TabsManager {
-    /** The floating nav pill holds at most this many tabs. */
-    public static final int MAX_TABS = 4;
     private static final String HOME_TAB_MIGRATED_KEY = "home_tab_added_v1";
     private static final String TRENDING_TAB_REMOVED_KEY = "trending_tab_removed_v1";
     private final SharedPreferences sharedPreferences;
@@ -35,8 +33,8 @@ public final class TabsManager {
         final String savedJson = sharedPreferences.getString(savedTabsKey, null);
         try {
             final List<Tab> tabs = TabsJsonHelper.getTabsFromJson(savedJson);
-            return limitTabs(removeTrendingTabOnce(addHomeTabOnce(tabs, savedJson != null),
-                    savedJson != null));
+            return removeTrendingTabOnce(addHomeTabOnce(tabs, savedJson != null),
+                    savedJson != null);
         } catch (final TabsJsonHelper.InvalidJsonException e) {
             Toast.makeText(context, R.string.saved_tabs_invalid_json, Toast.LENGTH_SHORT).show();
             return getDefaultTabs();
@@ -62,9 +60,8 @@ public final class TabsManager {
         final java.util.ArrayList<Tab> withHome = new java.util.ArrayList<>(tabs.size() + 1);
         withHome.add(home);
         withHome.addAll(tabs);
-        final List<Tab> limited = limitTabs(withHome);
-        saveTabs(limited);
-        return limited;
+        saveTabs(withHome);
+        return withHome;
     }
 
     /**
@@ -98,16 +95,6 @@ public final class TabsManager {
         }
         saveTabs(result);
         return result;
-    }
-
-    /** Keeps only the first {@link #MAX_TABS} tabs (and stores the trimmed list). */
-    private List<Tab> limitTabs(final List<Tab> tabs) {
-        if (tabs.size() <= MAX_TABS) {
-            return tabs;
-        }
-        final java.util.ArrayList<Tab> limited = new java.util.ArrayList<>(tabs.subList(0, MAX_TABS));
-        saveTabs(limited);
-        return limited;
     }
 
     public void saveTabs(final List<Tab> tabList) {
