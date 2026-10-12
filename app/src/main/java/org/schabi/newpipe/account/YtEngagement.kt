@@ -40,4 +40,10 @@ object YtEngagement {
     fun replyToComment(context: Context, videoId: String, commentId: String, text: String): Completable =
         Completable.fromAction { YtInnerTube.replyToComment(session(context), videoId, commentId, text) }
             .subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
+
+    /** Comment count as YouTube shows it (e.g. "1.9K"); empty when unknown. Needs no login. */
+    @JvmStatic
+    fun commentCount(videoId: String): Maybe<String> =
+        Maybe.fromCallable<String> { YtInnerTube.commentCountText(videoId) }
+            .subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
 }

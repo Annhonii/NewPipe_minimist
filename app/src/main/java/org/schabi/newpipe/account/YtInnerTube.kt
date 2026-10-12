@@ -496,4 +496,12 @@ object YtInnerTube {
         checkError(post("comment/create_comment_reply",
             JSONObject().put("createReplyParams", params).put("commentText", text), session))
     }
+
+    /** The comment count text from the video page ("1.9K"), or null. */
+    fun commentCountText(videoId: String): String? {
+        val next = post("next", JSONObject().put("videoId", videoId), null)
+        val entry = collect(next, "commentsEntryPointHeaderRenderer").firstOrNull()
+        val count = entry?.optJSONObject("commentCount")
+        return text(count)?.trim()?.takeIf { it.isNotEmpty() }
+    }
 }

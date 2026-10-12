@@ -1226,11 +1226,14 @@ public final class VideoDetailFragment
                         return;
                     }
                     binding.detailCommentInput.setEnabled(true);
-                    final int count = commentsInfo.getCommentCount();
-                    if (count > 0) {
-                        binding.detailCommentsCount.setText(
-                                Localization.shortCount(activity, count));
-                        binding.detailCommentsCount.setVisibility(View.VISIBLE);
+                    if (isYoutubeInfo(currentInfo)) {
+                        disposables.add(YtEngagement.commentCount(currentInfo.getId())
+                                .subscribe(text -> {
+                                    if (binding != null && binding.detailCommentsCount != null) {
+                                        binding.detailCommentsCount.setText(text);
+                                        binding.detailCommentsCount.setVisibility(View.VISIBLE);
+                                    }
+                                }, e -> { }));
                     }
                 }, throwable -> {
                     if (binding != null && binding.detailCommentsCard != null) {
