@@ -626,8 +626,9 @@ class FeedFragment : BaseStateFragment<FeedState>() {
             val item = groupAdapter.getItem(i) as StreamItem
 
             var typeface = Typeface.DEFAULT
+            // rows are rounded cards (bg_list_card), also while they are re-bound here
             var backgroundSupplier = { ctx: Context ->
-                resolveDrawable(ctx, android.R.attr.selectableItemBackground)
+                androidx.core.content.ContextCompat.getDrawable(ctx, R.drawable.bg_list_card)!!
             }
             if (doCheck) {
                 // If the uploadDate is null or true we should highlight the item
@@ -636,11 +637,12 @@ class FeedFragment : BaseStateFragment<FeedState>() {
 
                     typeface = Typeface.DEFAULT_BOLD
                     backgroundSupplier = { ctx: Context ->
-                        // Merge the drawables together. Otherwise we would lose the "select" effect
+                        // Merge the drawables together. Otherwise we would lose the card and the
+                        // "select" effect
                         LayerDrawable(
                             arrayOf(
-                                resolveDrawable(ctx, R.attr.dashed_border),
-                                resolveDrawable(ctx, android.R.attr.selectableItemBackground)
+                                androidx.core.content.ContextCompat.getDrawable(ctx, R.drawable.bg_list_card)!!,
+                                resolveDrawable(ctx, R.attr.dashed_border)
                             )
                         )
                     }
