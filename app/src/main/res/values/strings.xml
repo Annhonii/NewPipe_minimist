@@ -968,4 +968,7 @@
     <string name="disable_animations_title">Disable animations</string>
     <string name="disable_animations_summary">Turn off screen transition animations</string>
     <string name="tabs_limit_reached">The navigation bar holds at most %1$d tabs. Remove one first.</string>
+    <string name="yt_copy_token_title">Copy token</string>
+    <string name="yt_copy_token_summary">Copy your session token to sign in on another device</string>
+    <string name="yt_token_copied">Token copied. Keep it private, anyone with it can use your account.</string>
 </resources>

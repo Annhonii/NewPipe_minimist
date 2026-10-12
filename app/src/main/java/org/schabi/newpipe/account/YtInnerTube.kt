@@ -38,6 +38,8 @@ object YtInnerTube {
 
     data class Channel(val id: String, val name: String, val avatar: String?)
 
+    data class AccountInfo(val name: String, val email: String, val avatar: String)
+
     data class Page<T>(val items: List<T>, val continuation: String?)
 
     private val client = OkHttpClient.Builder()
@@ -104,12 +106,14 @@ object YtInnerTube {
     }
 
     /** Best effort: name / email of the signed-in account. Returns null on any failure. */
-    fun accountInfo(session: YtAccountStore.Session): Pair<String, String>? = runCatching {
+    fun accountInfo(session: YtAccountStore.Session): AccountInfo? = runCatching {
         val json = post("account/account_menu", JSONObject(), session)
         val header = collect(json, "activeAccountHeaderRenderer").firstOrNull() ?: return null
         val name = text(header.optJSONObject("accountName")).orEmpty()
         val email = text(header.optJSONObject("email")).orEmpty()
-        if (name.isBlank() && email.isBlank()) null else name to email
+        val avatar = lastThumb(header.optJSONObject("accountPhoto")?.optJSONArray("thumbnails")).orEmpty()
+        if (name.isBlank() && email.isBlank() && avatar.isBlank()) null
+        else AccountInfo(name, email, avatar)
     }.getOrNull()
 
     // ---------------------------------------------------------------- JSON helpers

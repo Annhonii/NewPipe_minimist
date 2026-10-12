@@ -30,6 +30,11 @@ class GoogleAccountSettingsFragment : BasePreferenceFragment() {
                 showTokenDialog()
                 true
             }
+        requirePreference<androidx.preference.Preference>(R.string.yt_copy_token_key)
+            .setOnPreferenceClickListener {
+                org.schabi.newpipe.account.YtAccountDialogs.copyToken(requireContext())
+                true
+            }
         requirePreference<androidx.preference.Preference>(R.string.yt_sync_key)
             .setOnPreferenceClickListener {
                 runSync()
@@ -73,6 +78,7 @@ class GoogleAccountSettingsFragment : BasePreferenceFragment() {
                 )
             else -> getString(R.string.yt_status_signed_in)
         }
+        requirePreference<androidx.preference.Preference>(R.string.yt_copy_token_key).isEnabled = loggedIn
         requirePreference<androidx.preference.Preference>(R.string.yt_sync_key).isEnabled = loggedIn
         requirePreference<androidx.preference.Preference>(R.string.yt_logout_key).isEnabled = loggedIn
     }

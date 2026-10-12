@@ -115,9 +115,20 @@ public class MainFragment extends BaseFragment implements TabLayout.OnTabSelecte
         updateTabLayoutPosition();
     }
 
+    private int lastAccountSignature = 0;
+
     @Override
     public void onResume() {
         super.onResume();
+
+        // the account button shows the Google photo: rebuild the top bar after (un)login
+        final org.schabi.newpipe.account.YtAccountStore.Session account =
+                org.schabi.newpipe.account.YtAccountStore.INSTANCE.load(requireContext());
+        final int signature = account == null ? 0 : account.hashCode();
+        if (signature != lastAccountSignature) {
+            lastAccountSignature = signature;
+            requireActivity().invalidateOptionsMenu();
+        }
 
         // re-apply the mini player space (this page may have just come back to the front)
         final Fragment playerFragment = requireActivity().getSupportFragmentManager()
@@ -170,10 +181,13 @@ public class MainFragment extends BaseFragment implements TabLayout.OnTabSelecte
                     + "menu = [" + menu + "], inflater = [" + inflater + "]");
         }
         inflater.inflate(R.menu.menu_main_fragment, menu);
+        org.schabi.newpipe.account.YtToolbarButtons.bind(activity, menu, this::onOptionsItemSelected);
 
         final ActionBar supportActionBar = activity.getSupportActionBar();
         if (supportActionBar != null) {
             supportActionBar.setDisplayHomeAsUpEnabled(false);
+            supportActionBar.setDisplayShowHomeEnabled(false);
+            supportActionBar.setDisplayUseLogoEnabled(false);
         }
     }
 

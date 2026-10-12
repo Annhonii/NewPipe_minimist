@@ -73,8 +73,9 @@ object YtAccountActions {
             val info = YtInnerTube.accountInfo(session)
             val full = if (info != null) {
                 session.copy(
-                    name = session.name.ifBlank { info.first },
-                    email = session.email.ifBlank { info.second }
+                    name = session.name.ifBlank { info.name },
+                    email = session.email.ifBlank { info.email },
+                    avatar = session.avatar.ifBlank { info.avatar }
                 )
             } else {
                 session
@@ -124,5 +125,41 @@ object YtAccountActions {
                     }
                 }
             )
+    }
+
+    /** Re-reads name / photo of an already signed-in account (older sessions have no photo). */
+    fun refreshProfile(context: Context): Single<Boolean> {
+        val app = context.applicationContext
+        return Single.fromCallable {
+            val session = YtAccountStore.load(app) ?: return@fromCallable false
+            val info = YtInnerTube.accountInfo(session) ?: return@fromCallable false
+            YtAccountStore.save(
+                app,
+                session.copy(
+                    name = info.name.ifBlank { session.name },
+                    email = info.email.ifBlank { session.email },
+                    avatar = info.avatar.ifBlank { session.avatar }
+                )
+            )
+            true
+        }.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
+    }
+
+    /** Sync with progress / result toasts (used by the account dialog). */
+    fun syncWithToasts(context: Context) {
+        val app = context.applicationContext
+        Toast.makeText(app, R.string.yt_syncing, Toast.LENGTH_SHORT).show()
+        syncSubscriptions(app).subscribe(
+            { r ->
+                Toast.makeText(app, app.getString(R.string.yt_sync_done, r.total, r.added), Toast.LENGTH_LONG).show()
+            },
+            { e ->
+                Toast.makeText(
+                    app,
+                    app.getString(R.string.yt_sync_failed, e.message ?: e.javaClass.simpleName),
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+        )
     }
 }

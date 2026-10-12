@@ -25,6 +25,13 @@
         app:iconSpaceReserved="false" />
 
     <Preference
+        android:key="@string/yt_copy_token_key"
+        android:summary="@string/yt_copy_token_summary"
+        android:title="@string/yt_copy_token_title"
+        app:singleLineTitle="false"
+        app:iconSpaceReserved="false" />
+
+    <Preference
         android:key="@string/yt_sync_key"
         android:summary="@string/yt_sync_summary"
         android:title="@string/yt_sync_title"

@@ -2306,6 +2306,28 @@ public final class VideoDetailFragment
         activity.getWindow().setNavigationBarColor(Color.TRANSPARENT);
     }
 
+    /** 0 = icons follow the theme, 1 = white icons because the black player is behind them. */
+    private int statusIconsState = -1;
+
+    private void updateStatusBarIcons(final boolean overPlayer) {
+        if (activity == null) {
+            return;
+        }
+        final int target = overPlayer ? 1 : 0;
+        if (statusIconsState == target) {
+            return;
+        }
+        statusIconsState = target;
+        final androidx.core.view.WindowInsetsControllerCompat controller =
+                androidx.core.view.WindowCompat.getInsetsController(activity.getWindow(),
+                        activity.getWindow().getDecorView());
+        if (controller != null) {
+            // dark icons only on a light page; over the black player they must be white
+            controller.setAppearanceLightStatusBars(!overPlayer
+                    && org.schabi.newpipe.util.ThemeHelper.isLightThemeSelected(activity));
+        }
+    }
+
     private void hideSystemUi() {
         if (DEBUG) {
             Log.d(TAG, "hideSystemUi() called");
@@ -2740,6 +2762,7 @@ public final class VideoDetailFragment
 
                 switch (newState) {
                     case BottomSheetBehavior.STATE_HIDDEN:
+                        updateStatusBarIcons(false);
                         moveFocusToMainFragment(true);
                         manageSpaceAtTheBottom(true);
 
@@ -2747,6 +2770,7 @@ public final class VideoDetailFragment
                         cleanUp();
                         break;
                     case BottomSheetBehavior.STATE_EXPANDED:
+                        updateStatusBarIcons(true);
                         moveFocusToMainFragment(false);
                         manageSpaceAtTheBottom(false);
 
@@ -2767,6 +2791,7 @@ public final class VideoDetailFragment
                         setOverlayLook(binding.appBarLayout, behavior, 1);
                         break;
                     case BottomSheetBehavior.STATE_COLLAPSED:
+                        updateStatusBarIcons(false);
                         // comments / description must not stay open over the mini player
                         VideoInfoBottomSheet.dismissIfShown(getChildFragmentManager());
                         moveFocusToMainFragment(true);
@@ -2805,6 +2830,7 @@ public final class VideoDetailFragment
 
             @Override
             public void onSlide(@NonNull final View bottomSheet, final float slideOffset) {
+                updateStatusBarIcons(slideOffset > 0.4f);
                 if (slideOffset < 0.95f) {
                     VideoInfoBottomSheet.dismissIfShown(getChildFragmentManager());
                 }

@@ -1534,6 +1534,7 @@
     <string name="yt_login_web_key">yt_login_web</string>
     <string name="yt_login_token_key">yt_login_token</string>
     <string name="yt_sync_key">yt_sync_subscriptions</string>
+    <string name="yt_copy_token_key">yt_copy_token</string>
     <string name="yt_logout_key">yt_logout</string>
 
     <!-- Appearance: ArchiveTune-style customisation -->

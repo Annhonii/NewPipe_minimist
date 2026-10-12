@@ -15,6 +15,7 @@ object YtAccountStore {
     private const val K_AUTH_USER = "auth_user"
     private const val K_NAME = "name"
     private const val K_EMAIL = "email"
+    private const val K_AVATAR = "avatar"
 
     data class Session(
         val cookie: String,
@@ -22,7 +23,8 @@ object YtAccountStore {
         val dataSyncId: String = "",
         val authUser: String = "0",
         val name: String = "",
-        val email: String = ""
+        val email: String = "",
+        val avatar: String = ""
     ) {
         val sapisid: String? get() = sapisidOf(cookie)
     }
@@ -52,7 +54,8 @@ object YtAccountStore {
             dataSyncId = p.getString(K_DATASYNC, "").orEmpty(),
             authUser = p.getString(K_AUTH_USER, "0").orEmpty().ifBlank { "0" },
             name = p.getString(K_NAME, "").orEmpty(),
-            email = p.getString(K_EMAIL, "").orEmpty()
+            email = p.getString(K_EMAIL, "").orEmpty(),
+            avatar = p.getString(K_AVATAR, "").orEmpty()
         )
     }
 
@@ -66,6 +69,7 @@ object YtAccountStore {
             .putString(K_AUTH_USER, s.authUser.filter(Char::isDigit).ifBlank { "0" })
             .putString(K_NAME, s.name)
             .putString(K_EMAIL, s.email)
+            .putString(K_AVATAR, s.avatar)
             .apply()
     }
 
