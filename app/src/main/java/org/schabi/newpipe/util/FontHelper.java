@@ -20,6 +20,8 @@ public final class FontHelper {
     private static Typeface titleTypeface;
     private static boolean titleTypefaceLoaded = false;
 
+    private static final boolean USE_TITLE_FONT = false;
+
     private FontHelper() { }
 
     public static boolean useDeviceFont(@NonNull final Context context) {
@@ -53,6 +55,9 @@ public final class FontHelper {
 
     /** Makes the toolbar title (on every screen) use Ntype82 whenever it changes. */
     public static void installToolbarTitleFont(@NonNull final Toolbar toolbar) {
+        if (!USE_TITLE_FONT) {
+            return; // ArchiveTune look: titles use the normal app font
+        }
         final Typeface face = getTitleTypeface(toolbar.getContext());
         if (face == null) {
             return;

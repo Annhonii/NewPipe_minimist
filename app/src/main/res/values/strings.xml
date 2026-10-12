@@ -960,4 +960,11 @@
     <string name="yt_comment_failed">Could not post comment: %1$s</string>
     <string name="yt_sign_in_required">Sign in first: Settings → Google account</string>
     <string name="yt_rate_failed">Action failed: %1$s</string>
+
+    <!-- Appearance customisation -->
+    <string name="accent_color_title">Accent color</string>
+    <string name="dynamic_color_title">Dynamic color (Material You)</string>
+    <string name="dynamic_color_summary">Use your wallpaper colors as the accent (Android 12+)</string>
+    <string name="disable_animations_title">Disable animations</string>
+    <string name="disable_animations_summary">Turn off screen transition animations</string>
 </resources>

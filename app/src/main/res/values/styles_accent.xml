@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Accent colour presets (Settings > Appearance > Accent color) -->
+<resources>
+    <color name="accent_sage">#5E8C61</color>
+    <style name="ThemeOverlay.Accent.Sage" parent="">
+        <item name="colorPrimary">@color/accent_sage</item>
+        <item name="colorPrimaryDark">@color/accent_sage</item>
+        <item name="colorAccent">@color/accent_sage</item>
+    </style>
+    <color name="accent_red">#D71921</color>
+    <style name="ThemeOverlay.Accent.Red" parent="">
+        <item name="colorPrimary">@color/accent_red</item>
+        <item name="colorPrimaryDark">@color/accent_red</item>
+        <item name="colorAccent">@color/accent_red</item>
+    </style>
+    <color name="accent_blue">#3F6FD8</color>
+    <style name="ThemeOverlay.Accent.Blue" parent="">
+        <item name="colorPrimary">@color/accent_blue</item>
+        <item name="colorPrimaryDark">@color/accent_blue</item>
+        <item name="colorAccent">@color/accent_blue</item>
+    </style>
+    <color name="accent_purple">#7E57C2</color>
+    <style name="ThemeOverlay.Accent.Purple" parent="">
+        <item name="colorPrimary">@color/accent_purple</item>
+        <item name="colorPrimaryDark">@color/accent_purple</item>
+        <item name="colorAccent">@color/accent_purple</item>
+    </style>
+    <color name="accent_pink">#D6457F</color>
+    <style name="ThemeOverlay.Accent.Pink" parent="">
+        <item name="colorPrimary">@color/accent_pink</item>
+        <item name="colorPrimaryDark">@color/accent_pink</item>
+        <item name="colorAccent">@color/accent_pink</item>
+    </style>
+    <color name="accent_orange">#E5732B</color>
+    <style name="ThemeOverlay.Accent.Orange" parent="">
+        <item name="colorPrimary">@color/accent_orange</item>
+        <item name="colorPrimaryDark">@color/accent_orange</item>
+        <item name="colorAccent">@color/accent_orange</item>
+    </style>
+    <color name="accent_teal">#1E8E87</color>
+    <style name="ThemeOverlay.Accent.Teal" parent="">
+        <item name="colorPrimary">@color/accent_teal</item>
+        <item name="colorPrimaryDark">@color/accent_teal</item>
+        <item name="colorAccent">@color/accent_teal</item>
+    </style>
+    <color name="accent_amber">#C58F00</color>
+    <style name="ThemeOverlay.Accent.Amber" parent="">
+        <item name="colorPrimary">@color/accent_amber</item>
+        <item name="colorPrimaryDark">@color/accent_amber</item>
+        <item name="colorAccent">@color/accent_amber</item>
+    </style>
+
+    <!-- Material You fallback (Android < 12); values-v31 overrides this with wallpaper colours -->
+    <style name="ThemeOverlay.Accent.Dynamic" parent="">
+        <item name="colorPrimary">@color/accent_sage</item>
+        <item name="colorPrimaryDark">@color/accent_sage</item>
+        <item name="colorAccent">@color/accent_sage</item>
+    </style>
+
+    <!-- Disable window / screen transition animations -->
+    <style name="ThemeOverlay.App.NoAnimations" parent="">
+        <item name="android:windowAnimationStyle">@style/Animation.App.None</item>
+    </style>
+    <style name="Animation.App.None" parent="">
+        <item name="android:windowEnterAnimation">@null</item>
+        <item name="android:windowExitAnimation">@null</item>
+        <item name="android:activityOpenEnterAnimation">@null</item>
+        <item name="android:activityOpenExitAnimation">@null</item>
+        <item name="android:activityCloseEnterAnimation">@null</item>
+        <item name="android:activityCloseExitAnimation">@null</item>
+    </style>
+</resources>

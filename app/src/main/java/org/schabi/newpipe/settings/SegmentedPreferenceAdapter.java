@@ -65,8 +65,8 @@ final class SegmentedPreferenceAdapter extends PreferenceGroupAdapter {
                                @NonNull final Context ctx) {
         super(preferenceGroup);
         this.context = ctx;
-        this.regular = ResourcesCompat.getFont(ctx, R.font.geist);
-        this.medium = ResourcesCompat.getFont(ctx, R.font.geist_medium);
+        this.regular = ResourcesCompat.getFont(ctx, R.font.poppins);
+        this.medium = ResourcesCompat.getFont(ctx, R.font.poppins);
     }
 
     @Override

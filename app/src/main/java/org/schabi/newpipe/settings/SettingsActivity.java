@@ -88,6 +88,8 @@ public class SettingsActivity extends AppCompatActivity implements
     @Override
     protected void onCreate(final Bundle savedInstanceBundle) {
         setTheme(ThemeHelper.getSettingsThemeStyle(this));
+        org.schabi.newpipe.util.FontHelper.applyFontOverlay(this);
+        org.schabi.newpipe.util.AppearanceHelper.applyOverlays(this);
 
         super.onCreate(savedInstanceBundle);
         Bridge.restoreInstanceState(this, savedInstanceBundle);

@@ -34,6 +34,33 @@ public class AppearanceSettingsFragment extends BasePreferenceFragment {
             return false;
         });
 
+        final Preference dynamicPref = findPreference(getString(R.string.dynamic_color_key));
+        if (dynamicPref != null && !org.schabi.newpipe.util.AppearanceHelper
+                .isDynamicColorSupported()) {
+            dynamicPref.setVisible(false);
+        }
+        final String[] recreateKeys = {
+                getString(R.string.dynamic_color_key),
+                getString(R.string.accent_color_key),
+                getString(R.string.disable_animations_key),
+                getString(R.string.use_device_font_key)
+        };
+        for (final String key : recreateKeys) {
+            final Preference pref = findPreference(key);
+            if (pref != null) {
+                pref.setOnPreferenceChangeListener((preference, newValue) -> {
+                    // the new value is stored once this returns true; recreate afterwards
+                    defaultPreferences.edit().putBoolean(Constants.KEY_THEME_CHANGE, true).apply();
+                    final androidx.fragment.app.FragmentActivity activity = getActivity();
+                    if (activity != null) {
+                        activity.getWindow().getDecorView().post(
+                                () -> ActivityCompat.recreate(activity));
+                    }
+                    return true;
+                });
+            }
+        }
+
         final String nightThemeKey = getString(R.string.night_theme_key);
         if (startThemeKey.equals(autoDeviceThemeKey)) {
             final String startNightThemeKey = defaultPreferences

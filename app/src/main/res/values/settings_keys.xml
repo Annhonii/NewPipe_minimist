@@ -1535,4 +1535,30 @@
     <string name="yt_login_token_key">yt_login_token</string>
     <string name="yt_sync_key">yt_sync_subscriptions</string>
     <string name="yt_logout_key">yt_logout</string>
+
+    <!-- Appearance: ArchiveTune-style customisation -->
+    <string name="accent_color_key" translatable="false">accent_color</string>
+    <string name="dynamic_color_key" translatable="false">dynamic_color</string>
+    <string name="disable_animations_key" translatable="false">disable_animations</string>
+    <string name="default_accent_color_value" translatable="false">sage</string>
+    <string-array name="accent_color_values" translatable="false">
+        <item>sage</item>
+        <item>red</item>
+        <item>blue</item>
+        <item>purple</item>
+        <item>pink</item>
+        <item>orange</item>
+        <item>teal</item>
+        <item>amber</item>
+    </string-array>
+    <string-array name="accent_color_names" translatable="false">
+        <item>Sage</item>
+        <item>Red</item>
+        <item>Blue</item>
+        <item>Purple</item>
+        <item>Pink</item>
+        <item>Orange</item>
+        <item>Teal</item>
+        <item>Amber</item>
+    </string-array>
 </resources>

@@ -27,6 +27,8 @@ class YtLoginActivity : AppCompatActivity() {
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(ThemeHelper.getSettingsThemeStyle(this))
+        org.schabi.newpipe.util.FontHelper.applyFontOverlay(this)
+        org.schabi.newpipe.util.AppearanceHelper.applyOverlays(this)
         super.onCreate(savedInstanceState)
         title = getString(R.string.yt_login_title)
 
