@@ -419,25 +419,53 @@ object YtInnerTube {
         collect(page, "continuationItemRenderer").lastOrNull()
             ?.let { allStrings(it, "token").firstOrNull() }
 
-    /** Looks the comment up in the signed-in comment pages (top comments, max 8 pages). */
+    private class PageState {
+        val pages = ArrayList<JSONObject>()
+        var next: String? = null
+        var started = false
+    }
+
+    private val pageStates = HashMap<String, PageState>()
+
+    /**
+     * Looks the comment up in the signed-in comment pages (top comments, max 8 new pages per
+     * call). Fetched pages are kept for the current video, so the next like / reply on another
+     * comment of the same video usually needs no network request just to find its tokens.
+     */
     @Synchronized
     private fun findCommentActions(
         session: YtAccountStore.Session, videoId: String, commentId: String
     ): CommentActions {
         commentActionCache[commentId]?.let { return it }
-        val next = post("next", JSONObject().put("videoId", videoId), session)
-        var page: JSONObject? = null
-        for (t in commentTokens(next)) {
-            val r = runCatching { post("next", JSONObject().put("continuation", t), session) }
-                .getOrNull() ?: continue
-            if (collect(r, "commentThreadRenderer").isNotEmpty()) { page = r; break }
+        if (pageStates.size > 1 || (pageStates.size == 1 && !pageStates.containsKey(videoId))) {
+            pageStates.clear() // keep only the video that is being watched
         }
-        var pages = 0
-        while (page != null && pages < 8) {
+        val st = pageStates.getOrPut(videoId) { PageState() }
+        for (p in st.pages) {
+            extractActions(p, commentId)?.let { commentActionCache[commentId] = it; return it }
+        }
+        if (!st.started) {
+            val next = post("next", JSONObject().put("videoId", videoId), session)
+            for (t in commentTokens(next)) {
+                val r = runCatching { post("next", JSONObject().put("continuation", t), session) }
+                    .getOrNull() ?: continue
+                if (collect(r, "commentThreadRenderer").isNotEmpty()) {
+                    st.started = true
+                    st.pages.add(r)
+                    st.next = nextPageToken(r)
+                    extractActions(r, commentId)?.let { commentActionCache[commentId] = it; return it }
+                    break
+                }
+            }
+        }
+        var fetched = 0
+        while (fetched < 8) {
+            val token = st.next ?: break
+            val page = post("next", JSONObject().put("continuation", token), session)
+            st.pages.add(page)
+            st.next = nextPageToken(page)
+            fetched++
             extractActions(page, commentId)?.let { commentActionCache[commentId] = it; return it }
-            val token = nextPageToken(page) ?: break
-            page = post("next", JSONObject().put("continuation", token), session)
-            pages++
         }
         throw IOException("Could not find this comment on YouTube")
     }

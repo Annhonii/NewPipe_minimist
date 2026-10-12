@@ -147,7 +147,7 @@ public class CommentInfoItemHolder extends InfoItemHolder {
         repliesButton.setText(hasReplies
                 ? Localization.replyCount(itemBuilder.getContext(), item.getReplyCount()) : "");
         ((RelativeLayout.LayoutParams) itemThumbsUpView.getLayoutParams()).topMargin =
-                hasReplies ? 0 : DeviceUtils.dpToPx(6, itemBuilder.getContext());
+                0;
 
 
         // setup comment content and click listeners to expand/ellipsize it

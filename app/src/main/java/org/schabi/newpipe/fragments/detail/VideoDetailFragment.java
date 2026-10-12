@@ -498,10 +498,13 @@ public final class VideoDetailFragment
         }
         final int accent = MaterialColors.getColor(binding.detailThumbsUpImgView,
                 androidx.appcompat.R.attr.colorPrimary);
+        // never pass null here: it wipes the vector's own tint and the icon turns pure black
+        final int normal = androidx.core.content.ContextCompat.getColor(
+                binding.detailThumbsUpImgView.getContext(), R.color.defaultIconTint);
         ImageViewCompat.setImageTintList(binding.detailThumbsUpImgView,
-                "LIKE".equals(ytLikeState) ? ColorStateList.valueOf(accent) : null);
+                ColorStateList.valueOf("LIKE".equals(ytLikeState) ? accent : normal));
         ImageViewCompat.setImageTintList(binding.detailThumbsDownImgView,
-                "DISLIKE".equals(ytLikeState) ? ColorStateList.valueOf(accent) : null);
+                ColorStateList.valueOf("DISLIKE".equals(ytLikeState) ? accent : normal));
     }
 
     private void onRateClicked(final boolean like) {
@@ -588,8 +591,8 @@ public final class VideoDetailFragment
                     v -> toggleTitleAndSecondaryControls());
             binding.detailCommentsCard.setOnClickListener(v -> showCommentsSheet());
             binding.detailCommentInput.setOnClickListener(v -> showAddCommentDialog());
-            binding.detailThumbsUpImgView.setOnClickListener(v -> onRateClicked(true));
-            binding.detailThumbsDownImgView.setOnClickListener(v -> onRateClicked(false));
+            binding.detailLikeButton.setOnClickListener(v -> onRateClicked(true));
+            binding.detailDislikeButton.setOnClickListener(v -> onRateClicked(false));
         } else {
             binding.detailTitleRootLayout.setOnClickListener(
                     v -> toggleTitleAndSecondaryControls());
