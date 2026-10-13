@@ -7,6 +7,7 @@ import static org.schabi.newpipe.util.ListHelper.getUrlAndNonTorrentStreams;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
@@ -474,6 +475,29 @@ public final class NavigationHelper {
                 .replace(R.id.fragment_holder, ChannelFragment.getInstance(serviceId, url, name))
                 .addToBackStack(null)
                 .commit();
+    }
+
+    /**
+     * Opens a channel when its round logo is tapped in a video list (home, trending, history,
+     * feed...). Uses the host activity's fragment manager, or an intent as a fallback.
+     */
+    public static void openChannelFromLogo(@NonNull final Context context, final int serviceId,
+                                           @Nullable final String channelUrl,
+                                           @Nullable final String channelName) {
+        if (TextUtils.isEmpty(channelUrl)) {
+            return;
+        }
+        final String name = channelName == null ? "" : channelName;
+        Context ctx = context;
+        while (ctx instanceof ContextWrapper) {
+            if (ctx instanceof FragmentActivity) {
+                openChannelFragment(((FragmentActivity) ctx).getSupportFragmentManager(),
+                        serviceId, channelUrl, name);
+                return;
+            }
+            ctx = ((ContextWrapper) ctx).getBaseContext();
+        }
+        openChannelFragmentUsingIntent(context, serviceId, channelUrl, name);
     }
 
     public static void openChannelFragment(@NonNull final Fragment fragment,

@@ -18,12 +18,17 @@ import org.schabi.newpipe.extractor.stream.StreamInfo;
 import org.schabi.newpipe.extractor.stream.StreamType;
 import org.schabi.newpipe.extractor.stream.VideoStream;
 import org.schabi.newpipe.player.playqueue.SinglePlayQueue;
+import org.schabi.newpipe.extractor.NewPipe;
+import org.schabi.newpipe.util.ExtractorHelper;
 import org.schabi.newpipe.util.NavigationHelper;
+
+import io.reactivex.rxjava3.schedulers.Schedulers;
 
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Lets downloaded (local) audio / video files play in the same player as online streams.
@@ -37,10 +42,13 @@ public final class LocalStreams {
     private static final class Entry {
         final String fileName;
         final boolean audioOnly;
+        /** Page of the original online video (null/empty if unknown). */
+        final String sourceUrl;
 
-        Entry(final String fileName, final boolean audioOnly) {
+        Entry(final String fileName, final boolean audioOnly, final String sourceUrl) {
             this.fileName = fileName;
             this.audioOnly = audioOnly;
+            this.sourceUrl = sourceUrl;
         }
     }
 
@@ -56,11 +64,26 @@ public final class LocalStreams {
 
     /** Opens a downloaded file in the main (online-style) player. */
     public static void open(@NonNull final Context context, @NonNull final Uri uri,
-                            @Nullable final String fileName, final boolean audioOnly) {
+                            @Nullable final String fileName, final boolean audioOnly,
+                            @Nullable final String sourceUrl) {
         final String url = uri.toString();
-        ENTRIES.put(url, new Entry(fileName, audioOnly));
+        final Entry entry = new Entry(fileName, audioOnly, sourceUrl);
+        ENTRIES.put(url, entry);
         NavigationHelper.playOnMainPlayer(context,
-                new SinglePlayQueue(baseInfo(context, url, ENTRIES.get(url))), false);
+                new SinglePlayQueue(baseInfo(context, url, entry, serviceIdOf(sourceUrl))),
+                false);
+    }
+
+    /** Service of the original video, so the channel opens in the right service. */
+    private static int serviceIdOf(@Nullable final String sourceUrl) {
+        if (sourceUrl != null && !sourceUrl.isEmpty()) {
+            try {
+                return NewPipe.getServiceByUrl(sourceUrl).getServiceId();
+            } catch (final Exception ignored) {
+                // not a known service: use the default below
+            }
+        }
+        return ServiceList.YouTube.getServiceId();
     }
 
     private static String titleOf(@Nullable final String fileName) {
@@ -72,8 +95,8 @@ public final class LocalStreams {
     }
 
     private static StreamInfo baseInfo(@NonNull final Context context, @NonNull final String url,
-                                       @NonNull final Entry entry) {
-        final StreamInfo info = new StreamInfo(ServiceList.YouTube.getServiceId(), url, url,
+                                       @NonNull final Entry entry, final int serviceId) {
+        final StreamInfo info = new StreamInfo(serviceId, url, url,
                 entry.audioOnly ? StreamType.AUDIO_STREAM : StreamType.VIDEO_STREAM,
                 url, titleOf(entry.fileName), 0);
         info.setUploaderName(context.getString(R.string.downloads));
@@ -92,9 +115,10 @@ public final class LocalStreams {
             // e.g. opened again from the watch history after the app was restarted
             final String last = Uri.parse(url).getLastPathSegment();
             entry = new Entry(last == null ? "" : last.substring(last.lastIndexOf('/') + 1),
-                    false);
+                    false, null);
         }
-        final StreamInfo info = baseInfo(context, url, entry);
+        final StreamInfo info = baseInfo(context, url, entry, serviceIdOf(entry.sourceUrl));
+        copyChannelInfo(info, entry.sourceUrl);
 
         long durationMs = 0;
         int height = 0;
@@ -155,6 +179,38 @@ public final class LocalStreams {
             info.setAudioStreams(List.of(audio));
         }
         return info;
+    }
+
+    /**
+     * Takes the channel (name, logo, link), thumbnail and description from the original online
+     * video, so tapping the channel works like online. Quietly skipped when offline.
+     */
+    private static void copyChannelInfo(@NonNull final StreamInfo info,
+                                        @Nullable final String sourceUrl) {
+        if (sourceUrl == null || sourceUrl.isEmpty() || isLocalUrl(sourceUrl)) {
+            return;
+        }
+        try {
+            final StreamInfo origin = ExtractorHelper
+                    .getStreamInfo(info.getServiceId(), sourceUrl, false)
+                    .subscribeOn(Schedulers.io())
+                    .timeout(3, TimeUnit.SECONDS)
+                    .blockingGet();
+            info.setUploaderName(origin.getUploaderName());
+            info.setUploaderUrl(origin.getUploaderUrl());
+            info.setUploaderAvatars(origin.getUploaderAvatars());
+            info.setUploaderVerified(origin.isUploaderVerified());
+            info.setUploaderSubscriberCount(origin.getUploaderSubscriberCount());
+            info.setSubChannelName(origin.getSubChannelName());
+            info.setSubChannelUrl(origin.getSubChannelUrl());
+            info.setSubChannelAvatars(origin.getSubChannelAvatars());
+            info.setThumbnails(origin.getThumbnails());
+            if (origin.getDescription() != null) {
+                info.setDescription(origin.getDescription());
+            }
+        } catch (final Exception ignored) {
+            // offline or the video is gone: keep the plain "Downloads" info
+        }
     }
 
     private static long parseLong(@Nullable final String value) {

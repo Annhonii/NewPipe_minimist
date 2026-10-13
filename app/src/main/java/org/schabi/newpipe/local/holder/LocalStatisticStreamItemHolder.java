@@ -122,6 +122,14 @@ public class LocalStatisticStreamItemHolder extends LocalItemHolder {
         }
         avatar.setTag(R.id.itemUploaderAvatarView, uploaderUrl);
         avatar.setVisibility(View.VISIBLE);
+        // tapping the logo opens the channel directly
+        if (uploaderUrl == null || uploaderUrl.isEmpty()) {
+            avatar.setOnClickListener(null);
+            avatar.setClickable(false);
+        } else {
+            avatar.setOnClickListener(view -> org.schabi.newpipe.util.NavigationHelper
+                    .openChannelFromLogo(view.getContext(), serviceId, uploaderUrl, ""));
+        }
         if (avatar.getLayoutParams() instanceof ViewGroup.MarginLayoutParams) {
             // logo starts exactly under the left edge of the thumbnail (16dp), not at the screen edge
             final ViewGroup.MarginLayoutParams lp =

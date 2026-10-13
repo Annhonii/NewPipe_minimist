@@ -12,6 +12,7 @@ import java.util.function.Consumer
 import org.schabi.newpipe.MainActivity
 import org.schabi.newpipe.R
 import org.schabi.newpipe.database.stream.StreamWithState
+import org.schabi.newpipe.util.NavigationHelper
 import org.schabi.newpipe.database.stream.model.StreamEntity
 import org.schabi.newpipe.databinding.ListStreamItemBinding
 import org.schabi.newpipe.extractor.stream.StreamType.AUDIO_LIVE_STREAM
@@ -137,6 +138,17 @@ data class StreamItem(
             } else {
                 avatar.visibility = View.VISIBLE
                 CoilHelper.loadAvatar(avatar, avatarUrl)
+            }
+            // tapping the logo opens the channel directly
+            if (stream.uploaderUrl.isNullOrBlank()) {
+                avatar.setOnClickListener(null)
+                avatar.isClickable = false
+            } else {
+                avatar.setOnClickListener {
+                    NavigationHelper.openChannelFromLogo(
+                        avatar.context, stream.serviceId, stream.uploaderUrl, stream.uploader
+                    )
+                }
             }
         }
 

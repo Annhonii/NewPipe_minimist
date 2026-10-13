@@ -17,6 +17,7 @@ import org.schabi.newpipe.ktx.ViewUtils;
 import org.schabi.newpipe.local.history.HistoryRecordManager;
 import org.schabi.newpipe.util.DependentPreferenceHelper;
 import org.schabi.newpipe.util.Localization;
+import org.schabi.newpipe.util.NavigationHelper;
 import org.schabi.newpipe.util.StreamTypeUtil;
 import org.schabi.newpipe.util.image.CoilHelper;
 import org.schabi.newpipe.views.AnimatedProgressBar;
@@ -105,6 +106,16 @@ public class StreamMiniInfoItemHolder extends InfoItemHolder {
             } else {
                 itemUploaderAvatarView.setVisibility(View.VISIBLE);
                 CoilHelper.INSTANCE.loadAvatar(itemUploaderAvatarView, item.getUploaderAvatars());
+            }
+            // tapping the logo opens the channel directly
+            if (item.getUploaderUrl() == null || item.getUploaderUrl().isEmpty()) {
+                itemUploaderAvatarView.setOnClickListener(null);
+                itemUploaderAvatarView.setClickable(false);
+            } else {
+                itemUploaderAvatarView.setOnClickListener(view ->
+                        NavigationHelper.openChannelFromLogo(view.getContext(),
+                                item.getServiceId(), item.getUploaderUrl(),
+                                item.getUploaderName()));
             }
         }
 

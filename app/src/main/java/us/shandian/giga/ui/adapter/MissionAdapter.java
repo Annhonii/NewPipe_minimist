@@ -429,7 +429,7 @@ public class MissionAdapter extends Adapter<ViewHolder> implements Handler.Callb
             // same player as online streams (not the simple LocalPlayerActivity)
             org.schabi.newpipe.local.downloads.LocalStreams.open(mContext,
                     mission.storage.getUri(), mission.storage.getName(),
-                    mimeType.startsWith("audio/"));
+                    mimeType.startsWith("audio/"), mission.source);
             return;
         }
 
