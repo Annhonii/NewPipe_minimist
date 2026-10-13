@@ -216,7 +216,7 @@
                 <!-- LOADING INDICATOR-->
                 <ProgressBar
                     android:id="@+id/loading_progress_bar"
-                    style="@style/Widget.AppCompat.ProgressBar"
+                    style="@style/Widget.App.ProgressBar"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/detail_title_root_layout"
@@ -323,6 +323,7 @@
                         </LinearLayout>
 
                         <org.schabi.newpipe.views.NewPipeTextView
+        android:stateListAnimator="@animator/press_scale"
                             android:id="@+id/detail_subscribe_button"
                             android:layout_width="wrap_content"
                             android:layout_height="36dp"
@@ -358,6 +359,7 @@
                             android:paddingHorizontal="12dp">
 
                         <LinearLayout
+        android:stateListAnimator="@animator/press_scale"
                             android:id="@+id/details_panel"
                             android:layout_width="wrap_content"
                             android:layout_height="36dp"
@@ -391,7 +393,7 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_marginStart="6dp"
-                                    android:fontFamily="monospace"
+                                    android:fontFamily="@font/geist_mono"
                                     android:lines="1"
                                     android:textSize="@dimen/video_item_detail_likes_text_size"
                                     tools:text="12M" />
@@ -426,7 +428,7 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_marginStart="6dp"
-                                    android:fontFamily="monospace"
+                                    android:fontFamily="@font/geist_mono"
                                     android:lines="1"
                                     android:textSize="@dimen/video_item_detail_likes_text_size"
                                     tools:text="10K" />
@@ -436,7 +438,7 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_marginStart="6dp"
-                                    android:fontFamily="monospace"
+                                    android:fontFamily="@font/geist_mono"
                                     android:text="@string/disabled"
                                     android:textSize="@dimen/video_item_detail_likes_text_size"
                                     android:visibility="gone"
@@ -445,6 +447,7 @@
                         </LinearLayout>
 
                         <org.schabi.newpipe.views.NewPipeTextView
+        android:stateListAnimator="@animator/press_scale"
                             android:id="@+id/detail_controls_background"
                             android:layout_width="wrap_content"
                             android:layout_height="36dp"
@@ -462,6 +465,7 @@
                             android:textStyle="bold" />
 
                         <org.schabi.newpipe.views.NewPipeTextView
+        android:stateListAnimator="@animator/press_scale"
                             android:id="@+id/detail_controls_popup"
                             android:layout_width="wrap_content"
                             android:layout_height="36dp"
@@ -479,6 +483,7 @@
                             android:textStyle="bold" />
 
                         <org.schabi.newpipe.views.NewPipeTextView
+        android:stateListAnimator="@animator/press_scale"
                             android:id="@+id/detail_controls_download"
                             android:layout_width="wrap_content"
                             android:layout_height="36dp"
@@ -496,6 +501,7 @@
                             android:textStyle="bold" />
 
                         <org.schabi.newpipe.views.NewPipeTextView
+        android:stateListAnimator="@animator/press_scale"
                             android:id="@+id/detail_controls_share"
                             android:layout_width="wrap_content"
                             android:layout_height="36dp"
@@ -513,6 +519,7 @@
                             android:textStyle="bold" />
 
                         <org.schabi.newpipe.views.NewPipeTextView
+        android:stateListAnimator="@animator/press_scale"
                             android:id="@+id/detail_controls_open_in_browser"
                             android:layout_width="wrap_content"
                             android:layout_height="36dp"
@@ -553,6 +560,7 @@
                         tools:visibility="visible">
 
                         <org.schabi.newpipe.views.NewPipeTextView
+        android:stateListAnimator="@animator/press_scale"
                             android:id="@+id/detail_controls_play_with_kodi"
                             android:layout_width="@dimen/detail_control_width"
                             android:layout_height="@dimen/detail_control_height"
@@ -570,6 +578,7 @@
                             android:textSize="@dimen/detail_control_text_size" />
 
                         <org.schabi.newpipe.views.NewPipeTextView
+        android:stateListAnimator="@animator/press_scale"
                             android:id="@+id/detail_controls_crash_the_player"
                             android:layout_width="@dimen/detail_control_width"
                             android:layout_height="@dimen/detail_control_height"

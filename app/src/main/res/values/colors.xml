@@ -10,8 +10,8 @@
     <color name="placeholder_foreground">#6C6C6C</color>
 
     <!-- Light Theme -->
-    <color name="light_background_color">#E9EDF5</color>
-    <color name="light_dialog_background_color">#F3F6FB</color>
+    <color name="light_background_color">#F2F2F2</color>
+    <color name="light_dialog_background_color">#FFFFFF</color>
     <color name="light_settings_accent_color">#D71921</color>
     <color name="light_separator_color">#12000000</color>
     <color name="light_ripple_color">#26000000</color>
@@ -20,13 +20,13 @@
     <color name="light_shadow_start_color">#5a000000</color>
     <color name="light_license_background_color">#ffffff</color>
     <color name="light_license_text_color">#212121</color>
-    <color name="light_card_item_background_color">#F7F9FD</color>
-    <color name="light_card_item_contrast_color">#DCE2EE</color>
+    <color name="light_card_item_background_color">#FFFFFF</color>
+    <color name="light_card_item_contrast_color">#EBEBEB</color>
     <color name="light_border_color">#1F000000</color>
 
     <!-- Dark Theme -->
-    <color name="dark_background_color">#14171C</color>
-    <color name="dark_dialog_background_color">#1E2229</color>
+    <color name="dark_background_color">#0A0A0A</color>
+    <color name="dark_dialog_background_color">#1C1C1C</color>
     <color name="dark_settings_accent_color">#D71921</color>
     <color name="dark_separator_color">#1AFFFFFF</color>
     <color name="dark_ripple_color">#26FFFFFF</color>
@@ -36,28 +36,28 @@
     <color name="dark_license_background_color">#424242</color>
     <color name="dark_license_text_color">#ffffff</color>
     <color name="dark_queue_background_color">#af000000</color>
-    <color name="dark_card_item_background_color">#1E2229</color>
-    <color name="dark_card_item_contrast_color">#2A303A</color>
+    <color name="dark_card_item_background_color">#1C1C1C</color>
+    <color name="dark_card_item_contrast_color">#292929</color>
     <color name="dark_border_color">#33FFFFFF</color>
 
     <!-- Black Theme -->
-    <color name="black_background_color">#0A0C0F</color>
+    <color name="black_background_color">#000000</color>
     <color name="black_settings_accent_color">@color/dark_settings_accent_color</color>
     <color name="black_separator_color">#1AFFFFFF</color>
     <color name="black_contrast_background_color">#1FFFFFFF</color>
-    <color name="black_card_item_background_color">#14171C</color>
-    <color name="black_card_item_contrast_color">#1F242C</color>
+    <color name="black_card_item_background_color">#141414</color>
+    <color name="black_card_item_contrast_color">#1F1F1F</color>
     <color name="black_border_color">#25FFFFFF</color>
 
 
     <!-- Material 3 tonal top bar: bar = surface container, pill/buttons = surface container highest.
          Change these 6 values to recolour the whole top bar. -->
-    <color name="m3_toolbar_container_light">#DEE5F1</color>
-    <color name="m3_toolbar_element_light">#CBD5E6</color>
-    <color name="m3_toolbar_container_dark">#1C2129</color>
-    <color name="m3_toolbar_element_dark">#2D3541</color>
-    <color name="m3_toolbar_container_black">#12161C</color>
-    <color name="m3_toolbar_element_black">#222934</color>
+    <color name="m3_toolbar_container_light">#F2F2F2</color>
+    <color name="m3_toolbar_element_light">#E4E4E4</color>
+    <color name="m3_toolbar_container_dark">#0A0A0A</color>
+    <color name="m3_toolbar_element_dark">#262626</color>
+    <color name="m3_toolbar_container_black">#000000</color>
+    <color name="m3_toolbar_element_black">#1C1C1C</color>
 
     <!-- Nothing/Music design tokens -->
     <color name="nothing_red">#D71921</color>

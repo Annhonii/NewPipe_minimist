@@ -8,6 +8,7 @@
     android:paddingBottom="8dp">
 
     <LinearLayout
+        android:stateListAnimator="@animator/press_scale"
         android:id="@+id/sortButton"
         android:layout_width="wrap_content"
         android:layout_height="32dp"
@@ -43,6 +44,7 @@
     </LinearLayout>
 
     <TextView
+        android:stateListAnimator="@animator/press_scale"
         android:id="@+id/clearHistoryButton"
         android:layout_width="wrap_content"
         android:layout_height="32dp"

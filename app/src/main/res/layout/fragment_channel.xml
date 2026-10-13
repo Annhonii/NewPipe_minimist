@@ -225,7 +225,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginBottom="10dp"
-                android:fontFamily="monospace"
+                android:fontFamily="@font/geist_mono"
                 android:text="(︶︹︺)"
                 android:textSize="35sp"
                 tools:ignore="HardcodedText" />

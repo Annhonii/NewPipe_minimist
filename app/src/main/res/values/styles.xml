@@ -15,6 +15,7 @@
 
     <!-- Base Theme -->
     <style name="Base.V21" parent="Theme.AppCompat.DayNight.NoActionBar">
+        <item name="android:fontFamily">@font/geist</item>
         <item name="actionColor">@color/white</item>
         <item name="floatingActionButtonStyle">@style/FloatingActionButtonTheme</item>
         <item name="toolbarSearchColor">@color/white</item>
@@ -25,6 +26,9 @@
         <item name="seekBarStyle">@style/Widget.App.SeekBar</item>
         <item name="popupMenuStyle">@style/Widget.App.PopupMenu</item>
         <item name="actionOverflowMenuStyle">@style/Widget.App.PopupMenu.Overflow</item>
+        <item name="android:progressBarStyle">@style/Widget.App.ProgressBar</item>
+        <item name="android:progressBarStyleLarge">@style/Widget.App.ProgressBar</item>
+        <item name="android:progressBarStyleLargeInverse">@style/Widget.App.ProgressBar</item>
         <item name="alertDialogTheme">@style/ThemeOverlay.App.AlertDialog</item>
         <item name="android:windowAnimationStyle">@style/Animation.App.Window</item>
     </style>
@@ -118,6 +122,7 @@
 
     <!-- Dialogs: floating rounded surfaces with accent text buttons -->
     <style name="LightDialogTheme" parent="Theme.AppCompat.DayNight.Dialog">
+        <item name="android:fontFamily">@font/geist</item>
         <item name="toolbar_container_color">@color/light_dialog_background_color</item>
         <item name="toolbar_element_color">@color/light_card_item_background_color</item>
         <item name="colorPrimary">@color/nothing_red</item>
@@ -144,6 +149,7 @@
     </style>
 
     <style name="DarkDialogTheme" parent="Theme.AppCompat.DayNight.Dialog">
+        <item name="android:fontFamily">@font/geist</item>
         <item name="toolbar_container_color">@color/dark_dialog_background_color</item>
         <item name="toolbar_element_color">@color/dark_card_item_background_color</item>
         <item name="colorPrimary">@color/nothing_red</item>
@@ -170,6 +176,7 @@
     </style>
 
     <style name="LightDialogMinWidthTheme" parent="Theme.AppCompat.DayNight.Dialog.MinWidth">
+        <item name="android:fontFamily">@font/geist</item>
         <item name="toolbar_container_color">@color/light_dialog_background_color</item>
         <item name="toolbar_element_color">@color/light_card_item_background_color</item>
         <item name="colorPrimary">@color/nothing_red</item>
@@ -196,6 +203,7 @@
     </style>
 
     <style name="DarkDialogMinWidthTheme" parent="Theme.AppCompat.DayNight.Dialog.MinWidth">
+        <item name="android:fontFamily">@font/geist</item>
         <item name="toolbar_container_color">@color/dark_dialog_background_color</item>
         <item name="toolbar_element_color">@color/dark_card_item_background_color</item>
         <item name="colorPrimary">@color/nothing_red</item>

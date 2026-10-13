@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Nothing-style loader: dotted rings that step round like a dot-matrix display. -->
+<animated-rotate xmlns:android="http://schemas.android.com/apk/res/android"
+    android:drawable="@drawable/progress_dot_ring_layers"
+    android:pivotX="50%"
+    android:pivotY="50%" />

@@ -132,6 +132,21 @@ public class MainFragment extends BaseFragment implements TabLayout.OnTabSelecte
         binding.mainTabLayout.setupWithViewPager(binding.pager);
         binding.mainTabLayout.addOnTabSelectedListener(this);
 
+        // Tab pages ease into each other: the page leaving shrinks and fades a little while
+        // the new one settles in, instead of a hard side-by-side slide.
+        binding.pager.setPageTransformer(false, (page, position) -> {
+            final float abs = Math.abs(position);
+            if (abs >= 1f) {
+                page.setAlpha(0f);
+                return;
+            }
+            final float scale = 1f - 0.05f * abs;
+            page.setAlpha(1f - 0.85f * abs);
+            page.setScaleX(scale);
+            page.setScaleY(scale);
+            page.setTranslationX(-position * page.getWidth() * 0.18f);
+        });
+
         setupTabs();
         updateTabLayoutPosition();
     }

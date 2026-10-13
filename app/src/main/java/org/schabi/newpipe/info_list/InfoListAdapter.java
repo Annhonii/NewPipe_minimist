@@ -1,16 +1,20 @@
 package org.schabi.newpipe.info_list;
 
 import android.content.Context;
+import android.os.SystemClock;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AnimationUtils;
+import android.view.animation.Interpolator;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import org.schabi.newpipe.R;
 import org.schabi.newpipe.databinding.PignateFooterBinding;
 import org.schabi.newpipe.extractor.InfoItem;
 import org.schabi.newpipe.extractor.channel.ChannelInfoItem;
@@ -84,6 +88,13 @@ public class InfoListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     private final InfoItemBuilder infoItemBuilder;
     private final List<InfoItem> infoItemList;
     private final HistoryRecordManager recordManager;
+
+    // Enter animation: rows rise and fade in with a short stagger, only the first time they
+    // appear (scrolling back up does not replay it).
+    private int lastAnimatedPosition = -1;
+    private long lastAttachTime = 0;
+    private int batchIndex = 0;
+    private Interpolator enterInterpolator = null;
 
     private boolean useMiniVariant = false;
     private boolean showFooter = false;
@@ -165,6 +176,7 @@ public class InfoListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             return;
         }
         infoItemList.clear();
+        lastAnimatedPosition = -1;
         notifyDataSetChanged();
     }
 
@@ -329,6 +341,51 @@ public class InfoListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             default:
                 return new FallbackViewHolder(new View(parent.getContext()));
         }
+    }
+
+    @Override
+    public void onViewAttachedToWindow(@NonNull final RecyclerView.ViewHolder holder) {
+        super.onViewAttachedToWindow(holder);
+        final int position = holder.getBindingAdapterPosition();
+        if (!(holder instanceof InfoItemHolder)
+                || holder instanceof CommentInfoItemHolder
+                || position == RecyclerView.NO_POSITION
+                || position <= lastAnimatedPosition) {
+            return;
+        }
+        lastAnimatedPosition = position;
+
+        final View view = holder.itemView;
+        final long now = SystemClock.uptimeMillis();
+        if (now - lastAttachTime > 150) {
+            batchIndex = 0; // a new batch (first load or a scroll): restart the stagger
+        }
+        lastAttachTime = now;
+        final long delay = Math.min(batchIndex++, 7) * 42L;
+
+        if (enterInterpolator == null) {
+            enterInterpolator = AnimationUtils.loadInterpolator(
+                    view.getContext(), R.interpolator.emphasized_decelerate);
+        }
+        final float rise = 28f * view.getResources().getDisplayMetrics().density / 2f;
+        view.setAlpha(0f);
+        view.setTranslationY(rise);
+        view.animate()
+                .alpha(1f)
+                .translationY(0f)
+                .setStartDelay(delay)
+                .setDuration(420)
+                .setInterpolator(enterInterpolator)
+                .start();
+    }
+
+    @Override
+    public void onViewDetachedFromWindow(@NonNull final RecyclerView.ViewHolder holder) {
+        super.onViewDetachedFromWindow(holder);
+        // Never leave a recycled row half-faded.
+        holder.itemView.animate().cancel();
+        holder.itemView.setAlpha(1f);
+        holder.itemView.setTranslationY(0f);
     }
 
     @Override
