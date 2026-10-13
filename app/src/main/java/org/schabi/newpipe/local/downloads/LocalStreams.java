@@ -143,7 +143,11 @@ public final class LocalStreams {
         } catch (final Exception ignored) {
             // unreadable metadata: still try to play the file with what is known
         } finally {
-            retriever.release();
+            try {
+                retriever.release();
+            } catch (final Exception ignored) {
+                // nothing to do if releasing fails
+            }
         }
         if (entry.audioOnly) {
             hasVideo = false;
