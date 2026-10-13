@@ -143,9 +143,14 @@ public class ScrollableTabLayout extends TabLayout {
         }
 
         final int shown = Math.min(count, pillVisibleTabs);
-        final int tabWidth = viewport / shown;
+        // The selected tab is wider (it shows icon + name); the others share the rest equally.
+        final int selectedIndex = getSelectedTabPosition();
+        final boolean expand = shown > 1 && selectedIndex >= 0 && selectedIndex < count;
+        final int selectedWidth = expand ? Math.round(viewport / (shown + 1.6f) * 2.6f) : 0;
+        final int tabWidth = expand ? (viewport - selectedWidth) / (shown - 1) : viewport / shown;
         // the left-over pixels go to the first tabs, so the tabs fill the whole pill exactly
-        final int remainder = count <= pillVisibleTabs ? viewport % shown : 0;
+        final int remainder = count <= pillVisibleTabs
+                ? (expand ? (viewport - selectedWidth) % (shown - 1) : viewport % shown) : 0;
         for (int i = 0; i < count; i++) {
             final Tab tab = getTabAt(i);
             final ViewGroup.LayoutParams params = tab == null ? null : tab.view.getLayoutParams();
@@ -154,7 +159,8 @@ public class ScrollableTabLayout extends TabLayout {
             }
             // The params object is changed in place: we are in the middle of a measure pass, so
             // the tab is measured with the new width right after this, without a new layout pass.
-            params.width = tabWidth + (i < remainder ? 1 : 0);
+            params.width = expand && i == selectedIndex
+                    ? selectedWidth : tabWidth + (i < remainder ? 1 : 0);
             if (params instanceof LinearLayout.LayoutParams) {
                 ((LinearLayout.LayoutParams) params).weight = 0;
             }

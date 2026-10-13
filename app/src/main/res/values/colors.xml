@@ -4,7 +4,7 @@
     <color name="contrastColor">@color/black</color>
     <color name="defaultIconTint">@color/black</color>
 
-    <color name="ic_launcher_background">#D71921</color>
+    <color name="ic_launcher_background">#0A0A0A</color>
 
     <color name="placeholder_background">#999999</color>
     <color name="placeholder_foreground">#6C6C6C</color>
@@ -12,7 +12,7 @@
     <!-- Light Theme -->
     <color name="light_background_color">#F2F2F2</color>
     <color name="light_dialog_background_color">#FFFFFF</color>
-    <color name="light_settings_accent_color">#D71921</color>
+    <color name="light_settings_accent_color">@color/accent_ice_light</color>
     <color name="light_separator_color">#12000000</color>
     <color name="light_ripple_color">#26000000</color>
     <color name="light_selected_color">#2a868686</color>
@@ -27,7 +27,7 @@
     <!-- Dark Theme -->
     <color name="dark_background_color">#0A0A0A</color>
     <color name="dark_dialog_background_color">#1C1C1C</color>
-    <color name="dark_settings_accent_color">#D71921</color>
+    <color name="dark_settings_accent_color">@color/accent_ice_dark</color>
     <color name="dark_separator_color">#1AFFFFFF</color>
     <color name="dark_ripple_color">#26FFFFFF</color>
     <color name="dark_selected_color">#2affffff</color>
@@ -60,9 +60,10 @@
     <color name="m3_toolbar_element_black">#1C1C1C</color>
 
     <!-- Nothing/Music design tokens -->
-    <color name="nothing_red">#D71921</color>
-    <color name="nothing_red_dim">#AE141B</color>
-    <color name="nothing_yellow">#FFC700</color>
+    <!-- Palette: pure black / grey / white + ice (cool pale blue). No Monet, no red. -->
+    <color name="accent_ice_dark">#CFE8F5</color>
+    <color name="accent_ice_light">#2F4A5C</color>
+    <color name="ice_soft">#8FB8D0</color>
     <color name="on_surface_light">#000000</color>
     <color name="on_surface_variant_light">#616161</color>
     <color name="on_surface_dark">#FFFFFF</color>
@@ -78,7 +79,7 @@
     <color name="queue_background_color">@color/dark_queue_background_color</color>
     <color name="drawer_header_font_color">#F2FFFFFF</color>
     <color name="duration_background_color">#aa000000</color>
-    <color name="live_duration_background_color">#c8E53935</color>
+    <color name="live_duration_background_color">#c8333333</color>
     <color name="playlist_stream_count_background_color">#e6000000</color>
     <color name="duration_text_color">#EEFFFFFF</color>
     <color name="video_overlay_color">#64000000</color>
@@ -96,8 +97,8 @@
     <!-- GigaGet download Theme colors -->
     <color name="audio_left_to_load_color">#1F808080</color>
     <color name="audio_already_load_color">#4D808080</color>
-    <color name="video_left_to_load_color">#26D71921</color>
-    <color name="video_already_load_color">#59D71921</color>
+    <color name="video_left_to_load_color">#26CFE8F5</color>
+    <color name="video_already_load_color">#59CFE8F5</color>
     <color name="subtitle_left_to_load_color">#1F808080</color>
     <color name="subtitle_already_load_color">#4D808080</color>
 

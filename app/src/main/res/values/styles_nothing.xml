@@ -114,9 +114,9 @@
 
     <!-- Default dialog theme for AlertDialog.Builder(context); light by default, dark in -night -->
     <style name="Theme.App.AlertDialog.Light" parent="Theme.AppCompat.Light.Dialog.Alert">
-        <item name="colorPrimary">@color/nothing_red</item>
-        <item name="colorPrimaryDark">@color/nothing_red</item>
-        <item name="colorAccent">@color/nothing_red</item>
+        <item name="colorPrimary">@color/accent_ice_light</item>
+        <item name="colorPrimaryDark">@color/accent_ice_light</item>
+        <item name="colorAccent">@color/accent_ice_light</item>
         <item name="android:windowBackground">@drawable/bg_dialog</item>
         <item name="android:windowAnimationStyle">@style/Animation.App.Dialog</item>
         <item name="android:textColorPrimary">@color/text_primary_light</item>
@@ -137,9 +137,9 @@
         <item name="windowBackground">@color/light_dialog_background_color</item>
     </style>
     <style name="Theme.App.AlertDialog.Dark" parent="Theme.AppCompat.Dialog.Alert">
-        <item name="colorPrimary">@color/nothing_red</item>
-        <item name="colorPrimaryDark">@color/nothing_red</item>
-        <item name="colorAccent">@color/nothing_red</item>
+        <item name="colorPrimary">@color/accent_ice_dark</item>
+        <item name="colorPrimaryDark">@color/accent_ice_dark</item>
+        <item name="colorAccent">@color/accent_ice_dark</item>
         <item name="android:windowBackground">@drawable/bg_dialog</item>
         <item name="android:windowAnimationStyle">@style/Animation.App.Dialog</item>
         <item name="android:textColorPrimary">@color/text_primary_dark</item>

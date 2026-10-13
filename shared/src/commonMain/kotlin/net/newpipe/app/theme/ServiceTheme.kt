@@ -19,52 +19,52 @@ import net.newpipe.app.Constants.KEY_STREAMING_SERVICE
 import org.koin.compose.koinInject
 
 val youTubeLightScheme = lightColorScheme(
-    primaryContainer = Color(0xFFE53935),
+    primaryContainer = Color(0xFF2F4A5C),
     onPrimaryContainer = Color(0xFFFFFFFF)
 )
 
 val youTubeDarkScheme = darkColorScheme(
-    primaryContainer = Color(0xFF992722),
+    primaryContainer = Color(0xFF3A3A3A),
     onPrimaryContainer = Color(0xFFFFFFFF)
 )
 
 val soundCloudLightScheme = lightColorScheme(
-    primaryContainer = Color(0xFFF57C00),
+    primaryContainer = Color(0xFF2F4A5C),
     onPrimaryContainer = Color(0xFFFFFFFF)
 )
 
 val soundCloudDarkScheme = darkColorScheme(
-    primaryContainer = Color(0xFFA35300),
+    primaryContainer = Color(0xFF3A3A3A),
     onPrimaryContainer = Color(0xFFFFFFFF)
 )
 
 val mediaCCCLightScheme = lightColorScheme(
-    primaryContainer = Color(0xFF9E9E9E),
+    primaryContainer = Color(0xFF2F4A5C),
     onPrimaryContainer = Color(0xFFFFFFFF)
 )
 
 val mediaCCCDarkScheme = darkColorScheme(
-    primaryContainer = Color(0xFF878787),
+    primaryContainer = Color(0xFF3A3A3A),
     onPrimaryContainer = Color(0xFFFFFFFF)
 )
 
 val peerTubeLightScheme = lightColorScheme(
-    primaryContainer = Color(0xFFFF6F00),
+    primaryContainer = Color(0xFF2F4A5C),
     onPrimaryContainer = Color(0xFFFFFFFF)
 )
 
 val peerTubeDarkScheme = darkColorScheme(
-    primaryContainer = Color(0xFFA34700),
+    primaryContainer = Color(0xFF3A3A3A),
     onPrimaryContainer = Color(0xFFFFFFFF)
 )
 
 val bandCampLightScheme = lightColorScheme(
-    primaryContainer = Color(0xFF17A0C4),
+    primaryContainer = Color(0xFF2F4A5C),
     onPrimaryContainer = Color(0xFFFFFFFF)
 )
 
 val bandCampDarkScheme = darkColorScheme(
-    primaryContainer = Color(0xFF1383A1),
+    primaryContainer = Color(0xFF3A3A3A),
     onPrimaryContainer = Color(0xFFFFFFFF)
 )
 

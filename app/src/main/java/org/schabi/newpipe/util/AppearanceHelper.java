@@ -24,10 +24,6 @@ public final class AppearanceHelper {
     public static void applyOverlays(@NonNull final Context context) {
         final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
-        // Dynamic (Material You) colour is always on; below Android 12 the style falls back
-        // to the default accent.
-        context.getTheme().applyStyle(R.style.ThemeOverlay_Accent_Dynamic, true);
-
         if (prefs.getBoolean(context.getString(R.string.disable_animations_key), false)) {
             context.getTheme().applyStyle(R.style.ThemeOverlay_App_NoAnimations, true);
         }

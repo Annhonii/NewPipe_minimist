@@ -1,38 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- YouTube -->
-    <color name="light_youtube_primary_color">#D71921</color>
-    <color name="light_youtube_accent_color">#000000</color>
+    <color name="light_youtube_primary_color">@color/accent_ice_light</color>
+    <color name="light_youtube_accent_color">@color/accent_ice_light</color>
 
-    <color name="dark_youtube_primary_color">#D71921</color>
-    <color name="dark_youtube_accent_color">#FFFFFF</color>
+    <color name="dark_youtube_primary_color">@color/accent_ice_dark</color>
+    <color name="dark_youtube_accent_color">@color/accent_ice_dark</color>
 
     <!-- SoundCloud -->
-    <color name="light_soundcloud_primary_color">#D71921</color>
-    <color name="light_soundcloud_accent_color">#000000</color>
+    <color name="light_soundcloud_primary_color">@color/accent_ice_light</color>
+    <color name="light_soundcloud_accent_color">@color/accent_ice_light</color>
 
-    <color name="dark_soundcloud_primary_color">#D71921</color>
-    <color name="dark_soundcloud_accent_color">#FFFFFF</color>
+    <color name="dark_soundcloud_primary_color">@color/accent_ice_dark</color>
+    <color name="dark_soundcloud_accent_color">@color/accent_ice_dark</color>
 
     <!-- PeerTube -->
-    <color name="light_peertube_primary_color">#D71921</color>
-    <color name="light_peertube_accent_color">#000000</color>
+    <color name="light_peertube_primary_color">@color/accent_ice_light</color>
+    <color name="light_peertube_accent_color">@color/accent_ice_light</color>
 
-    <color name="dark_peertube_primary_color">#D71921</color>
-    <color name="dark_peertube_accent_color">#FFFFFF</color>
+    <color name="dark_peertube_primary_color">@color/accent_ice_dark</color>
+    <color name="dark_peertube_accent_color">@color/accent_ice_dark</color>
 
     <!-- media.ccc.de -->
-    <color name="light_media_ccc_primary_color">#D71921</color>
-    <color name="light_media_ccc_accent_color">#000000</color>
+    <color name="light_media_ccc_primary_color">@color/accent_ice_light</color>
+    <color name="light_media_ccc_accent_color">@color/accent_ice_light</color>
 
-    <color name="dark_media_ccc_primary_color">#D71921</color>
-    <color name="dark_media_ccc_accent_color">#FFFFFF</color>
+    <color name="dark_media_ccc_primary_color">@color/accent_ice_dark</color>
+    <color name="dark_media_ccc_accent_color">@color/accent_ice_dark</color>
 
     <!-- Bandcamp -->
-    <color name="light_bandcamp_primary_color">#D71921</color>
-    <color name="light_bandcamp_accent_color">#000000</color>
+    <color name="light_bandcamp_primary_color">@color/accent_ice_light</color>
+    <color name="light_bandcamp_accent_color">@color/accent_ice_light</color>
 
-    <color name="dark_bandcamp_primary_color">#D71921</color>
-    <color name="dark_bandcamp_accent_color">#FFFFFF</color>
+    <color name="dark_bandcamp_primary_color">@color/accent_ice_dark</color>
+    <color name="dark_bandcamp_accent_color">@color/accent_ice_dark</color>
 
 </resources>

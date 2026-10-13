@@ -36,6 +36,10 @@ NOTE: nothing was compiled here. If the build fails, check first: progress_dot_r
 NOTE: still not compiled here. Check first: bg_sheet_top / bg_search_field use ?attr/surface_bright_color and ?attr/toolbar_element_color,
 player.xml padding on the 3 buttons (icon size in landscape / popup), toolbar_search_layout margins vs clear button.
 
+## DONE in pass 4 (user request)
+- Monet/dynamic colour removed (values-v31, accent presets, overlay). Palette = black/grey/white + ice (accent_ice_dark #CFE8F5, accent_ice_light #2F4A5C). Red removed everywhere (also Compose Color.kt + ServiceTheme).
+- Nav pill rebuilt: grey capsule, selected tab = darker capsule with icon + name (nav_pill_tab.xml, ScrollableTabLayout widens selected tab, MainFragment sets custom tab views). Not compiled here.
+
 ## TODO (pass 4 = remaining)
 1. Player: seekbar in fullscreen, popup/queue panels, fast-seek overlay, play/pause disc inside popup mode.
 2. Search: filter chips, empty/no-results state in Ndot.
