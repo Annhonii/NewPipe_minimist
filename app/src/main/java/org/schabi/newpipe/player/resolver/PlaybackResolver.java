@@ -291,7 +291,11 @@ public interface PlaybackResolver extends Resolver<StreamInfo, MediaSource> {
             throw new ResolverException("Non URI progressive contents are not supported");
         }
         throwResolverExceptionIfUrlNullOrEmpty(stream.getContent());
-        return dataSource.getProgressiveMediaSourceFactory().createMediaSource(
+        final ProgressiveMediaSource.Factory factory =
+                org.schabi.newpipe.local.downloads.LocalStreams.isLocalUrl(stream.getContent())
+                        ? dataSource.getCachelessProgressiveMediaSourceFactory()
+                        : dataSource.getProgressiveMediaSourceFactory();
+        return factory.createMediaSource(
                 new MediaItem.Builder()
                         .setTag(metadata)
                         .setUri(Uri.parse(stream.getContent()))

@@ -474,7 +474,8 @@ public final class VideoDetailFragment
     private String ytLikeState = "INDIFFERENT";
 
     private boolean isYoutubeInfo(@Nullable final StreamInfo info) {
-        return info != null && info.getServiceId() == ServiceList.YouTube.getServiceId();
+        return info != null && info.getServiceId() == ServiceList.YouTube.getServiceId()
+                && !org.schabi.newpipe.local.downloads.LocalStreams.isLocalUrl(info.getUrl());
     }
 
     private void setupYtEngagement(@NonNull final StreamInfo info) {
@@ -1111,6 +1112,9 @@ public final class VideoDetailFragment
     }
 
     private boolean shouldShowComments() {
+        if (org.schabi.newpipe.local.downloads.LocalStreams.isLocalUrl(url)) {
+            return false; // downloaded file: no comments
+        }
         try {
             return showComments && NewPipe.getService(serviceId)
                     .getServiceInfo()
@@ -1859,7 +1863,9 @@ public final class VideoDetailFragment
         }
 
         binding.detailControlsDownload.setVisibility(
-                StreamTypeUtil.isLiveStream(info.getStreamType()) ? View.GONE : View.VISIBLE);
+                StreamTypeUtil.isLiveStream(info.getStreamType())
+                        || org.schabi.newpipe.local.downloads.LocalStreams.isLocalUrl(info.getUrl())
+                        ? View.GONE : View.VISIBLE);
         binding.detailControlsBackground.setVisibility(
                 info.getAudioStreams().isEmpty() && info.getVideoStreams().isEmpty()
                         ? View.GONE : View.VISIBLE);
@@ -2993,6 +2999,8 @@ public final class VideoDetailFragment
 
         mask.setColor(ThemeHelper.resolveColorFromAttr(
                 requireContext(), R.attr.card_item_background_color));
+        mask.setBackdropColor(ThemeHelper.resolveColorFromAttr(
+                requireContext(), R.attr.windowBackground));
         mask.setGeometry(margin, 0f, root.getWidth() - margin, cardHeight, cardRadius,
                 left, top, right, bottom, videoLeftRadius, videoRightRadius);
         mask.setAlpha(1f - slide);

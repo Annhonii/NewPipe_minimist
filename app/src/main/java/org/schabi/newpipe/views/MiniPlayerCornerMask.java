@@ -19,6 +19,8 @@ import androidx.annotation.Nullable;
  */
 public class MiniPlayerCornerMask extends View {
     private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint cornerPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Path cornerPath = new Path();
     private final Path path = new Path();
     private final RectF card = new RectF();
     private final RectF hole = new RectF();
@@ -50,6 +52,12 @@ public class MiniPlayerCornerMask extends View {
         invalidate();
     }
 
+    /** Colour of the page behind the card, used to cut the video's square corners. */
+    public void setBackdropColor(final int color) {
+        cornerPaint.setColor(color);
+        invalidate();
+    }
+
     public void setGeometry(final float cardLeft, final float cardTop, final float cardRight,
                             final float cardBottom, final float cardCornerRadius,
                             final float videoLeft, final float videoTop,
@@ -69,6 +77,19 @@ public class MiniPlayerCornerMask extends View {
         if (!hasHole) {
             return;
         }
+        // The video sits flush with the card, so its square corners would stick out past the
+        // card's rounded corners (video corner radius == card radius, so the hole there cancels
+        // the card). Inside the video's bounds, paint everything outside the rounded card in the
+        // page colour to cut those corners off.
+        cornerPath.reset();
+        cornerPath.setFillType(Path.FillType.EVEN_ODD);
+        cornerPath.addRect(hole, Path.Direction.CW);
+        cornerPath.addRoundRect(card, cardRadius, cardRadius, Path.Direction.CW);
+        canvas.save();
+        canvas.clipRect(hole);
+        canvas.drawPath(cornerPath, cornerPaint);
+        canvas.restore();
+
         path.reset();
         path.setFillType(Path.FillType.EVEN_ODD);
         path.addRoundRect(card, cardRadius, cardRadius, Path.Direction.CW);

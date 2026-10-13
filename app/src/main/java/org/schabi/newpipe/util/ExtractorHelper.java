@@ -33,6 +33,8 @@ import androidx.core.text.HtmlCompat;
 import androidx.preference.PreferenceManager;
 
 import org.schabi.newpipe.MainActivity;
+import org.schabi.newpipe.App;
+import org.schabi.newpipe.local.downloads.LocalStreams;
 import org.schabi.newpipe.R;
 import org.schabi.newpipe.extractor.Info;
 import org.schabi.newpipe.extractor.InfoItem;
@@ -114,8 +116,11 @@ public final class ExtractorHelper {
     public static Single<StreamInfo> getStreamInfo(final int serviceId, final String url,
                                                    final boolean forceLoad) {
         checkServiceId(serviceId);
-        return checkCache(forceLoad, serviceId, url, InfoCache.Type.STREAM,
-                Single.fromCallable(() -> StreamInfo.getInfo(NewPipe.getService(serviceId), url)));
+        // downloaded files are described locally, no extractor knows them
+        final Single<StreamInfo> load = LocalStreams.isLocalUrl(url)
+                ? Single.fromCallable(() -> LocalStreams.buildInfo(App.getInstance(), url))
+                : Single.fromCallable(() -> StreamInfo.getInfo(NewPipe.getService(serviceId), url));
+        return checkCache(forceLoad, serviceId, url, InfoCache.Type.STREAM, load);
     }
 
     public static Single<ChannelInfo> getChannelInfo(final int serviceId, final String url,

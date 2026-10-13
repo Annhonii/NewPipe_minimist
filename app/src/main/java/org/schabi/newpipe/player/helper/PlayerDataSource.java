@@ -161,6 +161,12 @@ public class PlayerDataSource {
                 .setContinueLoadingCheckIntervalBytes(progressiveLoadIntervalBytes);
     }
 
+    /** For local files: no point in copying them into the ExoPlayer cache. */
+    public ProgressiveMediaSource.Factory getCachelessProgressiveMediaSourceFactory() {
+        return new ProgressiveMediaSource.Factory(cachelessDataSourceFactory)
+                .setContinueLoadingCheckIntervalBytes(progressiveLoadIntervalBytes);
+    }
+
     public SsMediaSource.Factory getSSMediaSourceFactory() {
         return new SsMediaSource.Factory(
                 new DefaultSsChunkSource.Factory(cachelessDataSourceFactory),

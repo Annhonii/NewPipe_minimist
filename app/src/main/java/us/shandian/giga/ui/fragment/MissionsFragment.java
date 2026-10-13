@@ -179,7 +179,7 @@ public class MissionsFragment extends Fragment {
         super.onCreateOptionsMenu(menu, inflater);
         // When this page is a tab of the main screen nobody inflated the downloads menu yet
         // (DownloadActivity does it on its own, and then the items already exist).
-        if (menu.findItem(R.id.clear_list) == null) {
+        if (menu.findItem(R.id.switch_mode) == null) {
             inflater.inflate(R.menu.download_menu, menu);
         }
         final MenuItem switchMode = menu.findItem(R.id.switch_mode);
@@ -192,7 +192,6 @@ public class MissionsFragment extends Fragment {
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
         mSwitch = menu.findItem(R.id.switch_mode);
-        mClear = menu.findItem(R.id.clear_list);
         mStart = menu.findItem(R.id.start_downloads);
         mPause = menu.findItem(R.id.pause_downloads);
 
@@ -207,9 +206,6 @@ public class MissionsFragment extends Fragment {
         if (itemId == R.id.switch_mode) {
             mLinear = !mLinear;
             updateList();
-            return true;
-        } else if (itemId == R.id.clear_list) {
-            showClearDownloadHistoryPrompt();
             return true;
         } else if (itemId == R.id.start_downloads) {
             mBinder.getDownloadManager().startAllMissions();
@@ -272,9 +268,10 @@ public class MissionsFragment extends Fragment {
     }
 
     private void setAdapterButtons() {
-        if (mClear == null || mStart == null || mPause == null) return;
+        // the "clear history" (dustbin) button was removed from the menu, so mClear stays null
+        if (mStart == null || mPause == null) return;
 
-        mAdapter.setClearButton(mClear);
+        if (mClear != null) mAdapter.setClearButton(mClear);
         mAdapter.setMasterButtons(mStart, mPause);
     }
 

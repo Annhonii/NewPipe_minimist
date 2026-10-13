@@ -426,11 +426,10 @@ public class MissionAdapter extends Adapter<ViewHolder> implements Handler.Callb
 
         // audio / video downloads play in the app's own player
         if (mimeType != null && (mimeType.startsWith("video/") || mimeType.startsWith("audio/"))) {
-            final String fileName = mission.storage.getName();
-            final int dot = fileName == null ? -1 : fileName.lastIndexOf('.');
-            org.schabi.newpipe.local.downloads.LocalPlayerActivity.start(mContext,
-                    mission.storage.getUri(),
-                    dot > 0 ? fileName.substring(0, dot) : fileName);
+            // same player as online streams (not the simple LocalPlayerActivity)
+            org.schabi.newpipe.local.downloads.LocalStreams.open(mContext,
+                    mission.storage.getUri(), mission.storage.getName(),
+                    mimeType.startsWith("audio/"));
             return;
         }
 
