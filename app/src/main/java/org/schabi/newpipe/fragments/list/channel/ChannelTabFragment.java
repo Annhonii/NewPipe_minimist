@@ -44,6 +44,15 @@ public class ChannelTabFragment extends BaseListInfoFragment<InfoItem, ChannelTa
     protected ListLinkHandler tabHandler;
     @State
     protected String channelName;
+    /** Logo of the channel, shown on every video that has no logo of its own. */
+    private List<org.schabi.newpipe.extractor.Image> channelAvatars;
+
+    public void setChannelAvatars(final List<org.schabi.newpipe.extractor.Image> avatars) {
+        channelAvatars = avatars;
+        if (infoListAdapter != null) {
+            infoListAdapter.setFallbackUploaderAvatars(avatars);
+        }
+    }
 
     private PlaylistControlBinding playlistControlBinding;
 
@@ -87,11 +96,7 @@ public class ChannelTabFragment extends BaseListInfoFragment<InfoItem, ChannelTa
 
     @Override
     protected Supplier<View> getListHeaderSupplier() {
-        if (ChannelTabHelper.isStreamsTab(tabHandler)) {
-            playlistControlBinding = PlaylistControlBinding
-                    .inflate(activity.getLayoutInflater(), itemsList, false);
-            return playlistControlBinding::getRoot;
-        }
+        // no Background / Play All / Popup row above the videos
         return null;
     }
 
@@ -117,6 +122,7 @@ public class ChannelTabFragment extends BaseListInfoFragment<InfoItem, ChannelTa
 
     @Override
     public void handleResult(@NonNull final ChannelTabInfo result) {
+        infoListAdapter.setFallbackUploaderAvatars(channelAvatars);
         super.handleResult(result);
 
         // FIXME this is a really hacky workaround, to avoid storing useless data in the fragment

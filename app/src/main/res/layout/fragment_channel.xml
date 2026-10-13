@@ -11,7 +11,7 @@
         android:id="@+id/app_bar_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:theme="@style/ToolbarTheme"
+        android:background="?android:attr/colorBackground"
         app:elevation="0dp">
 
         <org.schabi.newpipe.views.CustomCollapsingToolbarLayout
@@ -53,7 +53,7 @@
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintVertical_bias="1.0"
                     app:shapeAppearance="@style/CircularImageView"
-                    app:strokeColor="#ffffff"
+                    app:strokeColor="?android:attr/colorBackground"
                     app:strokeWidth="2dp"
                     app:tint="@null" />
 
@@ -146,12 +146,12 @@
             android:id="@+id/tab_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="?attr/colorPrimary"
+            android:background="?android:attr/colorBackground"
             app:tabGravity="fill"
-            app:tabIndicatorColor="@color/white"
+            app:tabIndicatorColor="?android:attr/textColorPrimary"
             app:tabMode="scrollable"
-            app:tabRippleColor="@color/white"
-            app:tabTextColor="@color/white" />
+            app:tabSelectedTextColor="?android:attr/textColorPrimary"
+            app:tabTextColor="?android:attr/textColorSecondary" />
 
         <androidx.viewpager.widget.ViewPager
             android:id="@+id/view_pager"

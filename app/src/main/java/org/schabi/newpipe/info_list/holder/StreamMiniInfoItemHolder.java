@@ -101,11 +101,15 @@ public class StreamMiniInfoItemHolder extends InfoItemHolder {
 
         // Channel logo next to the channel name (hidden when the item has no logo)
         if (itemUploaderAvatarView != null) {
-            if (item.getUploaderAvatars().isEmpty()) {
+            final java.util.List<org.schabi.newpipe.extractor.Image> avatars =
+                    item.getUploaderAvatars().isEmpty()
+                            ? itemBuilder.getFallbackUploaderAvatars()
+                            : item.getUploaderAvatars();
+            if (avatars.isEmpty()) {
                 itemUploaderAvatarView.setVisibility(View.GONE);
             } else {
                 itemUploaderAvatarView.setVisibility(View.VISIBLE);
-                CoilHelper.INSTANCE.loadAvatar(itemUploaderAvatarView, item.getUploaderAvatars());
+                CoilHelper.INSTANCE.loadAvatar(itemUploaderAvatarView, avatars);
             }
             // tapping the logo opens the channel directly
             if (item.getUploaderUrl() == null || item.getUploaderUrl().isEmpty()) {

@@ -6,6 +6,7 @@
 package org.schabi.newpipe.info_list
 
 import android.content.Context
+import org.schabi.newpipe.extractor.Image
 import org.schabi.newpipe.extractor.channel.ChannelInfoItem
 import org.schabi.newpipe.extractor.comments.CommentsInfoItem
 import org.schabi.newpipe.extractor.playlist.PlaylistInfoItem
@@ -17,4 +18,7 @@ class InfoItemBuilder(val context: Context) {
     var onChannelSelectedListener: OnClickGesture<ChannelInfoItem>? = null
     var onPlaylistSelectedListener: OnClickGesture<PlaylistInfoItem>? = null
     var onCommentsSelectedListener: OnClickGesture<CommentsInfoItem>? = null
+
+    /** Logo used for stream items that carry none (e.g. all videos on a channel page). */
+    var fallbackUploaderAvatars: List<Image> = emptyList()
 }

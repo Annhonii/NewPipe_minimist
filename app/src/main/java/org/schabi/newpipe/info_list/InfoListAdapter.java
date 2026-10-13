@@ -115,6 +115,12 @@ public class InfoListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         infoItemBuilder.setOnCommentsSelectedListener(listener);
     }
 
+    public void setFallbackUploaderAvatars(
+            @Nullable final List<org.schabi.newpipe.extractor.Image> avatars) {
+        infoItemBuilder.setFallbackUploaderAvatars(
+                avatars == null ? java.util.Collections.emptyList() : avatars);
+    }
+
     public void setUseMiniVariant(final boolean useMiniVariant) {
         this.useMiniVariant = useMiniVariant;
     }
