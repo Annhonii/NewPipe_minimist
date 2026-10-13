@@ -1,10 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Filled round icon button (Music's <FilledIconButton />), with the same fine outline as the
-     search pill. -->
+     search pill. The circle has a fixed 40dp size and is centred, so it stays a perfect circle
+     even when the toolbar stretches the button taller than it is wide. -->
 <ripple xmlns:android="http://schemas.android.com/apk/res/android"
     android:color="?attr/colorControlHighlight">
-    <item>
+    <item android:gravity="center">
         <shape android:shape="oval">
+            <size
+                android:width="40dp"
+                android:height="40dp" />
             <solid android:color="?attr/card_item_background_color" />
             <stroke
                 android:width="1dp"
