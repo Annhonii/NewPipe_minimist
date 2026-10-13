@@ -20,7 +20,6 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
 import androidx.core.graphics.ColorUtils;
 import androidx.core.view.MenuProvider;
 import androidx.preference.PreferenceManager;
@@ -203,6 +202,7 @@ public class ChannelFragment extends BaseStateFragment<ChannelInfo>
         if (!ImageStrategy.shouldLoadImages()) {
             // do not waste space for the banner if it is not going to be loaded
             binding.channelBannerImage.setImageDrawable(null);
+            binding.channelBannerImage.setVisibility(View.GONE);
         }
     }
 
@@ -386,12 +386,16 @@ public class ChannelFragment extends BaseStateFragment<ChannelInfo>
         final int backgroundDuration = isButtonVisible ? 300 : 0;
         final int textDuration = isButtonVisible ? 200 : 0;
 
-        final int subscribedBackground = ContextCompat
-                .getColor(activity, R.color.subscribed_background_color);
-        final int subscribedText = ContextCompat.getColor(activity, R.color.subscribed_text_color);
-        final int subscribeBackground = ColorUtils.blendARGB(ThemeHelper
-                .resolveColorFromAttr(activity, R.attr.colorPrimary), subscribedBackground, 0.35f);
-        final int subscribeText = ContextCompat.getColor(activity, R.color.subscribe_text_color);
+        // YouTube look: "Subscribed" = soft grey pill with normal text,
+        // "Subscribe" = solid pill in the text colour with page-coloured text
+        final int textColor = ThemeHelper.resolveColorFromAttr(activity,
+                android.R.attr.textColorPrimary);
+        final int pageColor = ThemeHelper.resolveColorFromAttr(activity,
+                android.R.attr.colorBackground);
+        final int subscribedBackground = ColorUtils.setAlphaComponent(textColor, 0x1F);
+        final int subscribedText = textColor;
+        final int subscribeBackground = textColor;
+        final int subscribeText = pageColor;
 
         if (isSubscribed) {
             binding.channelSubscribeButton.setText(R.string.subscribed_button_title);
@@ -592,10 +596,26 @@ public class ChannelFragment extends BaseStateFragment<ChannelInfo>
         setInitialData(result.getServiceId(), result.getOriginalUrl(), result.getName());
 
         if (ImageStrategy.shouldLoadImages() && !result.getBanners().isEmpty()) {
+            binding.channelBannerImage.setVisibility(View.VISIBLE);
             CoilHelper.INSTANCE.loadBanner(binding.channelBannerImage, result.getBanners());
         } else {
             // do not waste space for the banner, if the user disabled images or there is not one
             binding.channelBannerImage.setImageDrawable(null);
+            binding.channelBannerImage.setVisibility(View.GONE);
+        }
+
+        final String description = result.getDescription();
+        if (TextUtils.isEmpty(description) || TextUtils.isEmpty(description.trim())) {
+            binding.channelDescriptionView.setVisibility(View.GONE);
+        } else {
+            binding.channelDescriptionView.setText(description.trim());
+            binding.channelDescriptionView.setVisibility(View.VISIBLE);
+            binding.channelDescriptionView.setOnClickListener(v ->
+                    new androidx.appcompat.app.AlertDialog.Builder(activity)
+                            .setTitle(result.getName())
+                            .setMessage(description.trim())
+                            .setPositiveButton(android.R.string.ok, null)
+                            .show());
         }
 
         CoilHelper.INSTANCE.loadAvatar(binding.channelAvatarView, result.getAvatars());
