@@ -10,6 +10,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.HapticFeedbackConstants;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -400,6 +401,10 @@ public class MainFragment extends BaseFragment implements TabLayout.OnTabSelecte
             Log.d(TAG, "onTabSelected() called with: selectedTab = [" + selectedTab + "]");
         }
         updateTitleForTab(selectedTab.getPosition());
+        // light tick when the pill switches tab
+        if (binding != null) {
+            binding.mainTabLayout.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK);
+        }
         // show / hide the settings button of the top bar
         if (activity != null) {
             activity.invalidateOptionsMenu();

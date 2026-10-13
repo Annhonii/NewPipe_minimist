@@ -536,7 +536,9 @@
                 android:layout_height="40dp"
                 android:layout_marginEnd="10dp"
                 android:layout_weight="1"
-                android:background="?attr/selectableItemBackgroundBorderless"
+                android:background="@drawable/bg_player_ctrl"
+                android:padding="10dp"
+                android:stateListAnimator="@animator/press_scale"
                 android:clickable="true"
                 android:contentDescription="@string/previous_stream"
                 android:focusable="true"
@@ -550,11 +552,13 @@
                 android:layout_width="0dp"
                 android:layout_height="60dp"
                 android:layout_weight="1"
-                android:background="?attr/selectableItemBackgroundBorderless"
+                android:background="@drawable/bg_player_play"
+                android:padding="18dp"
+                android:stateListAnimator="@animator/press_scale"
                 android:contentDescription="@string/pause"
                 android:scaleType="fitCenter"
                 android:src="@drawable/ic_pause"
-                app:tint="@color/white" />
+                app:tint="@color/black" />
 
             <androidx.appcompat.widget.AppCompatImageButton
                 android:id="@+id/playNextButton"
@@ -562,7 +566,9 @@
                 android:layout_height="40dp"
                 android:layout_marginStart="10dp"
                 android:layout_weight="1"
-                android:background="?attr/selectableItemBackgroundBorderless"
+                android:background="@drawable/bg_player_ctrl"
+                android:padding="10dp"
+                android:stateListAnimator="@animator/press_scale"
                 android:clickable="true"
                 android:contentDescription="@string/next_stream"
                 android:focusable="true"

@@ -26,12 +26,20 @@ The gap was MOTION + tactile feedback, so pass 2 focused there:
 - Settings section labels: small, muted, normal weight.
 NOTE: nothing was compiled here. If the build fails, check first: progress_dot_ring (animated-rotate), InfoListAdapter imports, MainFragment lambda.
 
-## TODO (pass 3 = last ~30%)
-1. Player UI (player.xml): control buttons background + press feedback, seekbar look, popup/queue panels, fullscreen overlay buttons, fast-seek overlay.
-2. Search screen: toolbar search field as a pill, suggestion rows (item_search_suggestion), filter chips, empty/no-results state in Ndot.
-3. Drawer/account header, bottom sheets (bottom_sheet_video_info, long-press menus), dialogs list rows, download dialog + downloads (mission_item) screens.
-4. Splash screen: Ndot wordmark + dot loader; app icon check.
-5. Shimmer/placeholder thumbnails in Nothing grey, empty states: make sure every empty list uses list_empty_view style.
-6. Channel page header, playlist header, subscription feed headers: spacing/typography (NType82 titles).
-7. Haptics: light tick on switch/tab toggle (View.performHapticFeedback) where missing.
-8. Final consistency pass over Light/Dark/Black and fix anything that still looks like stock NewPipe. Update this file.
+## DONE in pass 3 (partial, ~30%)
+- Splash: stock red + NewPipe triangle removed. Now Nothing red dot on #F2F2F2 (light) / #000 (dark); opening nav bar transparent.
+- Notification/status-bar glyph ic_newpipe_triangle_white.xml replaced by ring + dot (same file name, so no code change).
+- Player: play/pause = white disc with black icon (bg_player_play), prev/next = translucent discs (bg_player_ctrl), press_scale on all three.
+- Search: toolbar field is a tonal pill (bg_search_field); suggestion rows 52dp min, 15sp, softer icon, more padding.
+- Bottom sheet (bottom_sheet_video_info): 28dp top corners (bg_sheet_top), title in NType82.
+- Haptics: CLOCK_TICK on main tab switch (MainFragment.onTabSelected).
+NOTE: still not compiled here. Check first: bg_sheet_top / bg_search_field use ?attr/surface_bright_color and ?attr/toolbar_element_color,
+player.xml padding on the 3 buttons (icon size in landscape / popup), toolbar_search_layout margins vs clear button.
+
+## TODO (pass 4 = remaining)
+1. Player: seekbar in fullscreen, popup/queue panels, fast-seek overlay, play/pause disc inside popup mode.
+2. Search: filter chips, empty/no-results state in Ndot.
+3. Drawer/account header, long-press menus, dialog list rows, download dialog + downloads (mission_item) screens.
+4. App icon check (mipmaps still stock?), shimmer/placeholder thumbnails in Nothing grey.
+5. Channel page header, playlist header, subscription feed headers: spacing/typography (NType82 titles).
+6. More haptics (switches, chips), then final Light/Dark/Black consistency pass.

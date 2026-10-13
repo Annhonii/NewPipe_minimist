@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?attr/windowBackground"
+    android:background="@drawable/bg_sheet_top"
     android:orientation="vertical">
 
     <View
@@ -16,10 +16,10 @@
         android:id="@+id/video_info_sheet_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingHorizontal="16dp"
-        android:paddingVertical="12dp"
-        android:textSize="16sp"
-        android:textStyle="bold" />
+        android:fontFamily="@font/ntype82"
+        android:paddingHorizontal="20dp"
+        android:paddingVertical="14dp"
+        android:textSize="20sp" />
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/video_info_sheet_container"
