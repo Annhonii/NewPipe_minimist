@@ -9,6 +9,6 @@
     android:insetBottom="4dp">
     <shape android:shape="rectangle">
         <solid android:color="#FFFFFFFF" />
-        <corners android:radius="100dp" />
+        <corners android:radius="12dp" />
     </shape>
 </inset>

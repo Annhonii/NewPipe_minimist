@@ -2979,7 +2979,7 @@ public final class VideoDetailFragment
         }
         final float margin = getResources().getDimension(R.dimen.mini_player_margin);
         final float cardHeight = getResources().getDimension(R.dimen.mini_player_height);
-        // squarish card: the card background (bg_mini_player, 14dp) and the video corners use
+        // rounded-rectangle card: the card background (bg_mini_player, 14dp) and the video corners use
         // the same radius, so the video sits flush inside the card without sticking out
         final float cardRadius = 14 * getResources().getDisplayMetrics().density;
         final float videoLeftRadius = cardRadius;

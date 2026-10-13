@@ -86,10 +86,10 @@
     <dimen name="video_item_detail_heart_image_size">18sp</dimen>
     <dimen name="channel_avatar_size">70dp</dimen>
     <dimen name="sub_channel_avatar_size">35dp</dimen>
-    <dimen name="mini_player_height">60dp</dimen>
+    <dimen name="mini_player_height">72dp</dimen>
     <!-- same side margin as the floating nav pill, so both have the same width -->
     <dimen name="mini_player_margin">16dp</dimen>
-    <dimen name="mini_player_video_width">104dp</dimen>
+    <dimen name="mini_player_video_width">128dp</dimen>
     <!-- space kept free below the mini player when the floating nav pill is visible -->
     <dimen name="mini_player_pill_space">88dp</dimen>
     <!-- floating nav pill: 60 + 16 = 76dp of screen taken, plus a 12dp breathing gap = 88dp -->

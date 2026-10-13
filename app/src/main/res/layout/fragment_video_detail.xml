@@ -752,7 +752,7 @@
         <LinearLayout
             android:id="@+id/overlay_metadata_layout"
             android:layout_width="match_parent"
-            android:layout_height="60dp"
+            android:layout_height="@dimen/mini_player_height"
             android:layout_toStartOf="@+id/overlay_buttons_layout"
             android:layout_toEndOf="@+id/overlay_thumbnail"
             android:layout_marginStart="12dp"
@@ -795,7 +795,7 @@
         <LinearLayout
             android:id="@+id/overlay_buttons_layout"
             android:layout_width="wrap_content"
-            android:layout_height="60dp"
+            android:layout_height="@dimen/mini_player_height"
             android:layout_alignParentEnd="true"
             android:gravity="center_vertical"
             android:theme="@style/ContrastTintTheme"
