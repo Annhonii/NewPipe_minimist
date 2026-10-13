@@ -2913,6 +2913,9 @@ public final class VideoDetailFragment
      *
      * @param rawSlide 0 = collapsed (mini player), 1 = fully expanded
      */
+    /** Gap (dp) between the minimised video and the card edge (top, bottom and left). */
+    private static final float MINI_VIDEO_PAD_DP = 4f;
+
     private void applyMiniPlayerLook(final float rawSlide) {
         if (binding == null) {
             return;
@@ -2932,8 +2935,9 @@ public final class VideoDetailFragment
         } else if (width > 0 && height > 0) {
             final float margin = getResources().getDimension(R.dimen.mini_player_margin);
             final float cardHeight = getResources().getDimension(R.dimen.mini_player_height);
-            // the video sits flush in the card (no gap), so its outer corners follow the card
-            final float pad = 0f;
+            // the video sits inside the card with a small gap, so its square corners never stick
+            // out of the card's rounded corners (4dp > 14dp * (1 - 1/sqrt(2)))
+            final float pad = MINI_VIDEO_PAD_DP * getResources().getDisplayMetrics().density;
             final float targetWidth = getResources()
                     .getDimension(R.dimen.mini_player_video_width) - 2 * pad;
             final float miniScale = Math.min(targetWidth / width,
@@ -2988,8 +2992,11 @@ public final class VideoDetailFragment
         // rounded-rectangle card: the card background (bg_mini_player, 14dp) and the video corners use
         // the same radius, so the video sits flush inside the card without sticking out
         final float cardRadius = 14 * getResources().getDisplayMetrics().density;
-        final float videoLeftRadius = cardRadius;
-        final float videoRightRadius = cardRadius;
+        // concentric with the card: card radius minus the gap around the video
+        final float videoRadius = cardRadius
+                - MINI_VIDEO_PAD_DP * getResources().getDisplayMetrics().density;
+        final float videoLeftRadius = videoRadius;
+        final float videoRightRadius = videoRadius;
 
         final View video = binding.detailThumbnailRootLayout;
         final float left = video.getTranslationX();
@@ -2999,8 +3006,6 @@ public final class VideoDetailFragment
 
         mask.setColor(ThemeHelper.resolveColorFromAttr(
                 requireContext(), R.attr.card_item_background_color));
-        mask.setBackdropColor(ThemeHelper.resolveColorFromAttr(
-                requireContext(), R.attr.windowBackground));
         mask.setGeometry(margin, 0f, root.getWidth() - margin, cardHeight, cardRadius,
                 left, top, right, bottom, videoLeftRadius, videoRightRadius);
         mask.setAlpha(1f - slide);

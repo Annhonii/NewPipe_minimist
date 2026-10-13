@@ -77,19 +77,6 @@ public class MiniPlayerCornerMask extends View {
         if (!hasHole) {
             return;
         }
-        // The video sits flush with the card, so its square corners would stick out past the
-        // card's rounded corners (video corner radius == card radius, so the hole there cancels
-        // the card). Inside the video's bounds, paint everything outside the rounded card in the
-        // page colour to cut those corners off.
-        cornerPath.reset();
-        cornerPath.setFillType(Path.FillType.EVEN_ODD);
-        cornerPath.addRect(hole, Path.Direction.CW);
-        cornerPath.addRoundRect(card, cardRadius, cardRadius, Path.Direction.CW);
-        canvas.save();
-        canvas.clipRect(hole);
-        canvas.drawPath(cornerPath, cornerPaint);
-        canvas.restore();
-
         path.reset();
         path.setFillType(Path.FillType.EVEN_ODD);
         path.addRoundRect(card, cardRadius, cardRadius, Path.Direction.CW);
