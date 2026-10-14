@@ -4,7 +4,6 @@ import static android.widget.RelativeLayout.ABOVE;
 import static android.widget.RelativeLayout.ALIGN_PARENT_BOTTOM;
 import static android.widget.RelativeLayout.ALIGN_PARENT_TOP;
 import static android.widget.RelativeLayout.BELOW;
-import static com.google.android.material.tabs.TabLayout.INDICATOR_GRAVITY_STRETCH;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -32,8 +31,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
 
-import com.google.android.material.tabs.TabLayout;
-
 import org.schabi.newpipe.BaseFragment;
 import org.schabi.newpipe.R;
 import org.schabi.newpipe.databinding.FragmentMainBinding;
@@ -45,19 +42,21 @@ import org.schabi.newpipe.settings.tabs.Tab;
 import org.schabi.newpipe.settings.tabs.TabsManager;
 import org.schabi.newpipe.util.NavigationHelper;
 import org.schabi.newpipe.util.ServiceHelper;
-import org.schabi.newpipe.util.ThemeHelper;
-import org.schabi.newpipe.views.NavTabView;
-import org.schabi.newpipe.views.ScrollableTabLayout;
+import org.schabi.newpipe.views.FloatingNavBar;
+import org.schabi.newpipe.views.MorphingNavPill;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainFragment extends BaseFragment implements TabLayout.OnTabSelectedListener {
+public class MainFragment extends BaseFragment
+        implements FloatingNavBar.OnItemSelectedListener {
     private FragmentMainBinding binding;
     private SelectedTabsPagerAdapter pagerAdapter;
 
     private final List<Tab> tabsList = new ArrayList<>();
     private TabsManager tabsManager;
+
+    private static final int MAX_TABS_FOR_TWO_ACTIONS = 4;
 
     private boolean hasTabsChanged = false;
 
@@ -127,12 +126,10 @@ public class MainFragment extends BaseFragment implements TabLayout.OnTabSelecte
 
         binding = FragmentMainBinding.bind(rootView);
 
-        // icon-only floating pill: every tab gets the same share of the pill, however many
-        binding.mainTabLayout.setPillVisibleTabs(Integer.MAX_VALUE);
-        binding.mainTabLayout.setSelectedTabIndicatorColor(ThemeHelper.resolveColorFromAttr(
-                requireContext(), R.attr.card_item_contrast_color));
-        binding.mainTabLayout.setupWithViewPager(binding.pager);
-        binding.mainTabLayout.addOnTabSelectedListener(this);
+        // floating pill: the selected tab morphs into an accent chip (icon + name), the pages
+        // slide in sync with it
+        binding.mainNavBar.attachToViewPager(binding.pager);
+        binding.mainNavBar.setOnItemSelectedListener(this);
 
         setupTabs();
         updateTabLayoutPosition();
@@ -254,26 +251,54 @@ public class MainFragment extends BaseFragment implements TabLayout.OnTabSelecte
         binding.pager.setAdapter(null);
         binding.pager.setAdapter(pagerAdapter);
 
-        updateTabsIconAndDescription();
+        updateNavItems();
+        updateNavActions();
         updateTitleForTab(binding.pager.getCurrentItem());
 
         hasTabsChanged = false;
     }
 
-    private void updateTabsIconAndDescription() {
-        for (int i = 0; i < tabsList.size(); i++) {
-            final TabLayout.Tab tabToSet = binding.mainTabLayout.getTabAt(i);
-            if (tabToSet != null) {
-                final Tab tab = tabsList.get(i);
-                // icon + label that lifts / rises in when the tab is selected
-                final NavTabView tabView = new NavTabView(requireContext());
-                tabView.bind(tab.getTabIconRes(requireContext()),
-                        tab.getTabName(requireContext()));
-                tabToSet.setCustomView(tabView);
-                tabView.snapTo(tabToSet.isSelected());
-                tabToSet.setContentDescription(tab.getTabName(requireContext()));
+    private void updateNavItems() {
+        final List<MorphingNavPill.Item> items = new ArrayList<>();
+        for (final Tab tab : tabsList) {
+            items.add(new MorphingNavPill.Item(tab.getTabIconRes(requireContext()),
+                    tab.getTabName(requireContext())));
+        }
+        binding.mainNavBar.setItems(items);
+        binding.mainNavBar.setSelectedIndex(binding.pager.getCurrentItem(), false);
+    }
+
+    /**
+     * Round buttons beside the pill for the places that are not a tab (yet): downloads and
+     * history. They are left out when they already are a tab, and only one is shown when there
+     * are many tabs, so that the pill stays roomy.
+     */
+    private void updateNavActions() {
+        final List<FloatingNavBar.Action> actions = new ArrayList<>();
+        if (!hasTab(Tab.DownloadsTab.ID)) {
+            actions.add(new FloatingNavBar.Action(R.drawable.ic_file_download,
+                    getString(R.string.downloads),
+                    () -> NavigationHelper.openDownloads(activity)));
+        }
+        if (!hasTab(Tab.HistoryTab.ID)) {
+            actions.add(new FloatingNavBar.Action(R.drawable.ic_history,
+                    getString(R.string.title_activity_history),
+                    () -> NavigationHelper.openStatisticFragment(getFM())));
+        }
+        final int maxActions = tabsList.size() <= MAX_TABS_FOR_TWO_ACTIONS ? 2 : 1;
+        while (actions.size() > maxActions) {
+            actions.remove(actions.size() - 1);
+        }
+        binding.mainNavBar.setActions(actions);
+    }
+
+    private boolean hasTab(final int tabId) {
+        for (final Tab tab : tabsList) {
+            if (tab.getTabId() == tabId) {
+                return true;
             }
         }
+        return false;
     }
 
     private void updateTitleForTab(final int tabPosition) {
@@ -354,10 +379,9 @@ public class MainFragment extends BaseFragment implements TabLayout.OnTabSelecte
     }
 
     private void updateTabLayoutPosition() {
-        // The tabs always float at the bottom as a rounded pill (see fragment_main.xml),
-        // with a soft pill sliding behind the selected tab.
+        // The tabs always float at the bottom as a rounded pill (see fragment_main.xml).
         // The "tabs position" setting no longer moves them.
-        final ScrollableTabLayout tabLayout = binding.mainTabLayout;
+        final FloatingNavBar tabLayout = binding.mainNavBar;
         final ViewPager viewPager = binding.pager;
 
         final var tabParams = (RelativeLayout.LayoutParams) tabLayout.getLayoutParams();
@@ -368,7 +392,6 @@ public class MainFragment extends BaseFragment implements TabLayout.OnTabSelecte
         // the pager fills the screen and runs behind the pill (see applyBottomInset)
         pagerParams.removeRule(BELOW);
         pagerParams.removeRule(ABOVE);
-        tabLayout.setSelectedTabIndicatorGravity(INDICATOR_GRAVITY_STRETCH);
 
         tabLayout.setLayoutParams(tabParams);
         viewPager.setLayoutParams(pagerParams);
@@ -378,7 +401,7 @@ public class MainFragment extends BaseFragment implements TabLayout.OnTabSelecte
         if (binding == null) {
             return false;
         }
-        int position = binding.mainTabLayout.getSelectedTabPosition();
+        int position = binding.mainNavBar.getSelectedIndex();
         if (position < 0) {
             position = binding.pager.getCurrentItem();
         }
@@ -387,13 +410,13 @@ public class MainFragment extends BaseFragment implements TabLayout.OnTabSelecte
     }
 
     @Override
-    public void onTabSelected(final TabLayout.Tab selectedTab) {
+    public void onItemSelected(final int position) {
         if (DEBUG) {
-            Log.d(TAG, "onTabSelected() called with: selectedTab = [" + selectedTab + "]");
+            Log.d(TAG, "onItemSelected() called with: position = [" + position + "]");
         }
-        updateTitleForTab(selectedTab.getPosition());
-        if (binding != null && binding.mainTabLayout.isLaidOut()) {
-            binding.mainTabLayout.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK);
+        updateTitleForTab(position);
+        if (binding != null && binding.mainNavBar.isLaidOut()) {
+            binding.mainNavBar.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK);
         }
         // show / hide the settings button of the top bar
         if (activity != null) {
@@ -402,14 +425,11 @@ public class MainFragment extends BaseFragment implements TabLayout.OnTabSelecte
     }
 
     @Override
-    public void onTabUnselected(final TabLayout.Tab tab) { }
-
-    @Override
-    public void onTabReselected(final TabLayout.Tab tab) {
+    public void onItemReselected(final int position) {
         if (DEBUG) {
-            Log.d(TAG, "onTabReselected() called with: tab = [" + tab + "]");
+            Log.d(TAG, "onItemReselected() called with: position = [" + position + "]");
         }
-        updateTitleForTab(tab.getPosition());
+        updateTitleForTab(position);
     }
 
     public static final class SelectedTabsPagerAdapter

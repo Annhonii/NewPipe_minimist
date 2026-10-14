@@ -47,3 +47,11 @@ player.xml padding on the 3 buttons (icon size in landscape / popup), toolbar_se
 4. App icon check (mipmaps still stock?), shimmer/placeholder thumbnails in Nothing grey.
 5. Channel page header, playlist header, subscription feed headers: spacing/typography (NType82 titles).
 6. More haptics (switches, chips), then final Light/Dark/Black consistency pass.
+
+## Pass 5: morphing floating nav (Google Phone / Material 3 style)
+- New views/MorphingNavPill (tabs: selected = accent chip with icon + label, others icon only; width, colour,
+  label alpha/scale all come from one fraction per tab; spring ~300 ms) and views/FloatingNavBar (pill + round
+  action buttons + ViewPager sync). Swiping the pages morphs the chip under the finger; tapping springs it.
+- fragment_main.xml (+ land) now use FloatingNavBar (id main_nav_bar). MainFragment adds round Downloads / History
+  buttons when they are not already tabs. Removed NavTabView and nav_pill_indicator. ScrollableTabLayout is unused now.
+- Chip colour = theme colorAccent (FloatingNavBar#setChipColor to override). NOT compiled here.
