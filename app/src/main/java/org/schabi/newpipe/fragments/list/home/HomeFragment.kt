@@ -37,6 +37,7 @@ class HomeFragment : BaseFragment() {
     private val chipAnimators = HashMap<TextView, ValueAnimator>()
     private var chipFills = IntArray(0)
     private var chipTexts = IntArray(0)
+    private var chipStrokes = IntArray(0)
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)
@@ -62,6 +63,7 @@ class HomeFragment : BaseFragment() {
         chips.clear()
         chipFills = IntArray(0)
         chipTexts = IntArray(0)
+        chipStrokes = IntArray(0)
         b.homeChips.removeAllViews()
         CATEGORIES.forEachIndexed { index, category ->
             val chip = layoutInflater.inflate(R.layout.item_home_chip, b.homeChips, false) as TextView
@@ -89,6 +91,7 @@ class HomeFragment : BaseFragment() {
         chipAnimators.clear()
         chipFills = IntArray(0)
         chipTexts = IntArray(0)
+        chipStrokes = IntArray(0)
         chips.clear()
         binding = null
     }
@@ -143,21 +146,25 @@ class HomeFragment : BaseFragment() {
     }
 
     /**
-     * Nothing style filter chips, coloured from the app theme (so every theme works):
-     * idle = tonal pill (same colour as the buttons of the top bar), selected = inverted pill
-     * (text colour as fill, page colour as text). The colours cross-fade when the selection
-     * moves, instead of snapping.
+     * Filter chips like the design: rounded rectangles on the bar. Idle = transparent with a thin
+     * outline, selected = filled with the text colour (inverted: page colour as text). Coloured
+     * from the app theme, so every theme works. Fill, outline and text cross-fade when the
+     * selection moves, instead of snapping.
      */
     private fun updateChipStyles(animate: Boolean = false) {
         val context = context ?: return
 
-        val idleFill = ThemeHelper.resolveColorFromAttr(context, R.attr.toolbar_element_color)
         val onSurface = ThemeHelper.resolveColorFromAttr(context, android.R.attr.textColorPrimary)
         val onInverse = ThemeHelper.resolveColorFromAttr(context, R.attr.toolbar_container_color)
+        // transparent in the same hue as the selected fill, so the cross-fade stays clean
+        val idleFill = ColorUtils.setAlphaComponent(onSurface, 0)
+        val idleStroke = ColorUtils.setAlphaComponent(onSurface, IDLE_STROKE_ALPHA)
+        val strokeWidth = DeviceUtils.dpToPx(1, context).coerceAtLeast(1)
 
         if (chipFills.size != chips.size) {
             chipFills = IntArray(chips.size) { idleFill }
             chipTexts = IntArray(chips.size) { onSurface }
+            chipStrokes = IntArray(chips.size) { idleStroke }
         }
 
         chips.forEachIndexed { index, chip ->
@@ -165,17 +172,20 @@ class HomeFragment : BaseFragment() {
             chip.isSelected = isSelected
             val toFill = if (isSelected) onSurface else idleFill
             val toText = if (isSelected) onInverse else onSurface
+            val toStroke = if (isSelected) onSurface else idleStroke
 
             val background = (chip.background as? GradientDrawable) ?: GradientDrawable().also {
-                it.cornerRadius = DeviceUtils.dpToPx(100, context).toFloat()
+                it.cornerRadius = DeviceUtils.dpToPx(CHIP_CORNER_DP, context).toFloat()
                 chip.background = it
             }
             chipAnimators.remove(chip)?.cancel()
 
             val fromFill = chipFills[index]
             val fromText = chipTexts[index]
-            if (!animate || (fromFill == toFill && fromText == toText)) {
+            val fromStroke = chipStrokes[index]
+            if (!animate || (fromFill == toFill && fromText == toText && fromStroke == toStroke)) {
                 background.setColor(toFill)
+                background.setStroke(strokeWidth, toStroke)
                 chip.setTextColor(toText)
             } else {
                 chipAnimators[chip] = ValueAnimator.ofFloat(0f, 1f).apply {
@@ -184,6 +194,10 @@ class HomeFragment : BaseFragment() {
                     addUpdateListener { animator ->
                         val t = animator.animatedFraction
                         background.setColor(ColorUtils.blendARGB(fromFill, toFill, t))
+                        background.setStroke(
+                            strokeWidth,
+                            ColorUtils.blendARGB(fromStroke, toStroke, t)
+                        )
                         chip.setTextColor(ColorUtils.blendARGB(fromText, toText, t))
                     }
                     start()
@@ -191,11 +205,14 @@ class HomeFragment : BaseFragment() {
             }
             chipFills[index] = toFill
             chipTexts[index] = toText
+            chipStrokes[index] = toStroke
         }
     }
 
     companion object {
         private const val KEY_SELECTED = "home_selected_category"
+        private const val CHIP_CORNER_DP = 12
+        private const val IDLE_STROKE_ALPHA = 0x40
 
         // The order is the one of the design: All, Gaming, Podcast, Music, Movies, (Live).
         // YouTube retired its own Trending page, so these are searches ("trending ...").
