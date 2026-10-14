@@ -68,6 +68,7 @@ public class FloatingNavBar extends LinearLayout {
     private ViewPager pager;
     private boolean pagerDriving = false;
     private boolean fakeDragging = false;
+    private boolean ignorePageSelected = false;
     private float lastScrubPosition;
     private int lastReported = -1;
     private int scrubStartIndex = 0;
@@ -90,6 +91,9 @@ public class FloatingNavBar extends LinearLayout {
 
                 @Override
                 public void onPageSelected(final int position) {
+                    if (ignorePageSelected) {
+                        return;
+                    }
                     if (!pagerDriving) {
                         pill.setSelectedIndex(position, true);
                     }
@@ -144,13 +148,15 @@ public class FloatingNavBar extends LinearLayout {
         });
         pill.setOnScrubListener(new MorphingNavPill.OnScrubListener() {
             @Override
-            public void onScrubStart(final float position) {
+            public boolean onScrubStart(final float position) {
                 lastScrubPosition = position;
                 scrubStartIndex = pill.getSelectedIndex();
                 setHoveredAction(-1);
                 if (pager != null && pager.getAdapter() != null && pager.beginFakeDrag()) {
                     fakeDragging = true;
                 }
+                // true: the pager moves under the finger and the pill just follows the pager
+                return fakeDragging;
             }
 
             @Override
@@ -188,7 +194,9 @@ public class FloatingNavBar extends LinearLayout {
                 final int action = hoveredAction;
                 setHoveredAction(-1);
                 if (action >= 0 && action < actionList.size()) {
+                    ignorePageSelected = true;
                     endFakeDrag();
+                    ignorePageSelected = false;
                     // go back to the tab we came from, then open the button's screen
                     pill.setSelectedIndex(scrubStartIndex, true);
                     if (pager != null) {
@@ -197,10 +205,14 @@ public class FloatingNavBar extends LinearLayout {
                     actionList.get(action).onClick.run();
                     return;
                 }
+                // ViewPager picks a page of its own when the fake drag ends; ignore that and go
+                // to the page the pill snapped to (past the 50 % mark, else back)
+                ignorePageSelected = true;
                 endFakeDrag();
                 if (pager != null) {
                     pager.setCurrentItem(target, true);
                 }
+                ignorePageSelected = false;
                 report(target);
             }
         });

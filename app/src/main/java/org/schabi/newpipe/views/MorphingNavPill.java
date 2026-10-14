@@ -83,8 +83,12 @@ public class MorphingNavPill extends ViewGroup {
 
     /** Reports a finger that is dragged over the pill ("scrubbing" through the tabs). */
     public interface OnScrubListener {
-        /** @param position the (fractional) tab index the pill is at when the drag starts */
-        void onScrubStart(float position);
+        /**
+         * @param position the (fractional) tab index the pill is at when the drag starts
+         * @return true when something else (the ViewPager) now drives the pill through
+         *         {@link #setPagerProgress}; the pill then only reports finger movement
+         */
+        boolean onScrubStart(float position);
 
         /** @param position the (fractional) tab index under the drag, 0..count-1 */
         void onScrub(float position);
@@ -142,6 +146,7 @@ public class MorphingNavPill extends ViewGroup {
     private final int touchSlop;
     private boolean tracking = false;
     private boolean scrubbing = false;
+    private boolean externalDrive = false;
     private float downX;
     private float startPosition;
     private float lastPosition;
@@ -432,6 +437,7 @@ public class MorphingNavPill extends ViewGroup {
     private void stopTracking() {
         tracking = false;
         scrubbing = false;
+        externalDrive = false;
         if (velocity != null) {
             velocity.recycle();
             velocity = null;
@@ -461,9 +467,7 @@ public class MorphingNavPill extends ViewGroup {
         if (getParent() != null) {
             getParent().requestDisallowInterceptTouchEvent(true);
         }
-        if (scrubListener != null) {
-            scrubListener.onScrubStart(startPosition);
-        }
+        externalDrive = scrubListener != null && scrubListener.onScrubStart(startPosition);
     }
 
     private void updateScrub(final float x) {
@@ -476,8 +480,10 @@ public class MorphingNavPill extends ViewGroup {
                 startPosition + (x - downX) / (available / count)));
         lastPosition = position;
 
-        final int whole = Math.min(count - 1, (int) Math.floor(position));
-        setPagerProgress(whole, position - whole);
+        if (!externalDrive) {
+            final int whole = Math.min(count - 1, (int) Math.floor(position));
+            setPagerProgress(whole, position - whole);
+        }
 
         final int tick = Math.round(position);
         if (tick != lastTick) {
@@ -494,10 +500,12 @@ public class MorphingNavPill extends ViewGroup {
         final int count = itemViews.size();
         // Threshold: past the 50 % midpoint towards a neighbour the chip snaps to that tab
         // (spring), before it the chip springs back to the tab it was dragged from.
-        int target = Math.round(lastPosition);
+        final float released = externalDrive ? currentPosition() : lastPosition;
+        int target = Math.round(released);
         target = Math.max(0, Math.min(count - 1, target));
 
         scrubbing = false;
+        externalDrive = false;
         setSelectedIndex(target, true);
         if (scrubListener != null) {
             scrubListener.onScrubEnd(target);
