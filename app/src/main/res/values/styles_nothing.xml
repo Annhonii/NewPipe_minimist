@@ -11,7 +11,7 @@
         <item name="track">@drawable/switch_track</item>
         <item name="showText">false</item>
         <item name="splitTrack">false</item>
-        <item name="switchMinWidth">52dp</item>
+        <item name="switchMinWidth">64dp</item>
         <item name="switchPadding">0dp</item>
         <item name="thumbTextPadding">0dp</item>
     </style>
@@ -28,6 +28,9 @@
     <!-- Menus -->
     <style name="Widget.App.PopupMenu" parent="Widget.AppCompat.PopupMenu">
         <item name="android:popupBackground">@drawable/bg_popup_menu</item>
+    </style>
+    <style name="Widget.App.PopupMenu.Dark" parent="Widget.AppCompat.PopupMenu">
+        <item name="android:popupBackground">@drawable/bg_popup_menu_dark</item>
     </style>
     <style name="Widget.App.PopupMenu.Overflow" parent="Widget.AppCompat.PopupMenu.Overflow">
         <item name="android:popupBackground">@drawable/bg_popup_menu</item>

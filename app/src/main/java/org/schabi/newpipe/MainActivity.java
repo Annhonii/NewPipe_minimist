@@ -23,6 +23,9 @@ package org.schabi.newpipe;
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.ValueAnimator;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
@@ -37,6 +40,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.PathInterpolator;
 import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.widget.AdapterView;
@@ -777,6 +781,91 @@ public class MainActivity extends AppCompatActivity {
     /*//////////////////////////////////////////////////////////////////////////
     // Menu
     //////////////////////////////////////////////////////////////////////////*/
+
+    /*//////////////////////////////////////////////////////////////////////////
+    // Toolbar fade-through (Material 3): the title / back arrow / action buttons never pop in or
+    // out when the page changes, they fade out, get rebuilt, then fade back in.
+    //////////////////////////////////////////////////////////////////////////*/
+
+    private static final long TOOLBAR_FADE_OUT_MS = 80L;
+    private static final long TOOLBAR_FADE_IN_MS = 220L;
+    private boolean toolbarRebuildPending = false;
+    @Nullable
+    private ValueAnimator toolbarFadeAnimator = null;
+
+    @Override
+    public void invalidateOptionsMenu() {
+        final View toolbar = toolbarLayoutBinding == null ? null : toolbarLayoutBinding.toolbar;
+        if (toolbar == null || !toolbar.isLaidOut() || isFinishing() || isDestroyed()) {
+            super.invalidateOptionsMenu();
+            return;
+        }
+        if (toolbarRebuildPending) {
+            // a rebuild is already scheduled, it will read the newest state anyway
+            return;
+        }
+        toolbarRebuildPending = true;
+        fadeToolbarContent(currentToolbarAlpha(), 0f, TOOLBAR_FADE_OUT_MS,
+                new PathInterpolator(0.3f, 0f, 1f, 1f), () -> {
+                    toolbarRebuildPending = false;
+                    super.invalidateOptionsMenu();
+                    // the rebuild is posted by the delegate, fade in right after it ran
+                    toolbar.postOnAnimation(() -> fadeToolbarContent(0f, 1f, TOOLBAR_FADE_IN_MS,
+                            new PathInterpolator(0.05f, 0.7f, 0.1f, 1f), null));
+                });
+    }
+
+    private float currentToolbarAlpha() {
+        final androidx.appcompat.widget.Toolbar toolbar = toolbarLayoutBinding.toolbar;
+        for (int i = 0; i < toolbar.getChildCount(); i++) {
+            final View child = toolbar.getChildAt(i);
+            if (child != toolbarLayoutBinding.toolbarSearchContainer.getRoot()) {
+                return child.getAlpha();
+            }
+        }
+        return 1f;
+    }
+
+    private void setToolbarContentAlpha(final float alpha) {
+        final androidx.appcompat.widget.Toolbar toolbar = toolbarLayoutBinding.toolbar;
+        final View search = toolbarLayoutBinding.toolbarSearchContainer.getRoot();
+        for (int i = 0; i < toolbar.getChildCount(); i++) {
+            final View child = toolbar.getChildAt(i);
+            if (child != search) {
+                child.setAlpha(alpha);
+            }
+        }
+    }
+
+    private void fadeToolbarContent(final float from, final float to, final long duration,
+                                    final android.animation.TimeInterpolator interpolator,
+                                    @Nullable final Runnable onEnd) {
+        if (toolbarFadeAnimator != null) {
+            toolbarFadeAnimator.removeAllListeners();
+            toolbarFadeAnimator.cancel();
+        }
+        final ValueAnimator animator = ValueAnimator.ofFloat(from, to);
+        animator.setDuration(duration);
+        animator.setInterpolator(interpolator);
+        animator.addUpdateListener(a -> {
+            if (toolbarLayoutBinding != null) {
+                setToolbarContentAlpha((float) a.getAnimatedValue());
+            }
+        });
+        animator.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(final Animator animation) {
+                if (toolbarLayoutBinding != null) {
+                    setToolbarContentAlpha(to);
+                }
+                if (onEnd != null) {
+                    onEnd.run();
+                }
+            }
+        });
+        toolbarFadeAnimator = animator;
+        animator.start();
+    }
 
     @Override
     public boolean onCreateOptionsMenu(final Menu menu) {

@@ -31,6 +31,7 @@
                 android:layout_height="@dimen/drawer_header_newpipe_icon_size"
                 android:layout_marginEnd="@dimen/drawer_header_newpipe_icon_title_space"
                 android:src="@drawable/ic_splash_mark"
+                app:tint="?android:attr/textColorPrimary"
                 tools:ignore="ContentDescription" />
 
             <org.schabi.newpipe.views.NewPipeTextView

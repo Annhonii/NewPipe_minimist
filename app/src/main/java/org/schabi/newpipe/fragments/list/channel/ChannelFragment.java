@@ -50,6 +50,7 @@ import org.schabi.newpipe.util.Constants;
 import org.schabi.newpipe.util.ExtractorHelper;
 import org.schabi.newpipe.util.Localization;
 import org.schabi.newpipe.util.NavigationHelper;
+import org.schabi.newpipe.util.ThemeHelper;
 import org.schabi.newpipe.util.StateSaver;
 import org.schabi.newpipe.util.external_communication.ShareUtils;
 import org.schabi.newpipe.util.image.CoilHelper;
@@ -187,7 +188,11 @@ public class ChannelFragment extends BaseStateFragment<ChannelInfo>
                     return true;
                 }
             };
-            activity.addMenuProvider(menuProvider);
+            // Only show the channel buttons while the page is resumed: the provider used to stay
+            // until the view was destroyed (after the exit animation), so share / 3-dots lingered
+            // on the home page and then vanished abruptly.
+            activity.addMenuProvider(menuProvider, getViewLifecycleOwner(),
+                    androidx.lifecycle.Lifecycle.State.RESUMED);
     }
 
     @Override // called from onViewCreated in BaseFragment.onViewCreated
@@ -233,6 +238,7 @@ public class ChannelFragment extends BaseStateFragment<ChannelInfo>
         super.onDestroyView();
         if (menuProvider != null) {
             activity.removeMenuProvider(menuProvider);
+            menuProvider = null;
         }
     }
 
@@ -387,12 +393,17 @@ public class ChannelFragment extends BaseStateFragment<ChannelInfo>
         final int backgroundDuration = isButtonVisible ? 300 : 0;
         final int textDuration = isButtonVisible ? 200 : 0;
 
-        // The channel header is black: "Subscribe" = solid white pill with black text,
-        // "Subscribed" = dark translucent-white pill with white text
-        final int subscribedBackground = 0x33FFFFFF;
-        final int subscribedText = 0xFFFFFFFF;
-        final int subscribeBackground = 0xFFFFFFFF;
-        final int subscribeText = 0xFF000000;
+        // Theme aware: "Subscribe" = inverted pill (text colour on page colour),
+        // "Subscribed" = tonal pill with normal text
+        final android.content.Context ctx = requireContext();
+        final int pageColor = ThemeHelper.resolveColorFromAttr(ctx, android.R.attr.colorBackground);
+        final int primaryText = ThemeHelper.resolveColorFromAttr(ctx,
+                android.R.attr.textColorPrimary);
+        final int subscribedBackground = ThemeHelper.resolveColorFromAttr(ctx,
+                R.attr.card_item_contrast_color);
+        final int subscribedText = primaryText;
+        final int subscribeBackground = primaryText;
+        final int subscribeText = pageColor;
 
         if (isSubscribed) {
             binding.channelSubscribeButton.setText(R.string.subscribed_button_title);

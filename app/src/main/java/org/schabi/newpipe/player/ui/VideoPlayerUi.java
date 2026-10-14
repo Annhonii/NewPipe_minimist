@@ -834,14 +834,7 @@ public abstract class VideoPlayerUi extends PlayerUi implements SeekBar.OnSeekBa
 
         animate(binding.currentDisplaySeek, false, 200, AnimationType.SCALE_AND_ALPHA);
 
-        animate(binding.playPauseButton, false, 80, AnimationType.SCALE_AND_ALPHA, 0,
-                () -> {
-                    updatePlayPauseButton(PlayButtonAction.PAUSE);
-                    animatePlayButtons(true, 200);
-                    if (!isAnyListViewOpen()) {
-                        binding.playPauseButton.requestFocus();
-                    }
-                });
+        swapPlayPauseButton(PlayButtonAction.PAUSE);
 
         binding.getRoot().setKeepScreenOn(true);
     }
@@ -864,14 +857,7 @@ public abstract class VideoPlayerUi extends PlayerUi implements SeekBar.OnSeekBa
             showControls(400);
             binding.loadingPanel.setVisibility(View.GONE);
 
-            animate(binding.playPauseButton, false, 80, AnimationType.SCALE_AND_ALPHA, 0,
-                    () -> {
-                        updatePlayPauseButton(PlayButtonAction.PLAY);
-                        animatePlayButtons(true, 200);
-                        if (!isAnyListViewOpen()) {
-                            binding.playPauseButton.requestFocus();
-                        }
-                    });
+            swapPlayPauseButton(PlayButtonAction.PLAY);
         }
 
         binding.getRoot().setKeepScreenOn(false);
@@ -888,11 +874,7 @@ public abstract class VideoPlayerUi extends PlayerUi implements SeekBar.OnSeekBa
     public void onCompleted() {
         super.onCompleted();
 
-        animate(binding.playPauseButton, false, 0, AnimationType.SCALE_AND_ALPHA, 0,
-                () -> {
-                    updatePlayPauseButton(PlayButtonAction.REPLAY);
-                    animatePlayButtons(true, DEFAULT_CONTROLS_DURATION);
-                });
+        swapPlayPauseButton(PlayButtonAction.REPLAY);
 
         binding.getRoot().setKeepScreenOn(false);
 
@@ -905,9 +887,42 @@ public abstract class VideoPlayerUi extends PlayerUi implements SeekBar.OnSeekBa
         animate(binding.surfaceForeground, true, 100);
     }
 
-    private void animatePlayButtons(final boolean show, final long duration) {
-        animate(binding.playPauseButton, show, duration, AnimationType.SCALE_AND_ALPHA);
+    /**
+     * Material 3 style icon swap: the button never shrinks or pops, only the glyph cross-fades
+     * (short fade out, new glyph, soft fade in). Replaces the old shrink-then-bounce-back.
+     */
+    private void swapPlayPauseButton(final PlayButtonAction action) {
+        final AppCompatImageButton button = binding.playPauseButton;
+        button.animate().cancel();
+        final boolean visible = button.getVisibility() == View.VISIBLE && button.getAlpha() > 0.5f;
+        button.setScaleX(1f);
+        button.setScaleY(1f);
+        if (!visible) {
+            updatePlayPauseButton(action);
+            animatePlayButtons(true, 220);
+        } else {
+            button.animate().alpha(0.15f).setDuration(70)
+                    .setInterpolator(new android.view.animation.PathInterpolator(0.3f, 0f, 1f, 1f))
+                    .withEndAction(() -> {
+                        updatePlayPauseButton(action);
+                        button.animate().alpha(1f).setDuration(180)
+                                .setInterpolator(new android.view.animation.PathInterpolator(
+                                        0.05f, 0.7f, 0.1f, 1f))
+                                .start();
+                        animateSkipButtons(true, 220);
+                    }).start();
+        }
+        if (!isAnyListViewOpen()) {
+            button.requestFocus();
+        }
+    }
 
+    private void animatePlayButtons(final boolean show, final long duration) {
+        animate(binding.playPauseButton, show, duration, AnimationType.LIGHT_SCALE_AND_ALPHA);
+        animateSkipButtons(show, duration);
+    }
+
+    private void animateSkipButtons(final boolean show, final long duration) {
         @Nullable final PlayQueue playQueue = player.getPlayQueue();
         if (playQueue == null) {
             return;
@@ -918,14 +933,14 @@ public abstract class VideoPlayerUi extends PlayerUi implements SeekBar.OnSeekBa
                     binding.playPreviousButton,
                     show,
                     duration,
-                    AnimationType.SCALE_AND_ALPHA);
+                    AnimationType.LIGHT_SCALE_AND_ALPHA);
         }
         if (!show || playQueue.getIndex() + 1 < playQueue.getStreams().size()) {
             animate(
                     binding.playNextButton,
                     show,
                     duration,
-                    AnimationType.SCALE_AND_ALPHA);
+                    AnimationType.LIGHT_SCALE_AND_ALPHA);
         }
     }
     //endregion

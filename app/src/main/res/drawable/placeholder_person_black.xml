@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Channel avatar while loading: plain black disc (no grey) -->
+<!-- Channel avatar while loading: theme-aware tonal disc -->
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
     android:shape="rectangle">
-    <solid android:color="#000000" />
+    <solid android:color="?attr/card_item_contrast_color" />
 </shape>

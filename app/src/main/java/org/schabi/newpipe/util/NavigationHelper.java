@@ -362,7 +362,10 @@ public final class NavigationHelper {
         InfoCache.getInstance().trimCache();
 
         fragmentManager.popBackStackImmediate(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
-        defaultTransaction(fragmentManager)
+        // top level destination -> Material 3 fade through instead of the shared axis slide
+        fragmentManager.beginTransaction()
+                .setCustomAnimations(R.animator.frag_through_enter, R.animator.frag_through_exit,
+                        R.animator.frag_through_enter, R.animator.frag_through_exit)
                 .replace(R.id.fragment_holder, new MainFragment())
                 .addToBackStack(MAIN_FRAGMENT_TAG)
                 .commit();

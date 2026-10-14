@@ -63,3 +63,13 @@ player.xml padding on the 3 buttons (icon size in landscape / popup), toolbar_se
 - Settings: flat Material 3 list (SegmentedPreferenceAdapter no longer draws cards/gaps), headers in colorPrimary; toggles = M3 52x32 switch (switch_track/switch_thumb drawables).
 - Loaders: progress_dot_ring replaced by M3-style arc loader (views/ArcLoaderDrawable.kt, drawable/progress_arc_loader.xml, Widget.App.ProgressBar); set as theme android:progressBarStyle/Large/LargeInverse in Base.V21; player buffering spinner forced white; FeedFragment pull-to-refresh coloured. Not compiled.
 - Landscape fullscreen fix: VideoDetailFragment.onSystemInsetsChanged() ignores status/nav bar insets while fullscreen (spacer 0, no bottom padding) and is re-run in onFullscreenStateChanged. Not compiled.
+
+## Pass 6 (user request): motion polish + settings tiles
+- Removed overshoot/bubble: press_scale(.95)/press_scale_card use emphasized_decelerate; SCALE_AND_ALPHA = 0.92 instead of 0.8.
+- Player play/pause: no shrink-and-pop; icon cross-fades (VideoPlayerUi.swapPlayPauseButton), skip buttons light-scale fade.
+- Toolbar: MainActivity.invalidateOptionsMenu fades title/back/actions out (80ms) -> rebuild -> in (220ms). ChannelFragment menu provider bound to RESUMED so share/3-dots don't linger on home.
+- openMainFragment uses M3 fade-through (frag_through_*).
+- Settings: each preference is its own rounded tile (14dp, 12dp side margin, small gaps); switch track widened 52 -> 64dp.
+Not compiled here.
+- Player quality/audio/caption popups + queue item menu: DarkPopupMenu now has a dark popup surface (bg_popup_menu_dark), fixing white text on white popup in light mode.
+- Home tab: HomeFeedFragment caches the last feed (30 min, per account; pull-to-refresh bypasses) + MainFragment keeps all tabs alive (offscreen limit) so switching tabs no longer re-buffers Home.

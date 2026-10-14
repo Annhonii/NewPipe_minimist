@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Popup menus opened over the video player: always dark, matching their white item text -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="#292929" />
+    <corners android:radius="16dp" />
+</shape>

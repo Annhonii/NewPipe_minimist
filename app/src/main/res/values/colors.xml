@@ -6,7 +6,7 @@
     <!-- unselected icon / label of the floating nav pill -->
     <color name="nav_inactive">#8A8A8A</color>
 
-    <color name="ic_launcher_background">#D71921</color>
+    <color name="ic_launcher_background">#0F0F0F</color>
 
     <color name="placeholder_background">#999999</color>
     <color name="placeholder_foreground">#6C6C6C</color>

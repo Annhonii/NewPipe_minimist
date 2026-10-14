@@ -248,6 +248,9 @@ public class MainFragment extends BaseFragment
                     getChildFragmentManager(), tabsList);
         }
 
+        // keep every tab alive: pages used to be destroyed when two tabs away, so coming back to
+        // Home reloaded (buffered) the feed and lost the scroll position
+        binding.pager.setOffscreenPageLimit(Math.max(1, tabsList.size() - 1));
         binding.pager.setAdapter(null);
         binding.pager.setAdapter(pagerAdapter);
 

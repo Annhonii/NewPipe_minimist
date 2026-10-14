@@ -1,15 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Dot-matrix launch mark: 3x3 dots, the centre one in Nothing red. -->
+<!-- mistpipe mark (splash + drawer header). Same glyph as the launcher icon, tight viewport. -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="96dp" android:height="96dp"
-    android:viewportWidth="96" android:viewportHeight="96">
-    <path android:fillColor="#000000" android:pathData="M16,22a6,6 0 1,0 12,0a6,6 0 1,0 -12,0z" />
-    <path android:fillColor="#000000" android:pathData="M36,22a6,6 0 1,0 12,0a6,6 0 1,0 -12,0z" />
-    <path android:fillColor="#000000" android:pathData="M56,22a6,6 0 1,0 12,0a6,6 0 1,0 -12,0z" />
-    <path android:fillColor="#000000" android:pathData="M16,42a6,6 0 1,0 12,0a6,6 0 1,0 -12,0z" />
-    <path android:fillColor="#D71921" android:pathData="M36,42a6,6 0 1,0 12,0a6,6 0 1,0 -12,0z" />
-    <path android:fillColor="#000000" android:pathData="M56,42a6,6 0 1,0 12,0a6,6 0 1,0 -12,0z" />
-    <path android:fillColor="#000000" android:pathData="M16,62a6,6 0 1,0 12,0a6,6 0 1,0 -12,0z" />
-    <path android:fillColor="#000000" android:pathData="M36,62a6,6 0 1,0 12,0a6,6 0 1,0 -12,0z" />
-    <path android:fillColor="#000000" android:pathData="M56,62a6,6 0 1,0 12,0a6,6 0 1,0 -12,0z" />
+    android:width="96dp"
+    android:height="96dp"
+    android:viewportWidth="60"
+    android:viewportHeight="60">
+    <path
+        android:pathData="M30,3.5a26.5,26.5 0 1,0 0.001,0z"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="2.6" />
+    <path
+        android:pathData="M23.2,18.5L23.2,41.5L43.7,30z"
+        android:fillColor="#00000000"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="2.6"
+        android:strokeLineJoin="round" />
+    <path
+        android:pathData="M32.1,10.6A19.5,19.5 0 0,1 45.6,18.3"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="2.6"
+        android:strokeLineCap="round" />
 </vector>

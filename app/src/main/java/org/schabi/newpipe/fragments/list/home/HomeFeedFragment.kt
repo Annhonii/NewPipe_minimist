@@ -54,12 +54,27 @@ class HomeFeedFragment : BaseListInfoFragment<StreamInfoItem, HomeFeedInfo>(User
     override fun loadResult(forceLoad: Boolean): Single<HomeFeedInfo> {
         val app = requireContext().applicationContext
         val title = getString(R.string.yt_home_title)
+        val key = YtAccountStore.load(app)?.hashCode() ?: 0
+
+        // Coming back to the Home tab (the page may have been destroyed while another tab was
+        // open) must not buffer again: reuse the last feed unless the user pulled to refresh.
+        val cached = cache
+        if (!forceLoad && cached != null && cacheKey == key &&
+            System.currentTimeMillis() - cacheTime < CACHE_MAX_AGE_MS
+        ) {
+            return Single.just(cached)
+        }
+
         return Single.fromCallable {
             val page = YtInnerTube.feed(YtAccountStore.load(app))
             HomeFeedInfo(title).apply {
                 relatedItems = page.items.map { toItem(it) }
                 nextPage = page.continuation?.let { Page(it) }
             }
+        }.doOnSuccess {
+            cache = it
+            cacheKey = key
+            cacheTime = System.currentTimeMillis()
         }
     }
 
@@ -74,6 +89,14 @@ class HomeFeedFragment : BaseListInfoFragment<StreamInfoItem, HomeFeedInfo>(User
                 emptyList<Throwable>()
             )
         }
+    }
+
+    companion object {
+        private const val CACHE_MAX_AGE_MS = 30 * 60 * 1000L
+
+        @Volatile private var cache: HomeFeedInfo? = null
+        @Volatile private var cacheKey = 0
+        @Volatile private var cacheTime = 0L
     }
 
     override fun showEmptyState() {

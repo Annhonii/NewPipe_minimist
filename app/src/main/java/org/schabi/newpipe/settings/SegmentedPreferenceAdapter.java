@@ -24,8 +24,9 @@ import org.schabi.newpipe.util.DeviceUtils;
 import org.schabi.newpipe.util.ThemeHelper;
 
 /**
- * Renders a preference screen as a flat Material 3 list: full-width rows on the plain screen
- * background (no cards, no gaps, no dividers). {@link PreferenceCategory}s are rendered as small
+ * Renders a preference screen as separate rounded tiles: every preference is its own card
+ * (card colour, 14dp corners) with a small gap between tiles, on the plain screen background.
+ * {@link PreferenceCategory}s are rendered as small
  * primary-coloured section headers (or as plain spacers if they have no title), and a
  * {@link #EXTRA_SEGMENT_BREAK} adds a bit of extra space between two groups of rows.
  */
@@ -38,7 +39,10 @@ final class SegmentedPreferenceAdapter extends PreferenceGroupAdapter {
     static final String EXTRA_SEGMENT_BREAK = "segment_break";
 
         private static final int SCREEN_PADDING_DP = 24;
-    private static final int ITEM_PADDING_DP = 24;
+    private static final int ITEM_PADDING_DP = 20;
+    private static final int TILE_MARGIN_H_DP = 12;
+    private static final int TILE_GAP_DP = 2;
+    private static final int TILE_RADIUS_DP = 14;
     private static final int ITEM_VERTICAL_PADDING_DP = 14;
     private static final int ITEM_MIN_HEIGHT_DP = 56;
     private static final int ICON_GAP_DP = 16;
@@ -85,15 +89,17 @@ final class SegmentedPreferenceAdapter extends PreferenceGroupAdapter {
         final boolean breakAbove = position > 0 && startsGroup(position);
 
         final View root = holder.itemView;
-        root.setBackground(createRipple());
+        root.setBackground(createTile());
         root.setMinimumHeight(dp(ITEM_MIN_HEIGHT_DP));
         root.setPadding(dp(ITEM_PADDING_DP), 0, dp(ITEM_PADDING_DP), 0);
 
         final ViewGroup.LayoutParams params = root.getLayoutParams();
         if (params instanceof ViewGroup.MarginLayoutParams) {
             final ViewGroup.MarginLayoutParams margins = (ViewGroup.MarginLayoutParams) params;
-            margins.setMargins(0,
-                    breakAbove && !isHeader(position - 1) ? dp(SECTION_GAP_DP) : 0, 0, 0);
+            margins.setMargins(dp(TILE_MARGIN_H_DP),
+                    (breakAbove && !isHeader(position - 1) ? dp(SECTION_GAP_DP) : 0)
+                            + dp(TILE_GAP_DP),
+                    dp(TILE_MARGIN_H_DP), dp(TILE_GAP_DP));
             root.setLayoutParams(margins);
         }
 
@@ -122,13 +128,20 @@ final class SegmentedPreferenceAdapter extends PreferenceGroupAdapter {
     }
 
     @NonNull
-    private RippleDrawable createRipple() {
+    private RippleDrawable createTile() {
+        final float radius = dp(TILE_RADIUS_DP);
         final GradientDrawable mask = new GradientDrawable();
         mask.setColor(0xFF000000);
+        mask.setCornerRadius(radius);
+
+        final GradientDrawable card = new GradientDrawable();
+        card.setColor(ThemeHelper.resolveColorFromAttr(context,
+                R.attr.card_item_background_color));
+        card.setCornerRadius(radius);
 
         final int ripple = ThemeHelper.resolveColorFromAttr(context,
                 androidx.appcompat.R.attr.colorControlHighlight);
-        return new RippleDrawable(ColorStateList.valueOf(ripple), null, mask);
+        return new RippleDrawable(ColorStateList.valueOf(ripple), card, mask);
     }
 
     //endregion

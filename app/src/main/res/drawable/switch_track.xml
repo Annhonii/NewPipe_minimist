@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Material 3 switch track: 52x32 pill. On = primary. Off = surface container with a 2dp outline. -->
+<!-- Material 3 switch track: 64x32 pill. On = primary. Off = surface container with a 2dp outline. -->
 <selector xmlns:android="http://schemas.android.com/apk/res/android"
     android:enterFadeDuration="100"
     android:exitFadeDuration="100">
@@ -7,7 +7,7 @@
         <shape android:shape="rectangle">
             <solid android:color="?attr/colorPrimary" />
             <stroke android:width="2dp" android:color="?attr/colorPrimary" />
-            <size android:width="52dp" android:height="32dp" />
+            <size android:width="64dp" android:height="32dp" />
             <corners android:radius="16dp" />
         </shape>
     </item>
@@ -15,7 +15,7 @@
         <shape android:shape="rectangle">
             <solid android:color="?attr/switch_track_off_color" />
             <stroke android:width="2dp" android:color="?android:attr/textColorSecondary" />
-            <size android:width="52dp" android:height="32dp" />
+            <size android:width="64dp" android:height="32dp" />
             <corners android:radius="16dp" />
         </shape>
     </item>

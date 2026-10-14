@@ -165,8 +165,8 @@ private fun View.animateAlpha(enterOrExit: Boolean, duration: Long, delay: Long,
 
 private fun View.animateScaleAndAlpha(enterOrExit: Boolean, duration: Long, delay: Long, execOnEnd: Runnable?) {
     if (enterOrExit) {
-        scaleX = .8f
-        scaleY = .8f
+        scaleX = .92f
+        scaleY = .92f
         animate()
             .setInterpolator(FastOutSlowInInterpolator())
             .alpha(1f).scaleX(1f).scaleY(1f)
@@ -178,7 +178,7 @@ private fun View.animateScaleAndAlpha(enterOrExit: Boolean, duration: Long, dela
         scaleY = 1f
         animate()
             .setInterpolator(FastOutSlowInInterpolator())
-            .alpha(0f).scaleX(.8f).scaleY(.8f)
+            .alpha(0f).scaleX(.92f).scaleY(.92f)
             .setDuration(duration).setStartDelay(delay)
             .setListener(HideAndExecOnEndListener(this, execOnEnd))
             .start()
