@@ -342,6 +342,11 @@ public class MainFragment extends BaseFragment
         if (root == null || binding == null || !isAdded()) {
             return;
         }
+        // the Shorts pager manages its own bottom space; padding its inner list would shrink
+        // every short and let the next one peek in
+        if (root instanceof androidx.viewpager2.widget.ViewPager2) {
+            return;
+        }
         final boolean scrolling = root instanceof RecyclerView
                 || root instanceof ScrollView || root instanceof NestedScrollView;
         if (scrolling && isVerticalScroller(root)) {

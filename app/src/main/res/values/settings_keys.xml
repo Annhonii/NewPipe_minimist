@@ -1562,4 +1562,17 @@
         <item>Teal</item>
         <item>Amber</item>
     </string-array>
+
+    <!-- Which player opens a Short: the normal video page or the vertical Shorts player -->
+    <string name="open_shorts_with_key" translatable="false">open_shorts_with</string>
+    <string name="open_shorts_with_normal_value" translatable="false">normal_player</string>
+    <string name="open_shorts_with_shorts_value" translatable="false">shorts_player</string>
+    <string-array name="open_shorts_with_names">
+        <item>@string/open_shorts_with_normal</item>
+        <item>@string/open_shorts_with_shorts</item>
+    </string-array>
+    <string-array name="open_shorts_with_values" translatable="false">
+        <item>@string/open_shorts_with_normal_value</item>
+        <item>@string/open_shorts_with_shorts_value</item>
+    </string-array>
 </resources>

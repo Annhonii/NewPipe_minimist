@@ -22,6 +22,7 @@ import org.schabi.newpipe.extractor.exceptions.ExtractionException;
 import org.schabi.newpipe.fragments.BlankFragment;
 import org.schabi.newpipe.fragments.list.channel.ChannelFragment;
 import org.schabi.newpipe.fragments.list.home.HomeFragment;
+import org.schabi.newpipe.fragments.list.shorts.ShortsFragment;
 import org.schabi.newpipe.fragments.list.kiosk.DefaultKioskFragment;
 import org.schabi.newpipe.fragments.list.kiosk.KioskFragment;
 import org.schabi.newpipe.fragments.list.kiosk.TrendingFragment;
@@ -172,7 +173,8 @@ public abstract class Tab {
         PLAYLIST(new PlaylistTab()),
         FEEDGROUP(new FeedGroupTab()),
         DOWNLOADS(new DownloadsTab()),
-        HOME(new HomeTab());
+        HOME(new HomeTab()),
+        SHORTS(new ShortsTab());
 
         private final Tab tab;
 
@@ -290,6 +292,32 @@ public abstract class Tab {
         public HomeFragment getFragment(final Context context) {
             // the home feed with the category pills (All, Gaming, Podcast, ...) on top
             return new HomeFragment();
+        }
+    }
+
+    public static class ShortsTab extends Tab {
+        public static final int ID = 12;
+
+        @Override
+        public int getTabId() {
+            return ID;
+        }
+
+        @Override
+        public String getTabName(final Context context) {
+            return context.getString(R.string.tab_shorts);
+        }
+
+        @DrawableRes
+        @Override
+        public int getTabIconRes(final Context context) {
+            return R.drawable.ic_shorts;
+        }
+
+        @Override
+        public ShortsFragment getFragment(final Context context) {
+            // vertical, full-screen Shorts feed (YouTube's own Shorts recommendations)
+            return new ShortsFragment();
         }
     }
 

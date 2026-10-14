@@ -1000,4 +1000,13 @@
     <string name="trending_tab_gaming">Gaming</string>
     <string name="trending_tab_movies_shows">Movies and shows</string>
     <string name="trending_tab_podcasts">Podcasts</string>
+    <string name="tab_shorts">Shorts</string>
+    <string name="shorts_like">Like</string>
+    <string name="shorts_empty">No Shorts could be loaded</string>
+    <string name="shorts_retry">Try again</string>
+    <string name="shorts_error">Could not load this Short</string>
+    <string name="shorts_share">Share</string>
+    <string name="open_shorts_with_title">Open Shorts videos with</string>
+    <string name="open_shorts_with_normal">Normal player</string>
+    <string name="open_shorts_with_shorts">Shorts player</string>
 </resources>

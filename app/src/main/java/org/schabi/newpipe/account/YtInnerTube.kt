@@ -38,6 +38,9 @@ object YtInnerTube {
 
     data class Channel(val id: String, val name: String, val avatar: String?)
 
+    /** One short as listed by YouTube's shorts feed (details are loaded when it is played). */
+    data class ShortItem(val id: String, val title: String?, val thumbnail: String?)
+
     data class AccountInfo(val name: String, val email: String, val avatar: String)
 
     data class Page<T>(val items: List<T>, val continuation: String?)
@@ -313,6 +316,139 @@ object YtInnerTube {
             )
         }
         return Page(out.filter { it.title.isNotBlank() }, continuationOf(json))
+    }
+
+    // ---------------------------------------------------------------- shorts
+
+    /**
+     * Shorts recommended by YouTube itself, in the order YouTube's own Shorts player would show
+     * them (personalised when [session] is signed in, generic otherwise).
+     *
+     * First call ([continuation] == null): a seed short is picked ([seedId] if given, otherwise
+     * the first short of YouTube's Shorts / home feed, otherwise a search), then YouTube's reel
+     * sequence for that seed is requested. Every later call passes the returned continuation.
+     * If the reel sequence is not available, the seed candidates themselves are returned, so the
+     * list is never empty just because one endpoint changed.
+     */
+    fun shortsFeed(
+        session: YtAccountStore.Session?,
+        continuation: String? = null,
+        seedId: String? = null
+    ): Page<ShortItem> {
+        if (continuation != null) {
+            val json = post(
+                "reel/reel_watch_sequence",
+                JSONObject().put("sequenceParams", continuation),
+                session
+            )
+            return Page(parseShorts(json), reelContinuation(json))
+        }
+
+        val candidates = ArrayList<ShortItem>()
+        if (seedId != null) {
+            candidates.add(ShortItem(seedId, null, "https://i.ytimg.com/vi/$seedId/hqdefault.jpg"))
+        } else {
+            candidates.addAll(shortsSeedCandidates(session))
+        }
+        val seed = candidates.firstOrNull() ?: return Page(emptyList(), null)
+
+        val sequence = runCatching {
+            val body = JSONObject()
+                .put("disablePlayerResponse", true)
+                .put("playerRequest", JSONObject().put("videoId", seed.id).put("params", "8AEB"))
+                .put("params", "CAUwAg%3D%3D")
+            val json = post("reel/reel_item_watch", body, session)
+            val token = reelContinuation(json)
+            if (token == null) {
+                null
+            } else {
+                val more = post(
+                    "reel/reel_watch_sequence",
+                    JSONObject().put("sequenceParams", token),
+                    session
+                )
+                Page(parseShorts(more), reelContinuation(more))
+            }
+        }.getOrNull()
+
+        val out = LinkedHashMap<String, ShortItem>()
+        out[seed.id] = seed
+        sequence?.items?.forEach { if (!out.containsKey(it.id)) out[it.id] = it }
+        if (sequence == null || sequence.items.isEmpty()) {
+            candidates.forEach { if (!out.containsKey(it.id)) out[it.id] = it }
+        }
+        return Page(out.values.toList(), sequence?.continuation)
+    }
+
+    /** Shorts that YouTube itself puts in front of the user: Shorts page, home shelf, search. */
+    private fun shortsSeedCandidates(session: YtAccountStore.Session?): List<ShortItem> {
+        val sources = listOf<() -> JSONObject>(
+            { browse(session, "FEshorts", null) },
+            { browse(session, "FEwhat_to_watch", null) },
+            { post("search", JSONObject().put("query", "#shorts"), session) }
+        )
+        for (source in sources) {
+            val found = runCatching { parseShorts(source()) }.getOrDefault(emptyList())
+            if (found.isNotEmpty()) return found
+        }
+        return emptyList()
+    }
+
+    private fun reelContinuation(json: JSONObject): String? {
+        json.optString("sequenceContinuation").takeIf { it.isNotEmpty() }?.let { return it }
+        return json.optJSONObject("continuationEndpoint")
+            ?.optJSONObject("continuationCommand")
+            ?.optString("token")?.takeIf { it.isNotEmpty() }
+    }
+
+    /** Collects every short of a reel / browse / search response (document order, no duplicates). */
+    private fun parseShorts(json: JSONObject): List<ShortItem> {
+        val seen = LinkedHashMap<String, ShortItem>()
+        fun add(id: String?, title: String?, thumb: String?) {
+            if (id.isNullOrEmpty() || id.length != 11 || seen.containsKey(id)) return
+            seen[id] = ShortItem(id, title?.takeIf { it.isNotBlank() }, thumb ?: "https://i.ytimg.com/vi/$id/hqdefault.jpg")
+        }
+
+        // classic shelf item
+        collect(json, "reelItemRenderer").forEach { r ->
+            add(
+                r.optString("videoId"),
+                text(r.optJSONObject("headline")),
+                lastThumb(r.optJSONObject("thumbnail")?.optJSONArray("thumbnails"))
+            )
+        }
+        // newer shelf item
+        collect(json, "shortsLockupViewModel").forEach { v ->
+            val id = collect(v, "reelWatchEndpoint").firstOrNull()?.optString("videoId")
+            val title = v.optJSONObject("overlayMetadata")?.optJSONObject("primaryText")
+                ?.optString("content")
+            val thumb = v.optJSONObject("thumbnail")?.optJSONArray("sources")?.let { lastThumb(it) }
+            add(id, title, thumb)
+        }
+        // reel sequence entries / navigation endpoints
+        collect(json, "reelWatchEndpoint").forEach { e ->
+            add(
+                e.optString("videoId"),
+                null,
+                lastThumb(e.optJSONObject("thumbnail")?.optJSONArray("thumbnails"))
+            )
+        }
+        // search results: videos that are really shorts (short link or <= 60 s)
+        collect(json, "videoRenderer").forEach { vr ->
+            val id = vr.optString("videoId")
+            val url = vr.optJSONObject("navigationEndpoint")?.optJSONObject("commandMetadata")
+                ?.optJSONObject("webCommandMetadata")?.optString("url").orEmpty()
+            val isShort = url.contains("/shorts/") ||
+                (parseDuration(text(vr.optJSONObject("lengthText"))) in 1L..60L)
+            if (isShort) {
+                add(
+                    id,
+                    text(vr.optJSONObject("title")),
+                    lastThumb(vr.optJSONObject("thumbnail")?.optJSONArray("thumbnails"))
+                )
+            }
+        }
+        return seen.values.toList()
     }
 
     // ---------------------------------------------------------------- subscriptions

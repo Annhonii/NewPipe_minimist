@@ -415,6 +415,14 @@ public final class NavigationHelper {
                                                @Nullable final PlayQueue playQueue,
                                                final boolean switchingPlayers) {
 
+        // a Short opened from a link / history / ...: Settings -> Content -> "Open Shorts
+        // videos with" decides between the vertical Shorts player and this normal video page
+        if (!switchingPlayers
+                && org.schabi.newpipe.fragments.list.shorts.ShortsHelper
+                        .openIfShortUrl(context, fragmentManager, url)) {
+            return;
+        }
+
         final boolean autoPlay;
         @Nullable final PlayerType playerType = PlayerHolder.getInstance().getType();
         if (playerType == null) {
@@ -466,6 +474,17 @@ public final class NavigationHelper {
                     .runOnCommit(() -> onVideoDetailFragmentReady.run(instance))
                     .commit();
         }
+    }
+
+    /** Opens the vertical Shorts player, starting with the given short. */
+    public static void openShortsFragment(final FragmentManager fragmentManager,
+                                          @NonNull final String videoId) {
+        defaultTransaction(fragmentManager)
+                .replace(R.id.fragment_holder,
+                        org.schabi.newpipe.fragments.list.shorts.ShortsFragment
+                                .newInstance(videoId))
+                .addToBackStack(null)
+                .commit();
     }
 
     public static void openChannelFragment(final FragmentManager fragmentManager,

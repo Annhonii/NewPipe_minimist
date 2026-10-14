@@ -376,6 +376,11 @@ public abstract class BaseListFragment<I, N> extends BaseStateFragment<I>
 
     private void onStreamSelected(final StreamInfoItem selectedItem) {
         onItemSelected(selectedItem);
+        // Shorts can open in the vertical Shorts player instead (Settings -> Content)
+        if (org.schabi.newpipe.fragments.list.shorts.ShortsHelper
+                .openIfShortItem(requireContext(), getFM(), selectedItem)) {
+            return;
+        }
         NavigationHelper.openVideoDetailFragment(requireContext(), getFM(),
                 selectedItem.getServiceId(), selectedItem.getUrl(), selectedItem.getName(),
                 null, false);
