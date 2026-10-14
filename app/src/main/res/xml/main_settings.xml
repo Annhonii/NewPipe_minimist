@@ -5,10 +5,20 @@
     android:title="@string/settings">
 
     <PreferenceScreen
+        android:fragment="org.schabi.newpipe.settings.GoogleAccountSettingsFragment"
+        android:icon="@drawable/ic_person"
+        android:title="@string/yt_account_title"
+        app:iconSpaceReserved="false" />
+
+    <PreferenceScreen
         android:fragment="org.schabi.newpipe.settings.VideoAudioSettingsFragment"
         android:icon="@drawable/ic_headset"
         android:title="@string/settings_category_video_audio_title"
-        app:iconSpaceReserved="false" />
+        app:iconSpaceReserved="false">
+        <extra
+            android:name="segment_break"
+            android:value="true" />
+    </PreferenceScreen>
 
     <PreferenceScreen
         android:fragment="org.schabi.newpipe.settings.DownloadSettingsFragment"

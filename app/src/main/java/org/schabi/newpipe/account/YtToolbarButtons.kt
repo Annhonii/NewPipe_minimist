@@ -7,8 +7,7 @@ import android.widget.ImageButton
 import android.widget.ImageView
 import androidx.core.util.Consumer
 import org.schabi.newpipe.R
-import org.schabi.newpipe.settings.GoogleAccountSettingsFragment
-import org.schabi.newpipe.settings.SettingsActivity
+import org.schabi.newpipe.util.NavigationHelper
 
 /**
  * Tonal buttons in the top bar: a wide search pill, settings, and the account button
@@ -38,12 +37,9 @@ object YtToolbarButtons {
         val view = account.actionView ?: return
         val image = view.findViewById<ImageView>(R.id.account_avatar) ?: return
         val open = android.view.View.OnClickListener {
-            // the Google account options (status, sign in, token, sync, sign out) live in their
-            // own settings page, which is opened straight from the profile picture
-            activity.startActivity(
-                android.content.Intent(activity, SettingsActivity::class.java)
-                    .putExtra(SettingsActivity.EXTRA_OPEN_FRAGMENT, GoogleAccountSettingsFragment::class.java.name)
-            )
+            // the profile picture opens the settings; the Google account page is the first
+            // entry in there, next to Appearance, Content, ...
+            NavigationHelper.openSettings(activity)
         }
         view.setOnClickListener(open)
         view.findViewById<android.view.View>(R.id.account_button)?.setOnClickListener(open)

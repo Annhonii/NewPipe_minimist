@@ -207,10 +207,10 @@ public class MainFragment extends BaseFragment implements TabLayout.OnTabSelecte
         inflater.inflate(R.menu.menu_main_fragment, menu);
         org.schabi.newpipe.account.YtToolbarButtons.bind(activity, menu, this::onOptionsItemSelected);
 
-        // the settings button is only shown on the History tab
+        // settings are opened from the profile picture, so the separate button stays hidden
         final MenuItem settingsItem = menu.findItem(R.id.action_settings);
         if (settingsItem != null) {
-            settingsItem.setVisible(isHistoryTabSelected());
+            settingsItem.setVisible(false);
         }
 
         final ActionBar supportActionBar = activity.getSupportActionBar();
