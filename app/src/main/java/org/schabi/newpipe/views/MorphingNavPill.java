@@ -19,7 +19,11 @@ import android.text.TextPaint;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.TypedValue;
+import android.view.HapticFeedbackConstants;
+import android.view.MotionEvent;
+import android.view.VelocityTracker;
 import android.view.View;
+import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.view.animation.Interpolator;
 
@@ -78,6 +82,19 @@ public class MorphingNavPill extends ViewGroup {
         void onItemReselected(int index);
     }
 
+    /** Reports a finger that is dragged over the pill ("scrubbing" through the tabs). */
+    public interface OnScrubListener {
+        /** @param position the (fractional) tab index the pill is at when the drag starts */
+        void onScrubStart(float position);
+
+        /** @param position the (fractional) tab index under the drag, 0..count-1 */
+        void onScrub(float position);
+
+        /** The finger was lifted: the pill springs to {@code target}. */
+        void onScrubEnd(int target);
+    }
+
+    private static final float FLING_VELOCITY = 800f;
     private static final long SELECT_DURATION_MS = 300L;
     private static final float ICON_SIZE_DP = 24f;
     private static final float ICON_LABEL_GAP_DP = 8f;
@@ -119,6 +136,18 @@ public class MorphingNavPill extends ViewGroup {
     private int chipColor;
     private final int inactiveColor;
 
+    @Nullable
+    private OnScrubListener scrubListener;
+    private final int touchSlop;
+    private boolean tracking = false;
+    private boolean scrubbing = false;
+    private float downX;
+    private float startPosition;
+    private float lastPosition;
+    private int lastTick;
+    @Nullable
+    private VelocityTracker velocity;
+
     public MorphingNavPill(@NonNull final Context context) {
         this(context, null);
     }
@@ -126,6 +155,7 @@ public class MorphingNavPill extends ViewGroup {
     public MorphingNavPill(@NonNull final Context context, @Nullable final AttributeSet attrs) {
         super(context, attrs);
         final float density = context.getResources().getDisplayMetrics().density;
+        touchSlop = ViewConfiguration.get(context).getScaledTouchSlop();
 
         inactiveColor = ContextCompat.getColor(context, R.color.nav_inactive);
         chipColor = resolveAccent(context);
@@ -157,6 +187,10 @@ public class MorphingNavPill extends ViewGroup {
 
     public void setOnItemClickListener(@Nullable final OnItemClickListener listener) {
         clickListener = listener;
+    }
+
+    public void setOnScrubListener(@Nullable final OnScrubListener listener) {
+        scrubListener = listener;
     }
 
     /** Replaces all tabs. The first tab is selected until {@link #setSelectedIndex} is called. */
@@ -315,6 +349,163 @@ public class MorphingNavPill extends ViewGroup {
         }
     }
 
+    /*//////////////////////////////////////////////////////////////////////////
+    // Scrubbing: hold the pill and drag sideways
+    //////////////////////////////////////////////////////////////////////////*/
+
+    @Override
+    public boolean onInterceptTouchEvent(final MotionEvent ev) {
+        switch (ev.getActionMasked()) {
+            case MotionEvent.ACTION_DOWN:
+                beginTracking(ev);
+                return false;
+            case MotionEvent.ACTION_MOVE:
+                if (tracking && velocity != null) {
+                    velocity.addMovement(ev);
+                    if (!scrubbing && Math.abs(ev.getX() - downX) > touchSlop) {
+                        startScrub(ev.getX());
+                        return true;
+                    }
+                }
+                return false;
+            case MotionEvent.ACTION_UP:
+            case MotionEvent.ACTION_CANCEL:
+                stopTracking();
+                return false;
+            default:
+                return false;
+        }
+    }
+
+    @Override
+    public boolean onTouchEvent(final MotionEvent ev) {
+        switch (ev.getActionMasked()) {
+            case MotionEvent.ACTION_DOWN:
+                beginTracking(ev);
+                return true;
+            case MotionEvent.ACTION_MOVE:
+                if (!tracking || velocity == null) {
+                    return false;
+                }
+                velocity.addMovement(ev);
+                if (!scrubbing && Math.abs(ev.getX() - downX) > touchSlop) {
+                    startScrub(ev.getX());
+                }
+                if (scrubbing) {
+                    updateScrub(ev.getX());
+                }
+                return true;
+            case MotionEvent.ACTION_UP:
+                if (velocity != null) {
+                    velocity.addMovement(ev);
+                }
+                if (scrubbing) {
+                    finishScrub(true);
+                }
+                stopTracking();
+                return true;
+            case MotionEvent.ACTION_CANCEL:
+                if (scrubbing) {
+                    finishScrub(false);
+                }
+                stopTracking();
+                return true;
+            default:
+                return true;
+        }
+    }
+
+    private void beginTracking(final MotionEvent ev) {
+        stopTracking();
+        tracking = true;
+        downX = ev.getX();
+        velocity = VelocityTracker.obtain();
+        velocity.addMovement(ev);
+    }
+
+    private void stopTracking() {
+        tracking = false;
+        scrubbing = false;
+        if (velocity != null) {
+            velocity.recycle();
+            velocity = null;
+        }
+    }
+
+    /** The tab index the pill is at right now, fractional while it morphs. */
+    private float currentPosition() {
+        float position = 0f;
+        for (int i = 0; i < fractions.length; i++) {
+            position += i * fractions[i];
+        }
+        return Math.max(0f, Math.min(Math.max(0, fractions.length - 1), position));
+    }
+
+    private void startScrub(final float x) {
+        if (itemViews.size() < 2) {
+            return;
+        }
+        scrubbing = true;
+        cancelAnimator();
+        // the drag is relative to where the finger crossed the slop, so nothing jumps
+        downX = x;
+        startPosition = currentPosition();
+        lastPosition = startPosition;
+        lastTick = Math.round(startPosition);
+        if (getParent() != null) {
+            getParent().requestDisallowInterceptTouchEvent(true);
+        }
+        if (scrubListener != null) {
+            scrubListener.onScrubStart(startPosition);
+        }
+    }
+
+    private void updateScrub(final float x) {
+        final int count = itemViews.size();
+        final float available = getWidth() - getPaddingLeft() - getPaddingRight();
+        if (count < 2 || available <= 0f) {
+            return;
+        }
+        final float position = Math.max(0f, Math.min(count - 1f,
+                startPosition + (x - downX) / (available / count)));
+        lastPosition = position;
+
+        final int whole = Math.min(count - 1, (int) Math.floor(position));
+        setPagerProgress(whole, position - whole);
+
+        final int tick = Math.round(position);
+        if (tick != lastTick) {
+            lastTick = tick;
+            performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK);
+        }
+        if (scrubListener != null) {
+            scrubListener.onScrub(position);
+        }
+    }
+
+    private void finishScrub(final boolean allowFling) {
+        final int count = itemViews.size();
+        float vx = 0f;
+        if (allowFling && velocity != null) {
+            velocity.computeCurrentVelocity(1000);
+            vx = velocity.getXVelocity();
+        }
+        // a quick flick moves on to the next tab, otherwise the nearest tab wins
+        int target = Math.round(lastPosition);
+        if (vx > FLING_VELOCITY) {
+            target = Math.max(target, (int) Math.floor(lastPosition) + 1);
+        } else if (vx < -FLING_VELOCITY) {
+            target = Math.min(target, (int) Math.ceil(lastPosition) - 1);
+        }
+        target = Math.max(0, Math.min(count - 1, target));
+
+        scrubbing = false;
+        setSelectedIndex(target, true);
+        if (scrubListener != null) {
+            scrubListener.onScrubEnd(target);
+        }
+    }
+
     private void onItemTapped(final int index) {
         if (index == selectedIndex) {
             if (clickListener != null) {
@@ -339,6 +530,7 @@ public class MorphingNavPill extends ViewGroup {
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
         cancelAnimator();
+        stopTracking();
         if (selectedIndex >= 0 && selectedIndex < fractions.length) {
             snapToSelection(selectedIndex);
         }

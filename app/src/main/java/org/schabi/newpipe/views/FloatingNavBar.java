@@ -67,6 +67,8 @@ public class FloatingNavBar extends LinearLayout {
     @Nullable
     private ViewPager pager;
     private boolean pagerDriving = false;
+    private boolean fakeDragging = false;
+    private float lastScrubPosition;
     private int lastReported = -1;
     @Nullable
     private OnItemSelectedListener listener;
@@ -135,6 +137,37 @@ public class FloatingNavBar extends LinearLayout {
                 if (listener != null) {
                     listener.onItemReselected(index);
                 }
+            }
+        });
+        pill.setOnScrubListener(new MorphingNavPill.OnScrubListener() {
+            @Override
+            public void onScrubStart(final float position) {
+                lastScrubPosition = position;
+                if (pager != null && pager.getAdapter() != null && pager.beginFakeDrag()) {
+                    fakeDragging = true;
+                }
+            }
+
+            @Override
+            public void onScrub(final float position) {
+                // the pages move exactly as far as the finger moved over the pill
+                if (fakeDragging && pager != null) {
+                    final int pageWidth = pager.getWidth() - pager.getPaddingLeft()
+                            - pager.getPaddingRight();
+                    pager.fakeDragBy(-(position - lastScrubPosition) * pageWidth);
+                }
+                lastScrubPosition = position;
+            }
+
+            @Override
+            public void onScrubEnd(final int target) {
+                // the pill springs by itself now, so it must not follow the pager any more
+                pagerDriving = false;
+                endFakeDrag();
+                if (pager != null) {
+                    pager.setCurrentItem(target, true);
+                }
+                report(target);
             }
         });
         addView(pill, new LayoutParams(0, Math.round(PILL_HEIGHT_DP * density), 1f));
@@ -225,6 +258,18 @@ public class FloatingNavBar extends LinearLayout {
     // Internals
     //////////////////////////////////////////////////////////////////////////*/
 
+    private void endFakeDrag() {
+        if (fakeDragging && pager != null) {
+            fakeDragging = false;
+            try {
+                pager.endFakeDrag();
+            } catch (final IllegalStateException ignored) {
+                // the drag was already ended
+            }
+        }
+        fakeDragging = false;
+    }
+
     private void report(final int index) {
         if (index != lastReported) {
             lastReported = index;
@@ -256,5 +301,6 @@ public class FloatingNavBar extends LinearLayout {
             pager.removeOnPageChangeListener(pagerListener);
         }
         pagerDriving = false;
+        endFakeDrag();
     }
 }
