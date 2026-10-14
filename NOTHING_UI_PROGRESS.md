@@ -61,3 +61,5 @@ player.xml padding on the 3 buttons (icon size in landscape / popup), toolbar_se
 - Dialogs = M3 (fade 150 + scale 0.8->1 250ms in, 100ms fade out). Settings/list entrance = M3 fade through (no stagger).
 - New interpolators: standard_accelerate, standard_decelerate. Not compiled.
 - Settings: flat Material 3 list (SegmentedPreferenceAdapter no longer draws cards/gaps), headers in colorPrimary; toggles = M3 52x32 switch (switch_track/switch_thumb drawables).
+- Loaders: progress_dot_ring replaced by M3-style arc loader (views/ArcLoaderDrawable.kt, drawable/progress_arc_loader.xml, Widget.App.ProgressBar); set as theme android:progressBarStyle/Large/LargeInverse in Base.V21; player buffering spinner forced white; FeedFragment pull-to-refresh coloured. Not compiled.
+- Landscape fullscreen fix: VideoDetailFragment.onSystemInsetsChanged() ignores status/nav bar insets while fullscreen (spacer 0, no bottom padding) and is re-run in onFullscreenStateChanged. Not compiled.

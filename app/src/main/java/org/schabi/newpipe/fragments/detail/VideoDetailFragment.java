@@ -2241,6 +2241,7 @@ public final class VideoDetailFragment
         }
         scrollToTop();
 
+        onSystemInsetsChanged();
         tryAddVideoPlayerView();
     }
 
@@ -2718,17 +2719,23 @@ public final class VideoDetailFragment
         if (binding == null) {
             return;
         }
+        // Fullscreen (landscape) video: the player already fills the whole window, so no status
+        // bar strip above it and no navigation bar padding below it, otherwise the video is
+        // pushed down and the seek bar ends up off screen.
+        final boolean fullscreen = isFullscreen();
+        final int topInset = fullscreen ? 0 : SystemInsets.getTop();
+        final int bottomInset = fullscreen ? 0 : SystemInsets.getBottom();
         final View spacer = binding.detailStatusSpacer;
         if (spacer != null) {
             final ViewGroup.LayoutParams lp = spacer.getLayoutParams();
-            if (lp.height != SystemInsets.getTop()) {
-                lp.height = SystemInsets.getTop();
+            if (lp.height != topInset) {
+                lp.height = topInset;
                 spacer.setLayoutParams(lp);
             }
         }
         if (binding.detailScrollCoordinator != null
-                && binding.detailScrollCoordinator.getPaddingBottom() != SystemInsets.getBottom()) {
-            binding.detailScrollCoordinator.setPadding(0, 0, 0, SystemInsets.getBottom());
+                && binding.detailScrollCoordinator.getPaddingBottom() != bottomInset) {
+            binding.detailScrollCoordinator.setPadding(0, 0, 0, bottomInset);
         }
         refreshMiniPlayerSpace();
         binding.getRoot().post(() -> {

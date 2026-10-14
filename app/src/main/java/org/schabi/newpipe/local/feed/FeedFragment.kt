@@ -283,7 +283,21 @@ class FeedFragment : BaseStateFragment<FeedState>() {
 
     override fun initListeners() {
         super.initListeners()
-        feedBinding.swipeRefreshLayout.setOnRefreshListener { reloadContent() }
+        feedBinding.swipeRefreshLayout.apply {
+            setOnRefreshListener { reloadContent() }
+            // Modern pull-to-refresh: accent coloured arc on a round surface chip
+            setColorSchemeColors(
+                org.schabi.newpipe.util.ThemeHelper.resolveColorFromAttr(
+                    requireContext(), androidx.appcompat.R.attr.colorPrimary
+                )
+            )
+            setProgressBackgroundColorSchemeColor(
+                org.schabi.newpipe.util.ThemeHelper.resolveColorFromAttr(
+                    requireContext(), org.schabi.newpipe.R.attr.card_item_background_color
+                )
+            )
+            setSize(androidx.swiperefreshlayout.widget.SwipeRefreshLayout.DEFAULT)
+        }
         feedBinding.newItemsLoadedButton.setOnClickListener {
             hideNewItemsLoaded(true)
             feedBinding.itemsList.scrollToPosition(0)

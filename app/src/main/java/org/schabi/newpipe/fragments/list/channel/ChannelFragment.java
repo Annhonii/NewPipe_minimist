@@ -43,6 +43,8 @@ import org.schabi.newpipe.fragments.detail.TabAdapter;
 import org.schabi.newpipe.ktx.AnimationType;
 import org.schabi.newpipe.local.feed.notifications.NotificationHelper;
 import org.schabi.newpipe.local.subscription.SubscriptionManager;
+import org.schabi.newpipe.extractor.channel.tabs.ChannelTabs;
+import org.schabi.newpipe.extractor.services.youtube.linkHandler.YoutubeChannelTabLinkHandlerFactory;
 import org.schabi.newpipe.util.ChannelTabHelper;
 import org.schabi.newpipe.util.Constants;
 import org.schabi.newpipe.util.ExtractorHelper;
@@ -53,6 +55,7 @@ import org.schabi.newpipe.util.external_communication.ShareUtils;
 import org.schabi.newpipe.util.image.CoilHelper;
 import org.schabi.newpipe.util.image.ImageStrategy;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.TimeUnit;
@@ -459,6 +462,39 @@ public class ChannelFragment extends BaseStateFragment<ChannelInfo>
     // Init
     //////////////////////////////////////////////////////////////////////////*/
 
+    /**
+     * The tabs reported by the extractor. For YouTube the Shorts tab is added after the Videos tab
+     * if YouTube's response did not list it, so the Shorts of a channel can always be opened.
+     */
+    private List<ListLinkHandler> tabsWithShorts() {
+        final List<ListLinkHandler> tabs = new ArrayList<>(currentInfo.getTabs());
+        if (serviceId != org.schabi.newpipe.extractor.ServiceList.YouTube.getServiceId()) {
+            return tabs;
+        }
+        for (final ListLinkHandler handler : tabs) {
+            final List<String> filters = handler.getContentFilters();
+            if (!filters.isEmpty() && ChannelTabs.SHORTS.equals(filters.get(0))) {
+                return tabs;
+            }
+        }
+        try {
+            final ListLinkHandler shorts = YoutubeChannelTabLinkHandlerFactory.getInstance()
+                    .fromQuery(currentInfo.getId(), List.of(ChannelTabs.SHORTS), "");
+            int index = 0;
+            for (int i = 0; i < tabs.size(); i++) {
+                final List<String> filters = tabs.get(i).getContentFilters();
+                if (!filters.isEmpty() && ChannelTabs.VIDEOS.equals(filters.get(0))) {
+                    index = i + 1;
+                    break;
+                }
+            }
+            tabs.add(index, shorts);
+        } catch (final Exception e) {
+            Log.e(TAG, "Could not add the Shorts tab", e);
+        }
+        return tabs;
+    }
+
     private void updateTabs() {
         tabAdapter.clearAllItems();
 
@@ -467,7 +503,7 @@ public class ChannelFragment extends BaseStateFragment<ChannelInfo>
             final SharedPreferences preferences = PreferenceManager
                     .getDefaultSharedPreferences(context);
 
-            for (final ListLinkHandler linkHandler : currentInfo.getTabs()) {
+            for (final ListLinkHandler linkHandler : tabsWithShorts()) {
                 final String tab = linkHandler.getContentFilters().get(0);
                 if (ChannelTabHelper.showChannelTab(context, preferences, tab)) {
                     final ChannelTabFragment channelTabFragment =

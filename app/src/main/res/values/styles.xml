@@ -23,6 +23,9 @@
 
         <!-- Nothing / Music component styles (see styles_nothing.xml) -->
         <item name="switchStyle">@style/Widget.App.Switch</item>
+        <item name="android:progressBarStyle">@style/Widget.App.ProgressBar</item>
+        <item name="android:progressBarStyleLarge">@style/Widget.App.ProgressBar.Large</item>
+        <item name="android:progressBarStyleLargeInverse">@style/Widget.App.ProgressBar.Large</item>
         <item name="seekBarStyle">@style/Widget.App.SeekBar</item>
         <item name="popupMenuStyle">@style/Widget.App.PopupMenu</item>
         <item name="actionOverflowMenuStyle">@style/Widget.App.PopupMenu.Overflow</item>
