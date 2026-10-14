@@ -24,7 +24,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - name: Get backport metadata
-        # the target branch is the first argument after `/backport`
+        # the targetk branch is the first argument after `/backport`
         env:
           COMMENT_BODY: ${{ github.event.comment.body }}
         run: |
