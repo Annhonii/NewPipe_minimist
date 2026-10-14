@@ -104,7 +104,8 @@ public class FloatingNavBar extends LinearLayout {
 
                 @Override
                 public void onPageScrollStateChanged(final int state) {
-                    if (state == ViewPager.SCROLL_STATE_IDLE) {
+                    if (state == ViewPager.SCROLL_STATE_IDLE && !fakeDragging) {
+                        // not while the pages are still dragged by the pill
                         restoreOffscreenLimit();
                     }
                     if (state == ViewPager.SCROLL_STATE_DRAGGING) {
@@ -171,7 +172,13 @@ public class FloatingNavBar extends LinearLayout {
                 if (fakeDragging && pager != null) {
                     final int pageWidth = pager.getWidth() - pager.getPaddingLeft()
                             - pager.getPaddingRight();
-                    pager.fakeDragBy(-(position - lastScrubPosition) * pageWidth);
+                    try {
+                        pager.fakeDragBy(-(position - lastScrubPosition) * pageWidth);
+                    } catch (final NullPointerException | IllegalStateException e) {
+                        // something else ended the pager's drag under us (e.g. a second
+                        // finger on the pages): give up following instead of crashing
+                        recoverFakeDrag();
+                    }
                 }
                 lastScrubPosition = position;
             }
@@ -367,11 +374,35 @@ public class FloatingNavBar extends LinearLayout {
             fakeDragging = false;
             try {
                 pager.endFakeDrag();
-            } catch (final IllegalStateException ignored) {
-                // the drag was already ended
+            } catch (final NullPointerException | IllegalStateException e) {
+                // the drag was already ended (or its velocity tracker was taken away)
+                recoverFakeDrag();
             }
         }
         fakeDragging = false;
+    }
+
+    /**
+     * Gets the ViewPager out of a broken fake drag. When a touch on the pager itself ends while
+     * a fake drag is running, the pager loses its velocity tracker but still believes it is
+     * fake dragging, which makes every further call throw and the pages impossible to swipe.
+     * Beginning a new fake drag gives it a tracker again, so that it can be ended properly.
+     */
+    private void recoverFakeDrag() {
+        fakeDragging = false;
+        if (pager == null) {
+            return;
+        }
+        try {
+            pager.beginFakeDrag();
+        } catch (final RuntimeException ignored) {
+            // nothing more to do
+        }
+        try {
+            pager.endFakeDrag();
+        } catch (final RuntimeException ignored) {
+            // the pager is not fake dragging (any more)
+        }
     }
 
     private void report(final int index) {

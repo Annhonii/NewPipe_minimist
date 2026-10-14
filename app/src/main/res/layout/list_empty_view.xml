@@ -14,15 +14,4 @@
         android:textAppearance="@style/TextAppearance.App.Accent"
         android:textColor="?android:attr/textColorPrimary"
         android:textSize="28sp" />
-
-    <org.schabi.newpipe.views.NewPipeTextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginTop="6dp"
-        android:gravity="center"
-        android:paddingHorizontal="16dp"
-        android:text="@string/empty_list_subtitle"
-        android:textColor="?android:attr/textColorSecondary"
-        android:textSize="12sp" />
 </LinearLayout>
