@@ -60,3 +60,4 @@ player.xml padding on the 3 buttons (icon size in landscape / popup), toolbar_se
 - Fragment + activity transitions = M3 Shared axis X (300ms, 30dp, fade out 90ms / fade in 210ms after 90ms); back = mirrored (screen_pop_*, frag_pop_*).
 - Dialogs = M3 (fade 150 + scale 0.8->1 250ms in, 100ms fade out). Settings/list entrance = M3 fade through (no stagger).
 - New interpolators: standard_accelerate, standard_decelerate. Not compiled.
+- Settings: flat Material 3 list (SegmentedPreferenceAdapter no longer draws cards/gaps), headers in colorPrimary; toggles = M3 52x32 switch (switch_track/switch_thumb drawables).

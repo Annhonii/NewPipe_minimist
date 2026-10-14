@@ -1,12 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- 20dp white thumb inside a 24dp box => 2dp margin to the track edge, like Music's <Switch />. -->
-<inset xmlns:android="http://schemas.android.com/apk/res/android"
-    android:insetLeft="2dp"
-    android:insetTop="2dp"
-    android:insetRight="2dp"
-    android:insetBottom="2dp">
-    <shape android:shape="oval">
-        <solid android:color="@color/white" />
-        <size android:width="20dp" android:height="20dp" />
-    </shape>
-</inset>
+<!-- Material 3 switch thumb: 16dp (off, outline colour) grows to 24dp (on, on-primary colour) inside a 32dp box. -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:enterFadeDuration="100"
+    android:exitFadeDuration="100">
+    <item android:state_checked="true">
+        <inset
+            android:insetLeft="4dp"
+            android:insetTop="4dp"
+            android:insetRight="4dp"
+            android:insetBottom="4dp">
+            <shape android:shape="oval">
+                <solid android:color="?android:attr/colorBackground" />
+                <size android:width="24dp" android:height="24dp" />
+            </shape>
+        </inset>
+    </item>
+    <item>
+        <inset
+            android:insetLeft="8dp"
+            android:insetTop="8dp"
+            android:insetRight="8dp"
+            android:insetBottom="8dp">
+            <shape android:shape="oval">
+                <solid android:color="?android:attr/textColorSecondary" />
+                <size android:width="16dp" android:height="16dp" />
+            </shape>
+        </inset>
+    </item>
+</selector>

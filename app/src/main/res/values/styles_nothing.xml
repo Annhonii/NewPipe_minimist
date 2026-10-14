@@ -5,13 +5,13 @@
 -->
 <resources>
 
-    <!-- Toggle: 44x24 pill, white 20dp thumb, grey -> accent track -->
+    <!-- Material 3 toggle: 52x32 track, thumb 16dp off / 24dp on -->
     <style name="Widget.App.Switch" parent="Widget.AppCompat.CompoundButton.Switch">
         <item name="android:thumb">@drawable/switch_thumb</item>
         <item name="track">@drawable/switch_track</item>
         <item name="showText">false</item>
         <item name="splitTrack">false</item>
-        <item name="switchMinWidth">44dp</item>
+        <item name="switchMinWidth">52dp</item>
         <item name="switchPadding">0dp</item>
         <item name="thumbTextPadding">0dp</item>
     </style>

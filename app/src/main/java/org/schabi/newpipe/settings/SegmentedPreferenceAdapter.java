@@ -24,10 +24,10 @@ import org.schabi.newpipe.util.DeviceUtils;
 import org.schabi.newpipe.util.ThemeHelper;
 
 /**
- * Renders a preference screen like the segmented lists of the Music app: every group of
- * preferences becomes a stack of cards with large outer corners and tiny inner corners, with a
- * hairline gap in between. {@link PreferenceCategory}s are rendered as small section headers (or
- * as plain spacers if they have no title), so that they separate the groups.
+ * Renders a preference screen as a flat Material 3 list: full-width rows on the plain screen
+ * background (no cards, no gaps, no dividers). {@link PreferenceCategory}s are rendered as small
+ * primary-coloured section headers (or as plain spacers if they have no title), and a
+ * {@link #EXTRA_SEGMENT_BREAK} adds a bit of extra space between two groups of rows.
  */
 final class SegmentedPreferenceAdapter extends PreferenceGroupAdapter {
 
@@ -37,13 +37,10 @@ final class SegmentedPreferenceAdapter extends PreferenceGroupAdapter {
      */
     static final String EXTRA_SEGMENT_BREAK = "segment_break";
 
-    private static final int RADIUS_OUTER_DP = 12;
-    private static final int RADIUS_INNER_DP = 4;
-    private static final int GAP_DP = 3;
-    private static final int SCREEN_PADDING_DP = 16;
-    private static final int ITEM_PADDING_DP = 16;
+        private static final int SCREEN_PADDING_DP = 24;
+    private static final int ITEM_PADDING_DP = 24;
     private static final int ITEM_VERTICAL_PADDING_DP = 14;
-    private static final int ITEM_MIN_HEIGHT_DP = 52;
+    private static final int ITEM_MIN_HEIGHT_DP = 56;
     private static final int ICON_GAP_DP = 16;
     private static final int SECTION_GAP_DP = 24;
     private static final int SECTION_FIRST_GAP_DP = 8;
@@ -86,21 +83,17 @@ final class SegmentedPreferenceAdapter extends PreferenceGroupAdapter {
 
     private void styleItem(@NonNull final PreferenceViewHolder holder, final int position) {
         final boolean breakAbove = position > 0 && startsGroup(position);
-        final boolean first = position == 0 || isHeader(position - 1) || breakAbove;
-        final boolean last = position == getItemCount() - 1 || isHeader(position + 1)
-                || startsGroup(position + 1);
 
         final View root = holder.itemView;
-        root.setBackground(createSegment(first, last));
+        root.setBackground(createRipple());
         root.setMinimumHeight(dp(ITEM_MIN_HEIGHT_DP));
         root.setPadding(dp(ITEM_PADDING_DP), 0, dp(ITEM_PADDING_DP), 0);
 
         final ViewGroup.LayoutParams params = root.getLayoutParams();
         if (params instanceof ViewGroup.MarginLayoutParams) {
             final ViewGroup.MarginLayoutParams margins = (ViewGroup.MarginLayoutParams) params;
-            margins.setMargins(dp(SCREEN_PADDING_DP),
-                    breakAbove && !isHeader(position - 1) ? dp(SECTION_GAP_DP) : 0,
-                    dp(SCREEN_PADDING_DP), last ? 0 : dp(GAP_DP));
+            margins.setMargins(0,
+                    breakAbove && !isHeader(position - 1) ? dp(SECTION_GAP_DP) : 0, 0, 0);
             root.setLayoutParams(margins);
         }
 
@@ -129,25 +122,13 @@ final class SegmentedPreferenceAdapter extends PreferenceGroupAdapter {
     }
 
     @NonNull
-    private RippleDrawable createSegment(final boolean first, final boolean last) {
-        final float outer = dp(RADIUS_OUTER_DP);
-        final float inner = dp(RADIUS_INNER_DP);
-        final float top = first ? outer : inner;
-        final float bottom = last ? outer : inner;
-        final float[] radii = {top, top, top, top, bottom, bottom, bottom, bottom};
-
-        final GradientDrawable content = new GradientDrawable();
-        content.setColor(ThemeHelper.resolveColorFromAttr(context,
-                R.attr.card_item_background_color));
-        content.setCornerRadii(radii);
-
+    private RippleDrawable createRipple() {
         final GradientDrawable mask = new GradientDrawable();
         mask.setColor(0xFF000000);
-        mask.setCornerRadii(radii);
 
         final int ripple = ThemeHelper.resolveColorFromAttr(context,
                 androidx.appcompat.R.attr.colorControlHighlight);
-        return new RippleDrawable(ColorStateList.valueOf(ripple), content, mask);
+        return new RippleDrawable(ColorStateList.valueOf(ripple), null, mask);
     }
 
     //endregion
@@ -162,7 +143,7 @@ final class SegmentedPreferenceAdapter extends PreferenceGroupAdapter {
         final View root = holder.itemView;
         root.setBackground(null);
         root.setMinimumHeight(0);
-        root.setPadding(dp(SCREEN_PADDING_DP + 4), dp(top), dp(SCREEN_PADDING_DP),
+        root.setPadding(dp(SCREEN_PADDING_DP), dp(top), dp(SCREEN_PADDING_DP),
                 hasTitle ? dp(SECTION_BOTTOM_DP) : 0);
 
         final ViewGroup.LayoutParams params = root.getLayoutParams();
@@ -176,7 +157,7 @@ final class SegmentedPreferenceAdapter extends PreferenceGroupAdapter {
             title.setTextSize(TypedValue.COMPLEX_UNIT_SP, HEADER_SP);
             title.setTypeface(medium);
             title.setTextColor(ThemeHelper.resolveColorFromAttr(context,
-                    android.R.attr.textColorPrimary));
+                    androidx.appcompat.R.attr.colorPrimary));
             title.setAllCaps(false);
         }
     }

@@ -1,20 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Music-style switch track: 44x24 pill, surfaceContainerHigh -> primary (150ms cross-fade). -->
+<!-- Material 3 switch track: 52x32 pill. On = primary. Off = surface container with a 2dp outline. -->
 <selector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:enterFadeDuration="150"
-    android:exitFadeDuration="150">
+    android:enterFadeDuration="100"
+    android:exitFadeDuration="100">
     <item android:state_checked="true">
         <shape android:shape="rectangle">
             <solid android:color="?attr/colorPrimary" />
-            <size android:width="44dp" android:height="24dp" />
-            <corners android:radius="12dp" />
+            <stroke android:width="2dp" android:color="?attr/colorPrimary" />
+            <size android:width="52dp" android:height="32dp" />
+            <corners android:radius="16dp" />
         </shape>
     </item>
     <item>
         <shape android:shape="rectangle">
             <solid android:color="?attr/switch_track_off_color" />
-            <size android:width="44dp" android:height="24dp" />
-            <corners android:radius="12dp" />
+            <stroke android:width="2dp" android:color="?android:attr/textColorSecondary" />
+            <size android:width="52dp" android:height="32dp" />
+            <corners android:radius="16dp" />
         </shape>
     </item>
 </selector>
