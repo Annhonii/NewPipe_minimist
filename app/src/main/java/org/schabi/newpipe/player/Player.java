@@ -264,6 +264,7 @@ public final class Player implements PlaybackListener, Listener {
     private final Context context;
     @NonNull
     private final SharedPreferences prefs;
+    private final org.schabi.newpipe.player.sponsorblock.SponsorBlockSkipper sponsorBlockSkipper;
     @NonNull
     private final HistoryRecordManager recordManager;
 
@@ -287,6 +288,8 @@ public final class Player implements PlaybackListener, Listener {
         this.service = service;
         context = service;
         prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        sponsorBlockSkipper = new org.schabi.newpipe.player.sponsorblock.SponsorBlockSkipper(
+                context, () -> simpleExoPlayer);
         recordManager = new HistoryRecordManager(context);
 
         setupBroadcastReceiver();
@@ -705,6 +708,7 @@ public final class Player implements PlaybackListener, Listener {
         databaseUpdateDisposable.clear();
         progressUpdateDisposable.set(null);
         streamItemDisposable.clear();
+        sponsorBlockSkipper.release();
 
         UIs.destroyAll(Object.class); // destroy every UI: obviously every UI extends Object
     }
@@ -1918,6 +1922,8 @@ public final class Player implements PlaybackListener, Listener {
         }
 
         maybeAutoQueueNextStream(info);
+        sponsorBlockSkipper.onStreamChanged(info.getUrl(),
+                info.getServiceId() == org.schabi.newpipe.extractor.ServiceList.YouTube.getServiceId());
 
         loadCurrentThumbnail(info.getThumbnails());
         registerStreamViewed();

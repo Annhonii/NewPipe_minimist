@@ -1009,4 +1009,36 @@
     <string name="open_shorts_with_title">Open Shorts videos with</string>
     <string name="open_shorts_with_normal">Normal player</string>
     <string name="open_shorts_with_shorts">Shorts player</string>
+    <string name="sponsorblock_title">SponsorBlock</string>
+    <string name="sponsorblock_enable_title">Skip sponsored segments</string>
+    <string name="sponsorblock_enable_summary">YouTube videos: automatically skip sponsors, intros and other segments using the SponsorBlock database</string>
+    <string name="sponsorblock_categories_title">Categories to skip</string>
+    <string name="sponsorblock_toast_title">Show a message when skipping</string>
+    <string name="sponsorblock_api_title">SponsorBlock server</string>
+    <string name="sponsorblock_skipped">Skipped: %1$s</string>
+    <string-array name="sponsorblock_category_names">
+        <item>Sponsor</item>
+        <item>Self promotion</item>
+        <item>Interaction reminder</item>
+        <item>Intro</item>
+        <item>Outro / credits</item>
+        <item>Preview / recap</item>
+        <item>Non-music section</item>
+    </string-array>
+    <string-array name="sponsorblock_category_default">
+        <item>sponsor</item>
+        <item>selfpromo</item>
+        <item>interaction</item>
+        <item>intro</item>
+        <item>outro</item>
+    </string-array>
+    <string-array name="sponsorblock_category_values">
+        <item>sponsor</item>
+        <item>selfpromo</item>
+        <item>interaction</item>
+        <item>intro</item>
+        <item>outro</item>
+        <item>preview</item>
+        <item>music_offtopic</item>
+    </string-array>
 </resources>
