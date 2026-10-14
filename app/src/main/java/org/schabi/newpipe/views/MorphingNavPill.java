@@ -96,7 +96,6 @@ public class MorphingNavPill extends ViewGroup {
         default void onScrubRaw(final float xInPill) { }
     }
 
-    private static final float FLING_VELOCITY = 800f;
     private static final long SELECT_DURATION_MS = 300L;
     private static final float ICON_SIZE_DP = 24f;
     private static final float ICON_LABEL_GAP_DP = 8f;
@@ -175,6 +174,11 @@ public class MorphingNavPill extends ViewGroup {
     }
 
     private static int resolveAccent(@NonNull final Context context) {
+        // light theme: the selected chip is plain black (white icon + label on it)
+        final int page = ThemeHelper.resolveColorFromAttr(context, android.R.attr.colorBackground);
+        if (ColorUtils.calculateLuminance(page) > 0.5) {
+            return 0xFF000000;
+        }
         final int accent = ThemeHelper.resolveColorFromAttr(context,
                 androidx.appcompat.R.attr.colorAccent);
         if (Color.alpha(accent) == 0) {
@@ -486,20 +490,11 @@ public class MorphingNavPill extends ViewGroup {
         }
     }
 
-    private void finishScrub(final boolean allowFling) {
+    private void finishScrub(final boolean unused) {
         final int count = itemViews.size();
-        float vx = 0f;
-        if (allowFling && velocity != null) {
-            velocity.computeCurrentVelocity(1000);
-            vx = velocity.getXVelocity();
-        }
-        // a quick flick moves on to the next tab, otherwise the nearest tab wins
+        // Threshold: past the 50 % midpoint towards a neighbour the chip snaps to that tab
+        // (spring), before it the chip springs back to the tab it was dragged from.
         int target = Math.round(lastPosition);
-        if (vx > FLING_VELOCITY) {
-            target = Math.max(target, (int) Math.floor(lastPosition) + 1);
-        } else if (vx < -FLING_VELOCITY) {
-            target = Math.min(target, (int) Math.ceil(lastPosition) - 1);
-        }
         target = Math.max(0, Math.min(count - 1, target));
 
         scrubbing = false;
@@ -636,6 +631,24 @@ public class MorphingNavPill extends ViewGroup {
     /** A tab that draws its chip, icon and label itself from a single selection fraction. */
     private static final class ItemView extends View {
         private static final ArgbEvaluator COLORS = new ArgbEvaluator();
+        // label weights the text glides through while the chip opens: 400 -> 600
+        private static final int[] WEIGHTS = {400, 450, 500, 550, 600};
+        private static final Typeface[] WEIGHT_FACES = new Typeface[WEIGHTS.length];
+
+        private static Typeface faceFor(final int step) {
+            if (WEIGHT_FACES[step] == null) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                    WEIGHT_FACES[step] = Typeface.create(
+                            Typeface.create("sans-serif", Typeface.NORMAL),
+                            WEIGHTS[step], false);
+                } else {
+                    WEIGHT_FACES[step] = step >= 2
+                            ? Typeface.create("sans-serif-medium", Typeface.NORMAL)
+                            : Typeface.create("sans-serif", Typeface.NORMAL);
+                }
+            }
+            return WEIGHT_FACES[step];
+        }
 
         private final Drawable icon;
         private final CharSequence label;
@@ -673,7 +686,8 @@ public class MorphingNavPill extends ViewGroup {
 
             labelPaint.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 14f,
                     context.getResources().getDisplayMetrics()));
-            labelPaint.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
+            // measured with the heaviest weight, so the label never gets cut while it bolds
+            labelPaint.setTypeface(faceFor(WEIGHTS.length - 1));
             naturalLabelWidth = Math.round(labelPaint.measureText(label, 0, label.length()));
             shownLabel = label;
             shownLabelWidth = naturalLabelWidth;
@@ -764,7 +778,10 @@ public class MorphingNavPill extends ViewGroup {
                 final Paint.FontMetrics fm = labelPaint.getFontMetrics();
                 final float baseline = h / 2f - (fm.ascent + fm.descent) / 2f;
 
-                labelPaint.setColor(ColorUtils.setAlphaComponent(onChipColor,
+                // colour and weight follow the chip's exact position (inactive -> selected)
+                final int labelColor = (Integer) COLORS.evaluate(fc, inactiveColor, onChipColor);
+                labelPaint.setTypeface(faceFor(Math.round(fc * (WEIGHTS.length - 1))));
+                labelPaint.setColor(ColorUtils.setAlphaComponent(labelColor,
                         Math.round(255 * labelAlpha)));
                 canvas.save();
                 canvas.clipRect(labelX, 0f, startX + contentWidth, h);

@@ -11,6 +11,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.graphics.ColorUtils;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentStatePagerAdapter;
@@ -106,14 +107,16 @@ public class TrendingFragment extends BaseFragment {
         final Context context = text.getContext();
         final int onSurface = ThemeHelper.resolveColorFromAttr(context,
                 android.R.attr.textColorPrimary);
-        final int idleFill = ThemeHelper.resolveColorFromAttr(context,
-                R.attr.toolbar_element_color);
         final int onInverse = ThemeHelper.resolveColorFromAttr(context,
                 R.attr.toolbar_container_color);
+        // same look as the Home pills: outlined when idle, filled with the text colour when
+        // selected (page colour as text), 12dp rounded rectangle
+        final int idleStroke = ColorUtils.setAlphaComponent(onSurface, 0x40);
         final GradientDrawable background = new GradientDrawable();
-        background.setCornerRadius(DeviceUtils.dpToPx(100, context));
-        // selected = inverted pill, idle = tonal pill (same as the Home chips)
-        background.setColor(selected ? onSurface : idleFill);
+        background.setCornerRadius(DeviceUtils.dpToPx(12, context));
+        background.setColor(selected ? onSurface : ColorUtils.setAlphaComponent(onSurface, 0));
+        background.setStroke(Math.max(1, DeviceUtils.dpToPx(1, context)),
+                selected ? onSurface : idleStroke);
         text.setBackground(background);
         text.setTextColor(selected ? onInverse : onSurface);
     }

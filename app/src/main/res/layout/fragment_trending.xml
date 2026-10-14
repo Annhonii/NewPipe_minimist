@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- The chips (Live, Gaming, Podcasts, ...) are in an AppBarLayout, so they scroll up together
+<!-- The chips (Entertainment, Music, ...) are in an AppBarLayout, so they scroll up together
      with the video list; only the top bar of the app stays fixed. -->
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -20,9 +20,12 @@
             android:id="@+id/trending_tabs"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="?attr/toolbar_container_color"
             android:clipToPadding="false"
-            android:paddingStart="12dp"
-            android:paddingEnd="12dp"
+            android:paddingStart="16dp"
+            android:paddingTop="6dp"
+            android:paddingEnd="8dp"
+            android:paddingBottom="10dp"
             app:layout_scrollFlags="scroll"
             app:tabGravity="start"
             app:tabIndicatorHeight="0dp"

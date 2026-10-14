@@ -22,6 +22,7 @@ import org.schabi.newpipe.R;
  * it never touches the adapter, the layout manager or the item animator.</p>
  */
 public final class ListMotion {
+    private static final boolean ENABLED = false;
     private static final long DURATION_MS = 380L;
     private static final long STAGGER_MS = 42L;
     private static final int MAX_STAGGER_STEPS = 8;
@@ -60,6 +61,11 @@ public final class ListMotion {
     }
 
     public static void install(@NonNull final RecyclerView list) {
+        // Entrance animation disabled: it could leave rows at alpha 0 (blank list) when
+        // scrolling fast or together with other animations.
+        if (!ENABLED) {
+            return;
+        }
         if (list.getTag(R.id.list_motion_state) != null) {
             return;
         }
