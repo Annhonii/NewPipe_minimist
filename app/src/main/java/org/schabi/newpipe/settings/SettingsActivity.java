@@ -93,6 +93,7 @@ public class SettingsActivity extends AppCompatActivity implements
         org.schabi.newpipe.util.AppearanceHelper.applyOverlays(this);
 
         super.onCreate(savedInstanceBundle);
+        org.schabi.newpipe.util.OpaqueFragmentBackground.install(getSupportFragmentManager());
         Bridge.restoreInstanceState(this, savedInstanceBundle);
         final boolean restored = savedInstanceBundle != null;
 
@@ -186,8 +187,8 @@ public class SettingsActivity extends AppCompatActivity implements
 
     private void showSettingsFragment(final Fragment fragment) {
         getSupportFragmentManager().beginTransaction()
-                .setCustomAnimations(R.animator.frag_enter, R.animator.frag_exit,
-                        R.animator.frag_pop_enter, R.animator.frag_pop_exit)
+                .setCustomAnimations(R.anim.screen_enter, R.anim.screen_exit,
+                        R.anim.screen_pop_enter, R.anim.screen_pop_exit)
                 .replace(FRAGMENT_HOLDER_ID, fragment)
                 .addToBackStack(null)
                 .commit();

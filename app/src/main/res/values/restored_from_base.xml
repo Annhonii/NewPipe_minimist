@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="accent_ice_dark">#CFE8F5</color>
-    <color name="accent_ice_light">#2F4A5C</color>
+    <color name="accent_ice_dark">#D71921</color>
+    <color name="accent_ice_light">#D71921</color>
 
     <!-- Modern circular loader: spinning arc that grows and shrinks, tinted with the accent -->
     <style name="Widget.App.ProgressBar" parent="@android:style/Widget.Material.ProgressBar">

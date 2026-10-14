@@ -15,8 +15,8 @@
         android:minHeight="?attr/actionBarSize"
         android:theme="@style/ContrastToolbarTheme"
         app:contentInsetEnd="8dp"
-        app:contentInsetStart="16dp"
-        app:contentInsetStartWithNavigation="8dp"
+        app:contentInsetStart="20dp"
+        app:contentInsetStartWithNavigation="12dp"
         app:titleMarginStart="8dp"
         app:titleTextAppearance="@style/TextAppearance.App.ToolbarTitle">
 

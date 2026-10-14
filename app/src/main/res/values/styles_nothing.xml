@@ -11,7 +11,7 @@
         <item name="track">@drawable/switch_track</item>
         <item name="showText">false</item>
         <item name="splitTrack">false</item>
-        <item name="switchMinWidth">64dp</item>
+        <item name="switchMinWidth">56dp</item>
         <item name="switchPadding">0dp</item>
         <item name="thumbTextPadding">0dp</item>
     </style>
@@ -75,9 +75,10 @@
     <style name="Widget.App.Toolbar.Button.Navigation"
         parent="Widget.AppCompat.Toolbar.Button.Navigation">
         <item name="android:background">@drawable/bg_icon_button</item>
-        <item name="android:minWidth">40dp</item>
-        <item name="android:minHeight">40dp</item>
-        <item name="android:padding">8dp</item>
+        <!-- 48dp touch box around a 36dp circle: leaves a visible gap to the screen edge / title -->
+        <item name="android:minWidth">48dp</item>
+        <item name="android:minHeight">48dp</item>
+        <item name="android:padding">12dp</item>
     </style>
 
     <!-- Accent text (Ndot dot-matrix) used for big headings -->

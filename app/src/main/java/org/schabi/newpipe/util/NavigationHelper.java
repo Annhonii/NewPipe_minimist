@@ -347,8 +347,8 @@ public final class NavigationHelper {
     @SuppressLint("CommitTransaction")
     private static FragmentTransaction defaultTransaction(final FragmentManager fragmentManager) {
         return fragmentManager.beginTransaction()
-                .setCustomAnimations(R.animator.frag_enter, R.animator.frag_exit,
-                        R.animator.frag_pop_enter, R.animator.frag_pop_exit);
+                .setCustomAnimations(R.anim.screen_enter, R.anim.screen_exit,
+                        R.anim.screen_pop_enter, R.anim.screen_pop_exit);
     }
 
     public static void gotoMainFragment(final FragmentManager fragmentManager) {
@@ -364,8 +364,8 @@ public final class NavigationHelper {
         fragmentManager.popBackStackImmediate(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
         // top level destination -> Material 3 fade through instead of the shared axis slide
         fragmentManager.beginTransaction()
-                .setCustomAnimations(R.animator.frag_through_enter, R.animator.frag_through_exit,
-                        R.animator.frag_through_enter, R.animator.frag_through_exit)
+                .setCustomAnimations(R.anim.screen_enter, R.anim.screen_exit,
+                        R.anim.screen_pop_enter, R.anim.screen_pop_exit)
                 .replace(R.id.fragment_holder, new MainFragment())
                 .addToBackStack(MAIN_FRAGMENT_TAG)
                 .commit();

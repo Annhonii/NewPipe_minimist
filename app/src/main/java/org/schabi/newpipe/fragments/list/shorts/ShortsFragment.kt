@@ -679,7 +679,7 @@ class ShortsFragment : BaseFragment() {
 
     companion object {
         private const val ARG_SEED = "shorts_seed_id"
-        private val LIKED_COLOR = Color.parseColor("#FFFF2D55")
+        private val LIKED_COLOR = Color.parseColor("#FFD71921")
 
         /** Shorts player that starts with the given short, then continues with YouTube's picks. */
         @JvmStatic

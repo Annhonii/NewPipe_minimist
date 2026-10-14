@@ -73,3 +73,14 @@ player.xml padding on the 3 buttons (icon size in landscape / popup), toolbar_se
 Not compiled here.
 - Player quality/audio/caption popups + queue item menu: DarkPopupMenu now has a dark popup surface (bg_popup_menu_dark), fixing white text on white popup in light mode.
 - Home tab: HomeFeedFragment caches the last feed (30 min, per account; pull-to-refresh bypasses) + MainFragment keeps all tabs alive (offscreen limit) so switching tabs no longer re-buffers Home.
+
+## Pass 7 (user request): no blink, slide transitions, red/black/white, Nothing switch
+- No blink: toolbar fade in MainActivity.invalidateOptionsMenu removed (instant rebuild); settings list layout-animation removed;
+  all fragment/activity transitions are now alpha-free slides (anim/screen_*: forward = new page from the right + old page -25% parallax,
+  back = leaving page slides out to the right over the previous one). animator/frag_* deleted, NavigationHelper + SettingsActivity use R.anim.screen_*.
+- util/OpaqueFragmentBackground (installed in MainActivity + SettingsActivity) gives pages an opaque bg so nothing shines through while sliding.
+- Colours: ice / sage / purple / pink / orange / amber / yellow accents, shorts seekbar, heart, splash foreground, avatar palette and the Compose
+  Color.kt blues are now Nothing red #D71921 or neutral greys. Left alone: PeerTube placeholder logo (orange brand artwork).
+- Switch: red track (on) / dark grey (off), 56x32, big white 24dp thumb (switch_track/switch_thumb, switchMinWidth 56dp).
+- Toolbar back circle: 36dp circle inside a 48dp touch box, toolbar start inset 20dp / 12dp with navigation.
+Not compiled here.
