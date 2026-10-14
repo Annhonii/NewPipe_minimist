@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Screen being covered: drifts left a little and fades out -->
+<!-- Material 3 shared axis X, forward: outgoing screen fades out in the first 90ms while moving left -->
 <set xmlns:android="http://schemas.android.com/apk/res/android"
     android:ordering="together">
     <objectAnimator
-        android:duration="140"
-        android:interpolator="@interpolator/emphasized_accelerate"
+        android:duration="90"
+        android:interpolator="@android:interpolator/linear"
         android:propertyName="alpha"
+        android:startOffset="0"
         android:valueFrom="1.0f"
         android:valueTo="0.0f" />
     <objectAnimator
@@ -13,6 +14,6 @@
         android:interpolator="@interpolator/emphasized_accelerate"
         android:propertyName="translationX"
         android:valueFrom="0dp"
-        android:valueTo="-36dp"
+        android:valueTo="-30dp"
         android:valueType="floatType" />
 </set>

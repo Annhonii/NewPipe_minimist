@@ -1,20 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Rows rise, fade and settle in a gentle cascade. Used by list layout animations. -->
+<!-- Material 3 fade through (incoming): fade in after a short beat with a subtle 92% scale -->
 <set xmlns:android="http://schemas.android.com/apk/res/android"
-    android:duration="480"
-    android:interpolator="@interpolator/emphasized_decelerate">
+    android:shareInterpolator="false">
     <alpha
-        android:duration="300"
+        android:duration="210"
         android:fromAlpha="0"
+        android:interpolator="@interpolator/standard_decelerate"
+        android:startOffset="90"
         android:toAlpha="1" />
-    <translate
-        android:fromYDelta="14%"
-        android:toYDelta="0%" />
     <scale
-        android:fromXScale="0.98"
-        android:fromYScale="0.98"
+        android:duration="300"
+        android:fromXScale="0.92"
+        android:fromYScale="0.92"
+        android:interpolator="@interpolator/emphasized_decelerate"
         android:pivotX="50%"
-        android:pivotY="0%"
+        android:pivotY="50%"
+        android:startOffset="90"
         android:toXScale="1"
         android:toYScale="1" />
 </set>

@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Screen leaving: recedes slightly and fades -->
+<!-- Material 3 shared axis X: covered activity moves left and fades out -->
 <set xmlns:android="http://schemas.android.com/apk/res/android"
-    android:duration="260"
-    android:interpolator="@interpolator/emphasized_accelerate">
+    android:shareInterpolator="false">
     <alpha
+        android:duration="90"
         android:fromAlpha="1"
+        android:interpolator="@android:interpolator/linear"
+        android:startOffset="0"
         android:toAlpha="0" />
-    <scale
-        android:fromXScale="1"
-        android:fromYScale="1"
-        android:pivotX="50%"
-        android:pivotY="50%"
-        android:toXScale="0.96"
-        android:toYScale="0.96" />
+    <translate
+        android:duration="300"
+        android:fromXDelta="0dp"
+        android:interpolator="@interpolator/emphasized_accelerate"
+        android:toXDelta="-30dp" />
 </set>

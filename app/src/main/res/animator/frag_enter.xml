@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- New screen: slides in from the right while fading in (shared axis X) -->
+<!-- Material 3 shared axis X, forward: incoming screen fades in after 90ms while moving in from the right -->
 <set xmlns:android="http://schemas.android.com/apk/res/android"
     android:ordering="together">
     <objectAnimator
-        android:duration="220"
-        android:interpolator="@interpolator/standard"
+        android:duration="210"
+        android:interpolator="@android:interpolator/linear"
         android:propertyName="alpha"
-        android:startOffset="60"
+        android:startOffset="90"
         android:valueFrom="0.0f"
         android:valueTo="1.0f" />
     <objectAnimator
-        android:duration="380"
+        android:duration="300"
         android:interpolator="@interpolator/emphasized_decelerate"
         android:propertyName="translationX"
-        android:valueFrom="36dp"
+        android:valueFrom="30dp"
         android:valueTo="0dp"
         android:valueType="floatType" />
 </set>

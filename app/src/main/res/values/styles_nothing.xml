@@ -112,8 +112,8 @@
     <style name="Animation.App.Window" parent="@android:style/Animation.Activity">
         <item name="android:activityOpenEnterAnimation">@anim/screen_enter</item>
         <item name="android:activityOpenExitAnimation">@anim/screen_exit</item>
-        <item name="android:activityCloseEnterAnimation">@anim/screen_enter</item>
-        <item name="android:activityCloseExitAnimation">@anim/screen_exit</item>
+        <item name="android:activityCloseEnterAnimation">@anim/screen_pop_enter</item>
+        <item name="android:activityCloseExitAnimation">@anim/screen_pop_exit</item>
     </style>
 
     <!-- Default dialog theme for AlertDialog.Builder(context); light by default, dark in -night -->
