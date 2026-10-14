@@ -2957,10 +2957,18 @@ public final class VideoDetailFragment
         final int restVisibility = slide <= 0f ? View.INVISIBLE : View.VISIBLE;
         for (final View rest : new View[] {binding.detailContentRootLayout, binding.viewPager,
                 binding.tabLayout, binding.relatedItemsLayout, binding.detailStatusSpacer}) {
-            if (rest != null) {
-                rest.setAlpha(slide);
-                rest.setVisibility(restVisibility);
+            if (rest == null) {
+                continue;
             }
+            if (rest == binding.tabLayout
+                    && (pageAdapter == null || pageAdapter.getCount() < 2)) {
+                // a single tab (the related videos) needs no tab bar: keep it hidden, as
+                // updateTabLayoutVisibility() decided, instead of showing it again here
+                rest.setVisibility(View.GONE);
+                continue;
+            }
+            rest.setAlpha(slide);
+            rest.setVisibility(restVisibility);
         }
 
         final android.graphics.drawable.Drawable background = binding.getRoot().getBackground();
