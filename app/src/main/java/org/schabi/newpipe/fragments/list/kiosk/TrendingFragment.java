@@ -1,7 +1,6 @@
 package org.schabi.newpipe.fragments.list.kiosk;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -12,7 +11,6 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.graphics.ColorUtils;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentStatePagerAdapter;
@@ -108,14 +106,18 @@ public class TrendingFragment extends BaseFragment {
         }
         final TextView text = custom.findViewById(R.id.trending_chip_text);
         final Context context = text.getContext();
-        final int primary = ThemeHelper.resolveColorFromAttr(context,
-                androidx.appcompat.R.attr.colorPrimary);
+        final int onSurface = ThemeHelper.resolveColorFromAttr(context,
+                android.R.attr.textColorPrimary);
+        final int idleFill = ThemeHelper.resolveColorFromAttr(context,
+                R.attr.toolbar_element_color);
+        final int onInverse = ThemeHelper.resolveColorFromAttr(context,
+                R.attr.toolbar_container_color);
         final GradientDrawable background = new GradientDrawable();
         background.setCornerRadius(DeviceUtils.dpToPx(100, context));
-        background.setColor(selected ? primary : ColorUtils.setAlphaComponent(primary, 0x2E));
+        // selected = inverted pill, idle = tonal pill (same as the Home chips)
+        background.setColor(selected ? onSurface : idleFill);
         text.setBackground(background);
-        text.setTextColor(selected ? Color.WHITE
-                : ThemeHelper.resolveColorFromAttr(context, android.R.attr.textColorPrimary));
+        text.setTextColor(selected ? onInverse : onSurface);
     }
 
     @Override

@@ -2,4 +2,5 @@
 <resources>
     <color name="contrastColor">@color/white</color>
     <color name="defaultIconTint">@color/white</color>
+    <color name="nav_inactive">#8A8A8A</color>
 </resources>

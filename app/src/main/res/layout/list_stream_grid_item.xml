@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout
-    android:stateListAnimator="@animator/press_scale_soft" xmlns:android="http://schemas.android.com/apk/res/android"
+    android:stateListAnimator="@animator/press_scale_card" xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/itemRoot"
@@ -45,7 +45,6 @@
     <!-- three-dots button on the top right of the thumbnail: opens the same menu as a long press
          (long press is turned off on these cards). Hidden until a holder wires it up. -->
     <ImageButton
-        android:stateListAnimator="@animator/press_scale"
         android:id="@+id/itemMoreButton"
         android:layout_width="32dp"
         android:layout_height="32dp"

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Dot-matrix launch mark: 3x3 dots, the centre one in Nothing red. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="96dp" android:height="96dp"
+    android:viewportWidth="96" android:viewportHeight="96">
+    <path android:fillColor="#FFFFFF" android:pathData="M16,22a6,6 0 1,0 12,0a6,6 0 1,0 -12,0z" />
+    <path android:fillColor="#FFFFFF" android:pathData="M36,22a6,6 0 1,0 12,0a6,6 0 1,0 -12,0z" />
+    <path android:fillColor="#FFFFFF" android:pathData="M56,22a6,6 0 1,0 12,0a6,6 0 1,0 -12,0z" />
+    <path android:fillColor="#FFFFFF" android:pathData="M16,42a6,6 0 1,0 12,0a6,6 0 1,0 -12,0z" />
+    <path android:fillColor="#D71921" android:pathData="M36,42a6,6 0 1,0 12,0a6,6 0 1,0 -12,0z" />
+    <path android:fillColor="#FFFFFF" android:pathData="M56,42a6,6 0 1,0 12,0a6,6 0 1,0 -12,0z" />
+    <path android:fillColor="#FFFFFF" android:pathData="M16,62a6,6 0 1,0 12,0a6,6 0 1,0 -12,0z" />
+    <path android:fillColor="#FFFFFF" android:pathData="M36,62a6,6 0 1,0 12,0a6,6 0 1,0 -12,0z" />
+    <path android:fillColor="#FFFFFF" android:pathData="M56,62a6,6 0 1,0 12,0a6,6 0 1,0 -12,0z" />
+</vector>

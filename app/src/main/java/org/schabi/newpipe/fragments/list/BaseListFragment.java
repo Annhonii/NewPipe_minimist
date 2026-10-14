@@ -242,6 +242,7 @@ public abstract class BaseListFragment<I, N> extends BaseStateFragment<I>
         }
 
         itemsList.setAdapter(infoListAdapter);
+        org.schabi.newpipe.util.ListMotion.install(itemsList);
     }
 
     protected void onItemSelected(final InfoItem selectedItem) {

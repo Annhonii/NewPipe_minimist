@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout
-    android:stateListAnimator="@animator/press_scale_soft" xmlns:android="http://schemas.android.com/apk/res/android"
+    android:stateListAnimator="@animator/press_scale_card" xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/itemRoot"
     android:layout_marginStart="12dp"

@@ -7,15 +7,15 @@
         <item name="colorAccent">@android:color/transparent</item>
 
         <item name="android:windowBackground">@drawable/splash_background</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
     </style>
     <style name="Base.OpeningTheme" parent="Base.V21.OpeningTheme">
-        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@color/light_background_color</item>
     </style>
     <style name="OpeningTheme" parent="Base.OpeningTheme" />
 
     <!-- Base Theme -->
     <style name="Base.V21" parent="Theme.AppCompat.DayNight.NoActionBar">
-        <item name="android:fontFamily">@font/geist</item>
         <item name="actionColor">@color/white</item>
         <item name="floatingActionButtonStyle">@style/FloatingActionButtonTheme</item>
         <item name="toolbarSearchColor">@color/white</item>
@@ -26,11 +26,10 @@
         <item name="seekBarStyle">@style/Widget.App.SeekBar</item>
         <item name="popupMenuStyle">@style/Widget.App.PopupMenu</item>
         <item name="actionOverflowMenuStyle">@style/Widget.App.PopupMenu.Overflow</item>
-        <item name="android:progressBarStyle">@style/Widget.App.ProgressBar</item>
-        <item name="android:progressBarStyleLarge">@style/Widget.App.ProgressBar</item>
-        <item name="android:progressBarStyleLargeInverse">@style/Widget.App.ProgressBar</item>
         <item name="alertDialogTheme">@style/ThemeOverlay.App.AlertDialog</item>
         <item name="android:windowAnimationStyle">@style/Animation.App.Window</item>
+        <item name="android:fontFamily">@font/geist</item>
+        <item name="fontFamily">@font/geist</item>
     </style>
     <style name="Base" parent="Base.V21"/>
 
@@ -122,12 +121,11 @@
 
     <!-- Dialogs: floating rounded surfaces with accent text buttons -->
     <style name="LightDialogTheme" parent="Theme.AppCompat.DayNight.Dialog">
-        <item name="android:fontFamily">@font/geist</item>
         <item name="toolbar_container_color">@color/light_dialog_background_color</item>
         <item name="toolbar_element_color">@color/light_card_item_background_color</item>
-        <item name="colorPrimary">@color/accent_ice_light</item>
-        <item name="colorPrimaryDark">@color/accent_ice_light</item>
-        <item name="colorAccent">@color/accent_ice_light</item>
+        <item name="colorPrimary">@color/nothing_red</item>
+        <item name="colorPrimaryDark">@color/nothing_red</item>
+        <item name="colorAccent">@color/nothing_red</item>
         <item name="android:windowBackground">@drawable/bg_dialog</item>
         <item name="android:windowAnimationStyle">@style/Animation.App.Dialog</item>
         <item name="android:textColorPrimary">@color/text_primary_light</item>
@@ -146,15 +144,16 @@
         <item name="seekBarStyle">@style/Widget.App.SeekBar</item>
         <item name="popupMenuStyle">@style/Widget.App.PopupMenu</item>
         <item name="windowBackground">@color/light_dialog_background_color</item>
+        <item name="android:fontFamily">@font/geist</item>
+        <item name="fontFamily">@font/geist</item>
     </style>
 
     <style name="DarkDialogTheme" parent="Theme.AppCompat.DayNight.Dialog">
-        <item name="android:fontFamily">@font/geist</item>
         <item name="toolbar_container_color">@color/dark_dialog_background_color</item>
         <item name="toolbar_element_color">@color/dark_card_item_background_color</item>
-        <item name="colorPrimary">@color/accent_ice_dark</item>
-        <item name="colorPrimaryDark">@color/accent_ice_dark</item>
-        <item name="colorAccent">@color/accent_ice_dark</item>
+        <item name="colorPrimary">@color/nothing_red</item>
+        <item name="colorPrimaryDark">@color/nothing_red</item>
+        <item name="colorAccent">@color/nothing_red</item>
         <item name="android:windowBackground">@drawable/bg_dialog</item>
         <item name="android:windowAnimationStyle">@style/Animation.App.Dialog</item>
         <item name="android:textColorPrimary">@color/text_primary_dark</item>
@@ -173,15 +172,16 @@
         <item name="seekBarStyle">@style/Widget.App.SeekBar</item>
         <item name="popupMenuStyle">@style/Widget.App.PopupMenu</item>
         <item name="windowBackground">@color/dark_dialog_background_color</item>
+        <item name="android:fontFamily">@font/geist</item>
+        <item name="fontFamily">@font/geist</item>
     </style>
 
     <style name="LightDialogMinWidthTheme" parent="Theme.AppCompat.DayNight.Dialog.MinWidth">
-        <item name="android:fontFamily">@font/geist</item>
         <item name="toolbar_container_color">@color/light_dialog_background_color</item>
         <item name="toolbar_element_color">@color/light_card_item_background_color</item>
-        <item name="colorPrimary">@color/accent_ice_light</item>
-        <item name="colorPrimaryDark">@color/accent_ice_light</item>
-        <item name="colorAccent">@color/accent_ice_light</item>
+        <item name="colorPrimary">@color/nothing_red</item>
+        <item name="colorPrimaryDark">@color/nothing_red</item>
+        <item name="colorAccent">@color/nothing_red</item>
         <item name="android:windowBackground">@drawable/bg_dialog</item>
         <item name="android:windowAnimationStyle">@style/Animation.App.Dialog</item>
         <item name="android:textColorPrimary">@color/text_primary_light</item>
@@ -200,15 +200,16 @@
         <item name="seekBarStyle">@style/Widget.App.SeekBar</item>
         <item name="popupMenuStyle">@style/Widget.App.PopupMenu</item>
         <item name="windowBackground">@color/light_dialog_background_color</item>
+        <item name="android:fontFamily">@font/geist</item>
+        <item name="fontFamily">@font/geist</item>
     </style>
 
     <style name="DarkDialogMinWidthTheme" parent="Theme.AppCompat.DayNight.Dialog.MinWidth">
-        <item name="android:fontFamily">@font/geist</item>
         <item name="toolbar_container_color">@color/dark_dialog_background_color</item>
         <item name="toolbar_element_color">@color/dark_card_item_background_color</item>
-        <item name="colorPrimary">@color/accent_ice_dark</item>
-        <item name="colorPrimaryDark">@color/accent_ice_dark</item>
-        <item name="colorAccent">@color/accent_ice_dark</item>
+        <item name="colorPrimary">@color/nothing_red</item>
+        <item name="colorPrimaryDark">@color/nothing_red</item>
+        <item name="colorAccent">@color/nothing_red</item>
         <item name="android:windowBackground">@drawable/bg_dialog</item>
         <item name="android:windowAnimationStyle">@style/Animation.App.Dialog</item>
         <item name="android:textColorPrimary">@color/text_primary_dark</item>
@@ -227,6 +228,8 @@
         <item name="seekBarStyle">@style/Widget.App.SeekBar</item>
         <item name="popupMenuStyle">@style/Widget.App.PopupMenu</item>
         <item name="windowBackground">@color/dark_dialog_background_color</item>
+        <item name="android:fontFamily">@font/geist</item>
+        <item name="fontFamily">@font/geist</item>
     </style>
 
 

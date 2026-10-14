@@ -13,6 +13,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceCategory;
 import androidx.preference.PreferenceGroup;
@@ -64,8 +65,18 @@ final class SegmentedPreferenceAdapter extends PreferenceGroupAdapter {
                                @NonNull final Context ctx) {
         super(preferenceGroup);
         this.context = ctx;
-        this.regular = Typeface.DEFAULT;
-        this.medium = Typeface.create(Typeface.DEFAULT, Typeface.BOLD);
+        // Geist, like the rest of the app (falls back to the system font if loading fails)
+        Typeface geistRegular = null;
+        Typeface geistMedium = null;
+        try {
+            geistRegular = ResourcesCompat.getFont(ctx, R.font.geist_regular);
+            geistMedium = ResourcesCompat.getFont(ctx, R.font.geist_medium);
+        } catch (final Exception ignored) {
+            // keep the fallbacks below
+        }
+        this.regular = geistRegular != null ? geistRegular : Typeface.DEFAULT;
+        this.medium = geistMedium != null ? geistMedium
+                : Typeface.create(Typeface.DEFAULT, Typeface.BOLD);
     }
 
     @Override

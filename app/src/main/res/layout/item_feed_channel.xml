@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
-    android:stateListAnimator="@animator/press_scale_soft" xmlns:android="http://schemas.android.com/apk/res/android"
+    android:stateListAnimator="@animator/press_scale_card" xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="72dp"
     android:layout_height="wrap_content"

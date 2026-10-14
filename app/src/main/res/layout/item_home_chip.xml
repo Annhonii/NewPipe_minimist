@@ -10,4 +10,5 @@
     android:paddingStart="12dp"
     android:paddingEnd="12dp"
     android:singleLine="true"
+    android:stateListAnimator="@animator/press_scale"
     android:textSize="14sp" />

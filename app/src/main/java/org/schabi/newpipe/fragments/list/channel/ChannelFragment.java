@@ -669,7 +669,7 @@ public class ChannelFragment extends BaseStateFragment<ChannelInfo>
         }
 
         binding.errorContentNotSupported.setVisibility(View.VISIBLE);
-        binding.channelKaomoji.setText("(︶︹︺)");
-        binding.channelKaomoji.setTextSize(TypedValue.COMPLEX_UNIT_SP, 45f);
+        binding.channelKaomoji.setText("...");
+        binding.channelKaomoji.setTextSize(TypedValue.COMPLEX_UNIT_SP, 56f);
     }
 }

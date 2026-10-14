@@ -146,6 +146,7 @@ public abstract class BaseLocalListFragment<I, N> extends BaseStateFragment<I>
         itemListAdapter.setFooter(footerRootBinding.getRoot());
 
         itemsList.setAdapter(itemListAdapter);
+        org.schabi.newpipe.util.ListMotion.install(itemsList);
     }
 
     @Override

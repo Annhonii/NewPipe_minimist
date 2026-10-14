@@ -66,9 +66,9 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginBottom="10dp"
-            android:fontFamily="@font/geist_mono"
-            android:text="╰(°●°╰)"
-            android:textSize="35sp"
+            android:fontFamily="@font/ndot"
+            android:text="..."
+            android:textSize="56sp"
             tools:ignore="HardcodedText,UnusedAttribute" />
 
         <org.schabi.newpipe.views.NewPipeTextView

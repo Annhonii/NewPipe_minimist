@@ -4,17 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="?colorPrimary"
+    android:background="?android:attr/windowBackground"
     android:nextFocusDown="@+id/drawer_header_action_button">
-
-    <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:scaleType="centerCrop"
-        android:src="@drawable/background_header"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:ignore="ContentDescription" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -39,7 +30,7 @@
                 android:layout_width="@dimen/drawer_header_newpipe_icon_size"
                 android:layout_height="@dimen/drawer_header_newpipe_icon_size"
                 android:layout_marginEnd="@dimen/drawer_header_newpipe_icon_title_space"
-                android:src="@drawable/splash_foreground"
+                android:src="@drawable/ic_splash_mark"
                 tools:ignore="ContentDescription" />
 
             <org.schabi.newpipe.views.NewPipeTextView
@@ -52,8 +43,9 @@
                 android:hyphenationFrequency="full"
                 android:maxLines="1"
                 android:text="@string/app_name"
-                android:textColor="@color/drawer_header_font_color"
-                android:textStyle="bold"
+                android:fontFamily="@font/ndot"
+                android:textAllCaps="true"
+                android:textColor="?android:attr/textColorPrimary"
                 app:autoSizeMaxTextSize="@dimen/drawer_header_newpipe_title_max_text_size"
                 app:autoSizeMinTextSize="@dimen/drawer_header_newpipe_title_min_text_size"
                 app:autoSizeTextType="uniform"
@@ -64,7 +56,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            android:background="@drawable/drawer_header_bottom_background"
+            android:background="@drawable/bg_drawer_service_pill"
             android:gravity="center"
             android:orientation="horizontal"
             android:paddingLeft="6dp"
@@ -84,7 +76,7 @@
                     android:layout_marginLeft="6dp"
                     android:layout_marginRight="6dp"
                     android:scaleType="fitCenter"
-                    app:tint="@color/drawer_header_font_color"
+                    app:tint="?android:attr/textColorPrimary"
                     tools:ignore="ContentDescription"
                     tools:src="@drawable/ic_smart_display" />
 
@@ -94,7 +86,7 @@
                     android:layout_height="wrap_content"
                     android:ellipsize="end"
                     android:maxLines="1"
-                    android:textColor="@color/drawer_header_font_color"
+                    android:textColor="?android:attr/textColorPrimary"
                     android:textSize="@dimen/drawer_header_service_title_text_size"
                     tools:text="YouTube" />
             </LinearLayout>
@@ -105,7 +97,7 @@
                 android:layout_height="24dp"
                 android:layout_marginStart="4dp"
                 android:src="@drawable/ic_arrow_drop_down"
-                app:tint="@color/drawer_header_font_color"
+                app:tint="?android:attr/textColorPrimary"
                 tools:ignore="ContentDescription" />
         </LinearLayout>
     </LinearLayout>

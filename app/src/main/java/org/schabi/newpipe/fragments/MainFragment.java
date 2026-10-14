@@ -17,10 +17,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -48,6 +46,7 @@ import org.schabi.newpipe.settings.tabs.TabsManager;
 import org.schabi.newpipe.util.NavigationHelper;
 import org.schabi.newpipe.util.ServiceHelper;
 import org.schabi.newpipe.util.ThemeHelper;
+import org.schabi.newpipe.views.NavTabView;
 import org.schabi.newpipe.views.ScrollableTabLayout;
 
 import java.util.ArrayList;
@@ -131,24 +130,9 @@ public class MainFragment extends BaseFragment implements TabLayout.OnTabSelecte
         // icon-only floating pill: every tab gets the same share of the pill, however many
         binding.mainTabLayout.setPillVisibleTabs(Integer.MAX_VALUE);
         binding.mainTabLayout.setSelectedTabIndicatorColor(ThemeHelper.resolveColorFromAttr(
-                requireContext(), R.attr.card_item_background_color));
+                requireContext(), R.attr.card_item_contrast_color));
         binding.mainTabLayout.setupWithViewPager(binding.pager);
         binding.mainTabLayout.addOnTabSelectedListener(this);
-
-        // Tab pages ease into each other: the page leaving shrinks and fades a little while
-        // the new one settles in, instead of a hard side-by-side slide.
-        binding.pager.setPageTransformer(false, (page, position) -> {
-            final float abs = Math.abs(position);
-            if (abs >= 1f) {
-                page.setAlpha(0f);
-                return;
-            }
-            final float scale = 1f - 0.05f * abs;
-            page.setAlpha(1f - 0.85f * abs);
-            page.setScaleX(scale);
-            page.setScaleY(scale);
-            page.setTranslationX(-position * page.getWidth() * 0.18f);
-        });
 
         setupTabs();
         updateTabLayoutPosition();
@@ -281,15 +265,13 @@ public class MainFragment extends BaseFragment implements TabLayout.OnTabSelecte
             final TabLayout.Tab tabToSet = binding.mainTabLayout.getTabAt(i);
             if (tabToSet != null) {
                 final Tab tab = tabsList.get(i);
-                final String name = tab.getTabName(requireContext());
-                final View custom = LayoutInflater.from(requireContext())
-                        .inflate(R.layout.nav_pill_tab, null);
-                ((ImageView) custom.findViewById(R.id.nav_tab_icon))
-                        .setImageResource(tab.getTabIconRes(requireContext()));
-                ((TextView) custom.findViewById(R.id.nav_tab_label)).setText(name);
-                tabToSet.setCustomView(custom);
-                tabToSet.setContentDescription(name);
-                setTabLabelVisible(tabToSet, tabToSet.isSelected());
+                // icon + label that lifts / rises in when the tab is selected
+                final NavTabView tabView = new NavTabView(requireContext());
+                tabView.bind(tab.getTabIconRes(requireContext()),
+                        tab.getTabName(requireContext()));
+                tabToSet.setCustomView(tabView);
+                tabView.snapTo(tabToSet.isSelected());
+                tabToSet.setContentDescription(tab.getTabName(requireContext()));
             }
         }
     }
@@ -410,13 +392,7 @@ public class MainFragment extends BaseFragment implements TabLayout.OnTabSelecte
             Log.d(TAG, "onTabSelected() called with: selectedTab = [" + selectedTab + "]");
         }
         updateTitleForTab(selectedTab.getPosition());
-        setTabLabelVisible(selectedTab, true);
-        // the selected tab is wider than the others: lay the pill out again
-        if (binding != null) {
-            binding.mainTabLayout.requestLayout();
-        }
-        // light tick when the pill switches tab
-        if (binding != null) {
+        if (binding != null && binding.mainTabLayout.isLaidOut()) {
             binding.mainTabLayout.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK);
         }
         // show / hide the settings button of the top bar
@@ -426,20 +402,7 @@ public class MainFragment extends BaseFragment implements TabLayout.OnTabSelecte
     }
 
     @Override
-    public void onTabUnselected(final TabLayout.Tab tab) {
-        setTabLabelVisible(tab, false);
-    }
-
-    /** Only the selected nav pill tab shows its name next to the icon. */
-    private static void setTabLabelVisible(final TabLayout.Tab tab, final boolean visible) {
-        final View custom = tab.getCustomView();
-        if (custom != null) {
-            final View label = custom.findViewById(R.id.nav_tab_label);
-            if (label != null) {
-                label.setVisibility(visible ? View.VISIBLE : View.GONE);
-            }
-        }
-    }
+    public void onTabUnselected(final TabLayout.Tab tab) { }
 
     @Override
     public void onTabReselected(final TabLayout.Tab tab) {

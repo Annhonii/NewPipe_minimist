@@ -1,14 +1,16 @@
 package org.schabi.newpipe.fragments.list.home
 
-import android.graphics.Color
+import android.animation.ValueAnimator
 import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.DecelerateInterpolator
 import android.widget.TextView
 import androidx.core.graphics.ColorUtils
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentTransaction
 import org.schabi.newpipe.BaseFragment
 import org.schabi.newpipe.R
 import org.schabi.newpipe.databinding.FragmentHomeBinding
@@ -32,6 +34,9 @@ class HomeFragment : BaseFragment() {
     private var binding: FragmentHomeBinding? = null
     private var selected = 0
     private val chips = ArrayList<TextView>()
+    private val chipAnimators = HashMap<TextView, ValueAnimator>()
+    private var chipFills = IntArray(0)
+    private var chipTexts = IntArray(0)
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)
@@ -55,6 +60,8 @@ class HomeFragment : BaseFragment() {
         binding = b
 
         chips.clear()
+        chipFills = IntArray(0)
+        chipTexts = IntArray(0)
         b.homeChips.removeAllViews()
         CATEGORIES.forEachIndexed { index, category ->
             val chip = layoutInflater.inflate(R.layout.item_home_chip, b.homeChips, false) as TextView
@@ -78,6 +85,10 @@ class HomeFragment : BaseFragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        chipAnimators.values.forEach { it.cancel() }
+        chipAnimators.clear()
+        chipFills = IntArray(0)
+        chipTexts = IntArray(0)
         chips.clear()
         binding = null
     }
@@ -87,7 +98,7 @@ class HomeFragment : BaseFragment() {
             return
         }
         selected = index
-        updateChipStyles()
+        updateChipStyles(animate = true)
         showPage(index)
         binding?.homeChipsScroll?.let { scroll ->
             // keep the tapped pill visible when it is partly outside the screen
@@ -103,6 +114,7 @@ class HomeFragment : BaseFragment() {
         }
         childFragmentManager.beginTransaction()
             .setReorderingAllowed(true)
+            .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
             .replace(R.id.home_content, createPage(CATEGORIES[index]))
             .commitAllowingStateLoss()
     }
@@ -131,29 +143,54 @@ class HomeFragment : BaseFragment() {
     }
 
     /**
-     * Material 3 style filter chips, coloured from the app theme (so every theme works):
-     * idle = tonal pill (same colour as the buttons of the top bar) with a thin outline,
-     * selected = filled with the accent colour.
+     * Nothing style filter chips, coloured from the app theme (so every theme works):
+     * idle = tonal pill (same colour as the buttons of the top bar), selected = inverted pill
+     * (text colour as fill, page colour as text). The colours cross-fade when the selection
+     * moves, instead of snapping.
      */
-    private fun updateChipStyles() {
+    private fun updateChipStyles(animate: Boolean = false) {
         val context = context ?: return
-        val density = context.resources.displayMetrics.density
 
         val idleFill = ThemeHelper.resolveColorFromAttr(context, R.attr.toolbar_element_color)
         val onSurface = ThemeHelper.resolveColorFromAttr(context, android.R.attr.textColorPrimary)
-        val idleStroke = ColorUtils.setAlphaComponent(onSurface, 0x33)
-        val accent = ThemeHelper.resolveColorFromAttr(context, androidx.appcompat.R.attr.colorPrimary)
+        val onInverse = ThemeHelper.resolveColorFromAttr(context, R.attr.toolbar_container_color)
+
+        if (chipFills.size != chips.size) {
+            chipFills = IntArray(chips.size) { idleFill }
+            chipTexts = IntArray(chips.size) { onSurface }
+        }
 
         chips.forEachIndexed { index, chip ->
             val isSelected = index == selected
-            chip.background = GradientDrawable().apply {
-                cornerRadius = DeviceUtils.dpToPx(100, context).toFloat()
-                setColor(if (isSelected) accent else idleFill)
-                // the selected pill is a filled pill without outline
-                setStroke(if (isSelected) 0 else Math.round(density), idleStroke)
-            }
-            chip.setTextColor(if (isSelected) Color.WHITE else onSurface)
             chip.isSelected = isSelected
+            val toFill = if (isSelected) onSurface else idleFill
+            val toText = if (isSelected) onInverse else onSurface
+
+            val background = (chip.background as? GradientDrawable) ?: GradientDrawable().also {
+                it.cornerRadius = DeviceUtils.dpToPx(100, context).toFloat()
+                chip.background = it
+            }
+            chipAnimators.remove(chip)?.cancel()
+
+            val fromFill = chipFills[index]
+            val fromText = chipTexts[index]
+            if (!animate || (fromFill == toFill && fromText == toText)) {
+                background.setColor(toFill)
+                chip.setTextColor(toText)
+            } else {
+                chipAnimators[chip] = ValueAnimator.ofFloat(0f, 1f).apply {
+                    duration = 240L
+                    interpolator = DecelerateInterpolator()
+                    addUpdateListener { animator ->
+                        val t = animator.animatedFraction
+                        background.setColor(ColorUtils.blendARGB(fromFill, toFill, t))
+                        chip.setTextColor(ColorUtils.blendARGB(fromText, toText, t))
+                    }
+                    start()
+                }
+            }
+            chipFills[index] = toFill
+            chipTexts[index] = toText
         }
     }
 
