@@ -3,11 +3,13 @@ package org.schabi.newpipe.views;
 import android.animation.AnimatorInflater;
 import android.content.Context;
 import android.content.res.ColorStateList;
+import android.os.Build;
 import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.Scroller;
 
 import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
@@ -59,14 +61,15 @@ public class FloatingNavBar extends LinearLayout {
     private static final float ACTION_SIZE_DP = 56f;
     private static final float ACTION_ICON_DP = 24f;
     private static final float ACTION_GAP_DP = 8f;
-    private static final float PILL_HEIGHT_DP = 60f;
+    private static final float PILL_HEIGHT_DP = 56f;
+    /** Pages glide to rest in this long, whatever the distance (critically damped spring). */
+    private static final int GLIDE_MS = 450;
 
     private MorphingNavPill pill;
     private final float density;
 
     @Nullable
     private ViewPager pager;
-    private boolean pagerDriving = false;
     private boolean fakeDragging = false;
     private boolean ignorePageSelected = false;
     private float lastScrubPosition;
@@ -82,11 +85,9 @@ public class FloatingNavBar extends LinearLayout {
                 @Override
                 public void onPageScrolled(final int position, final float positionOffset,
                                            final int positionOffsetPixels) {
-                    // only follow the pager while the user drags it (or it flings on): a tap
-                    // runs its own spring animation
-                    if (pagerDriving) {
-                        pill.setPagerProgress(position, positionOffset);
-                    }
+                    // the thumb of the pill always sits where the pages are: while the user
+                    // swipes them, drags the pill, or a tap makes them glide to the new page
+                    pill.setPagerProgress(position, positionOffset);
                 }
 
                 @Override
@@ -94,21 +95,14 @@ public class FloatingNavBar extends LinearLayout {
                     if (ignorePageSelected) {
                         return;
                     }
-                    if (!pagerDriving) {
-                        pill.setSelectedIndex(position, true);
-                    }
+                    pill.markSelected(position);
                     report(position);
                 }
 
                 @Override
                 public void onPageScrollStateChanged(final int state) {
-                    if (state == ViewPager.SCROLL_STATE_DRAGGING) {
-                        pagerDriving = true;
-                    } else if (state == ViewPager.SCROLL_STATE_IDLE && pagerDriving) {
-                        pagerDriving = false;
-                        if (pager != null) {
-                            pill.settleAt(pager.getCurrentItem());
-                        }
+                    if (state == ViewPager.SCROLL_STATE_IDLE && pager != null) {
+                        pill.settleAt(pager.getCurrentItem());
                     }
                 }
             };
@@ -131,10 +125,11 @@ public class FloatingNavBar extends LinearLayout {
         pill.setOnItemClickListener(new MorphingNavPill.OnItemClickListener() {
             @Override
             public void onItemClicked(final int index) {
-                // slide the pages right away, the pill is morphing to the tab already
-                pagerDriving = false;
+                // the pages glide to the tab, and the thumb of the pill glides with them
                 if (pager != null) {
                     pager.setCurrentItem(index, true);
+                } else {
+                    pill.setSelectedIndex(index, true);
                 }
                 report(index);
             }
@@ -189,8 +184,6 @@ public class FloatingNavBar extends LinearLayout {
 
             @Override
             public void onScrubEnd(final int target) {
-                // the pill springs by itself now, so it must not follow the pager any more
-                pagerDriving = false;
                 final int action = hoveredAction;
                 setHoveredAction(-1);
                 if (action >= 0 && action < actionList.size()) {
@@ -198,15 +191,17 @@ public class FloatingNavBar extends LinearLayout {
                     endFakeDrag();
                     ignorePageSelected = false;
                     // go back to the tab we came from, then open the button's screen
-                    pill.setSelectedIndex(scrubStartIndex, true);
+                    pill.markSelected(scrubStartIndex);
                     if (pager != null) {
                         pager.setCurrentItem(scrubStartIndex, true);
+                    } else {
+                        pill.setSelectedIndex(scrubStartIndex, true);
                     }
                     actionList.get(action).onClick.run();
                     return;
                 }
                 // ViewPager picks a page of its own when the fake drag ends; ignore that and go
-                // to the page the pill snapped to (past the 50 % mark, else back)
+                // to the page the pill chose (past the 50 % mark, else back)
                 ignorePageSelected = true;
                 endFakeDrag();
                 if (pager != null) {
@@ -268,7 +263,11 @@ public class FloatingNavBar extends LinearLayout {
             button.setPadding(padding, padding, padding, padding);
             button.setBackgroundResource(R.drawable.bg_nav_action);
             button.setClipToOutline(true);
-            button.setElevation(10f * density);
+            button.setElevation(6f * density);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                button.setOutlineAmbientShadowColor(0x33000000);
+                button.setOutlineSpotShadowColor(0x33000000);
+            }
             button.setContentDescription(action.description);
             button.setClickable(true);
             button.setFocusable(true);
@@ -292,8 +291,8 @@ public class FloatingNavBar extends LinearLayout {
             pager.removeOnPageChangeListener(pagerListener);
         }
         pager = viewPager;
-        pagerDriving = false;
         viewPager.addOnPageChangeListener(pagerListener);
+        installGlideScroller(viewPager);
     }
 
     public void detachFromViewPager() {
@@ -329,6 +328,28 @@ public class FloatingNavBar extends LinearLayout {
         }
         if (index >= 0) {
             performHapticFeedback(android.view.HapticFeedbackConstants.CLOCK_TICK);
+        }
+    }
+
+    /**
+     * Pages settle with the same critically damped glide as the pill's thumb (no overshoot),
+     * and take the same time whether they travel one page or three, like a spring does.
+     */
+    private static void installGlideScroller(@NonNull final ViewPager viewPager) {
+        try {
+            final java.lang.reflect.Field field =
+                    ViewPager.class.getDeclaredField("mScroller");
+            field.setAccessible(true);
+            field.set(viewPager, new Scroller(viewPager.getContext(),
+                    MorphingNavPill.GLIDE) {
+                @Override
+                public void startScroll(final int startX, final int startY, final int dx,
+                                        final int dy, final int duration) {
+                    super.startScroll(startX, startY, dx, dy, GLIDE_MS);
+                }
+            });
+        } catch (final ReflectiveOperationException | RuntimeException ignored) {
+            // keep the default page animation
         }
     }
 
@@ -374,7 +395,6 @@ public class FloatingNavBar extends LinearLayout {
         if (pager != null) {
             pager.removeOnPageChangeListener(pagerListener);
         }
-        pagerDriving = false;
         endFakeDrag();
     }
 }

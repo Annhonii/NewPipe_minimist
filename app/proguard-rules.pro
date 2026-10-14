@@ -1,5 +1,10 @@
 # https://developer.android.com/build/shrink-code
 
+## The nav pill swaps the page scroller of ViewPager (see FloatingNavBar)
+-keepclassmembers class androidx.viewpager.widget.ViewPager {
+    private android.widget.Scroller mScroller;
+}
+
 ## Helps debug release versions
 -dontobfuscate
 

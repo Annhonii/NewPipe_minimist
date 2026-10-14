@@ -11,7 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <!-- Floating bar: a capsule whose selected tab morphs into an accent chip (icon + label),
+    <!-- Floating bar: a capsule with a thumb that slides behind the tab names (Shrinky style),
          plus round action buttons next to it. See FloatingNavBar / MorphingNavPill. -->
     <org.schabi.newpipe.views.FloatingNavBar
         android:id="@+id/main_nav_bar"
