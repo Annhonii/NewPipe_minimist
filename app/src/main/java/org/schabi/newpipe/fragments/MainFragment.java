@@ -126,7 +126,7 @@ public class MainFragment extends BaseFragment
 
         binding = FragmentMainBinding.bind(rootView);
 
-        // floating pill: a thumb slides behind the tab names and follows the pages, which
+        // floating pill: the selected tab morphs into an accent chip (icon + name), the pages
         // slide in sync with it
         binding.mainNavBar.attachToViewPager(binding.pager);
         binding.mainNavBar.setOnItemSelectedListener(this);

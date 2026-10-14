@@ -91,12 +91,12 @@
     <dimen name="mini_player_margin">16dp</dimen>
     <dimen name="mini_player_video_width">128dp</dimen>
     <!-- space kept free below the mini player when the floating nav pill is visible -->
-    <dimen name="mini_player_pill_space">84dp</dimen>
-    <!-- floating nav pill: 56 + 16 = 72dp of screen taken, plus a 12dp breathing gap = 84dp -->
-    <dimen name="nav_pill_height">56dp</dimen>
-    <dimen name="nav_pill_margin_side">16dp</dimen>
+    <dimen name="mini_player_pill_space">88dp</dimen>
+    <!-- floating nav pill: 60 + 16 = 76dp of screen taken, plus a 12dp breathing gap = 88dp -->
+    <dimen name="nav_pill_height">60dp</dimen>
+    <dimen name="nav_pill_margin_side">12dp</dimen>
     <dimen name="nav_pill_margin_bottom">16dp</dimen>
-    <dimen name="nav_pill_content_inset">84dp</dimen>
+    <dimen name="nav_pill_content_inset">88dp</dimen>
     <!-- Paddings & Margins -->
     <dimen name="video_item_detail_pinned_right_margin">5dp</dimen>
     <dimen name="video_item_detail_like_margin">5dp</dimen>
