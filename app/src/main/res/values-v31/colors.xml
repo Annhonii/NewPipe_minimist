@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Material You (dynamic colour, Android 12+): the whole app surface follows the wallpaper colours
+     instead of the fixed icy blue-grey. Same resource names as values/colors.xml, so every theme
+     attribute (windowBackground, card_item_background_color, ...) picks them up automatically.
+     Mapping (Material 3 roles): background = surface, card / dialog = surface container,
+     card contrast = surface container highest, top bar = surface container, pill = secondary container.
+     Older Android versions keep the fixed colours from values/colors.xml. -->
+<resources>
+    <!-- Light -->
+    <!-- Dark -->
+    <!-- Black -->
+
+    <!-- Top bar: bar = surface container, search pill / buttons = secondary container -->
+</resources>
