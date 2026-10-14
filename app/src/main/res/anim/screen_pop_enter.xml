@@ -1,10 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Back: previous screen comes back from the left : pure slide, no alpha change, so the screen never blinks -->
+<!-- Material 3 shared axis X: going back, previous activity enters from the left -->
 <set xmlns:android="http://schemas.android.com/apk/res/android"
     android:shareInterpolator="false">
+    <alpha
+        android:duration="210"
+        android:fromAlpha="0"
+        android:interpolator="@android:interpolator/linear"
+        android:startOffset="90"
+        android:toAlpha="1" />
     <translate
-        android:duration="350"
-        android:fromXDelta="-25%p"
+        android:duration="300"
+        android:fromXDelta="-30dp"
         android:interpolator="@interpolator/emphasized_decelerate"
-        android:toXDelta="0%" />
+        android:toXDelta="0dp" />
 </set>

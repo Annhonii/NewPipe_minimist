@@ -3,6 +3,7 @@ package org.schabi.newpipe.settings;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
+import android.view.animation.AnimationUtils;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -55,6 +56,8 @@ public abstract class BasePreferenceFragment extends PreferenceFragmentCompat {
         list.setClipToPadding(false);
         list.setPadding(0, DeviceUtils.dpToPx(8, requireContext()), 0,
                 DeviceUtils.dpToPx(32, requireContext()));
+        list.setLayoutAnimation(
+                AnimationUtils.loadLayoutAnimation(requireContext(), R.anim.layout_list_enter));
     }
 
     @NonNull

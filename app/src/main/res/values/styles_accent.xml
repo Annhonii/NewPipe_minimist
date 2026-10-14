@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Accent colour presets (Settings > Appearance > Accent color) -->
 <resources>
-    <color name="accent_sage">#D71921</color>
+    <color name="accent_sage">#5E8C61</color>
     <style name="ThemeOverlay.Accent.Sage" parent="">
         <item name="colorPrimary">@color/accent_sage</item>
         <item name="colorPrimaryDark">@color/accent_sage</item>
@@ -19,19 +19,19 @@
         <item name="colorPrimaryDark">@color/accent_blue</item>
         <item name="colorAccent">@color/accent_blue</item>
     </style>
-    <color name="accent_purple">#D71921</color>
+    <color name="accent_purple">#7E57C2</color>
     <style name="ThemeOverlay.Accent.Purple" parent="">
         <item name="colorPrimary">@color/accent_purple</item>
         <item name="colorPrimaryDark">@color/accent_purple</item>
         <item name="colorAccent">@color/accent_purple</item>
     </style>
-    <color name="accent_pink">#D71921</color>
+    <color name="accent_pink">#D6457F</color>
     <style name="ThemeOverlay.Accent.Pink" parent="">
         <item name="colorPrimary">@color/accent_pink</item>
         <item name="colorPrimaryDark">@color/accent_pink</item>
         <item name="colorAccent">@color/accent_pink</item>
     </style>
-    <color name="accent_orange">#D71921</color>
+    <color name="accent_orange">#E5732B</color>
     <style name="ThemeOverlay.Accent.Orange" parent="">
         <item name="colorPrimary">@color/accent_orange</item>
         <item name="colorPrimaryDark">@color/accent_orange</item>
@@ -43,7 +43,7 @@
         <item name="colorPrimaryDark">@color/accent_teal</item>
         <item name="colorAccent">@color/accent_teal</item>
     </style>
-    <color name="accent_amber">#D71921</color>
+    <color name="accent_amber">#C58F00</color>
     <style name="ThemeOverlay.Accent.Amber" parent="">
         <item name="colorPrimary">@color/accent_amber</item>
         <item name="colorPrimaryDark">@color/accent_amber</item>

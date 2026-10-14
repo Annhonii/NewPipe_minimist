@@ -151,8 +151,8 @@ class InitialAvatarDrawable(label: String) : Drawable() {
 
     private companion object {
         val PALETTE = intArrayOf(
-            0xFFD71921.toInt(), 0xFF2B2B2B.toInt(), 0xFF4A4A4A.toInt(), 0xFFAE141B.toInt(),
-            0xFF3A3A3A.toInt(), 0xFF6A6A6A.toInt(), 0xFF1C1C1C.toInt(), 0xFF5A5A5A.toInt()
+            0xFF5C6BC0.toInt(), 0xFF26A69A.toInt(), 0xFFEF5350.toInt(), 0xFFAB47BC.toInt(),
+            0xFF42A5F5.toInt(), 0xFFFF7043.toInt(), 0xFF66BB6A.toInt(), 0xFFEC407A.toInt()
         )
     }
 }

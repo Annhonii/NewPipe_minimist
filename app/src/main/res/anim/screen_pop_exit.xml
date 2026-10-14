@@ -1,10 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Back: leaving screen slides out to the right : pure slide, no alpha change, so the screen never blinks -->
+<!-- Material 3 shared axis X: going back, leaving activity moves right and fades out -->
 <set xmlns:android="http://schemas.android.com/apk/res/android"
     android:shareInterpolator="false">
+    <alpha
+        android:duration="90"
+        android:fromAlpha="1"
+        android:interpolator="@android:interpolator/linear"
+        android:startOffset="0"
+        android:toAlpha="0" />
     <translate
-        android:duration="350"
-        android:fromXDelta="0%"
+        android:duration="300"
+        android:fromXDelta="0dp"
         android:interpolator="@interpolator/emphasized_accelerate"
-        android:toXDelta="100%p" />
+        android:toXDelta="30dp" />
 </set>

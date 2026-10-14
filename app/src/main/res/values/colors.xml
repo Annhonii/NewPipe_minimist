@@ -64,7 +64,7 @@
     <!-- Nothing/Music design tokens -->
     <color name="nothing_red">#D71921</color>
     <color name="nothing_red_dim">#AE141B</color>
-    <color name="nothing_yellow">#D71921</color>
+    <color name="nothing_yellow">#FFC700</color>
     <color name="on_surface_light">#000000</color>
     <color name="on_surface_variant_light">#606060</color>
     <color name="on_surface_dark">#FFFFFF</color>
@@ -80,7 +80,7 @@
     <color name="queue_background_color">@color/dark_queue_background_color</color>
     <color name="drawer_header_font_color">#F2FFFFFF</color>
     <color name="duration_background_color">#aa000000</color>
-    <color name="live_duration_background_color">#c8D71921</color>
+    <color name="live_duration_background_color">#c8E53935</color>
     <color name="playlist_stream_count_background_color">#e6000000</color>
     <color name="duration_text_color">#EEFFFFFF</color>
     <color name="video_overlay_color">#64000000</color>
@@ -93,7 +93,7 @@
     <color name="selected_background_color">#96717171</color>
 
     <!-- GigaGet theme -->
-    <color name="bluegray">#D71921</color>
+    <color name="bluegray">#607D8B</color>
 
     <!-- GigaGet download Theme colors -->
     <color name="audio_left_to_load_color">#1F808080</color>
