@@ -63,7 +63,7 @@
                     android:layout_gravity="center"
                     android:background="@android:color/transparent"
                     android:src="@drawable/ic_play_arrow_shadow"
-                    android:visibility="invisible"
+                    android:visibility="gone"
                     tools:ignore="ContentDescription"
                     tools:visibility="visible" />
 
@@ -393,7 +393,7 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_marginStart="6dp"
-                                    android:fontFamily="@font/geist_mono"
+                                    android:fontFamily="sans-serif"
                                     android:lines="1"
                                     android:textSize="@dimen/video_item_detail_likes_text_size"
                                     tools:text="12M" />
@@ -428,7 +428,7 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_marginStart="6dp"
-                                    android:fontFamily="@font/geist_mono"
+                                    android:fontFamily="sans-serif"
                                     android:lines="1"
                                     android:textSize="@dimen/video_item_detail_likes_text_size"
                                     tools:text="10K" />
@@ -438,7 +438,7 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_marginStart="6dp"
-                                    android:fontFamily="@font/geist_mono"
+                                    android:fontFamily="sans-serif"
                                     android:text="@string/disabled"
                                     android:textSize="@dimen/video_item_detail_likes_text_size"
                                     android:visibility="gone"

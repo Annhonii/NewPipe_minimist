@@ -43,7 +43,7 @@
                 android:hyphenationFrequency="full"
                 android:maxLines="1"
                 android:text="@string/app_name"
-                android:fontFamily="@font/ndot"
+                android:fontFamily="sans-serif"
                 android:textAllCaps="true"
                 android:textColor="?android:attr/textColorPrimary"
                 app:autoSizeMaxTextSize="@dimen/drawer_header_newpipe_title_max_text_size"

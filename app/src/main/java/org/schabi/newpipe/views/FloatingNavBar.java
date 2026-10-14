@@ -70,6 +70,9 @@ public class FloatingNavBar extends LinearLayout {
     private boolean fakeDragging = false;
     private float lastScrubPosition;
     private int lastReported = -1;
+    private int scrubStartIndex = 0;
+    private int hoveredAction = -1;
+    private final java.util.ArrayList<Action> actionList = new java.util.ArrayList<>();
     @Nullable
     private OnItemSelectedListener listener;
 
@@ -143,6 +146,8 @@ public class FloatingNavBar extends LinearLayout {
             @Override
             public void onScrubStart(final float position) {
                 lastScrubPosition = position;
+                scrubStartIndex = pill.getSelectedIndex();
+                setHoveredAction(-1);
                 if (pager != null && pager.getAdapter() != null && pager.beginFakeDrag()) {
                     fakeDragging = true;
                 }
@@ -160,9 +165,38 @@ public class FloatingNavBar extends LinearLayout {
             }
 
             @Override
+            public void onScrubRaw(final float xInPill) {
+                // the finger can be dragged past the last tab onto a round button
+                // (downloads / history): that button lights up and opens on release
+                final float xInBar = xInPill + pill.getLeft();
+                int found = -1;
+                for (int i = 0; i < actionList.size(); i++) {
+                    final View button = getChildAt(i + 1);
+                    if (button != null && xInBar >= button.getLeft() - ACTION_GAP_DP * density / 2f
+                            && xInBar <= button.getRight() + ACTION_GAP_DP * density / 2f) {
+                        found = i;
+                        break;
+                    }
+                }
+                setHoveredAction(found);
+            }
+
+            @Override
             public void onScrubEnd(final int target) {
                 // the pill springs by itself now, so it must not follow the pager any more
                 pagerDriving = false;
+                final int action = hoveredAction;
+                setHoveredAction(-1);
+                if (action >= 0 && action < actionList.size()) {
+                    endFakeDrag();
+                    // go back to the tab we came from, then open the button's screen
+                    pill.setSelectedIndex(scrubStartIndex, true);
+                    if (pager != null) {
+                        pager.setCurrentItem(scrubStartIndex, true);
+                    }
+                    actionList.get(action).onClick.run();
+                    return;
+                }
                 endFakeDrag();
                 if (pager != null) {
                     pager.setCurrentItem(target, true);
@@ -206,6 +240,9 @@ public class FloatingNavBar extends LinearLayout {
     public void setActions(@NonNull final List<Action> actions) {
         // everything after the pill is an action button
         removeViews(1, getChildCount() - 1);
+        actionList.clear();
+        actionList.addAll(actions);
+        hoveredAction = -1;
 
         final int size = Math.round(ACTION_SIZE_DP * density);
         final int padding = Math.round((ACTION_SIZE_DP - ACTION_ICON_DP) / 2f * density);
@@ -257,6 +294,31 @@ public class FloatingNavBar extends LinearLayout {
     /*//////////////////////////////////////////////////////////////////////////
     // Internals
     //////////////////////////////////////////////////////////////////////////*/
+
+    private void setHoveredAction(final int index) {
+        if (index == hoveredAction) {
+            return;
+        }
+        hoveredAction = index;
+        for (int i = 0; i < actionList.size(); i++) {
+            final View button = getChildAt(i + 1);
+            if (button != null) {
+                final boolean on = i == index;
+                button.animate().scaleX(on ? 1.2f : 1f).scaleY(on ? 1.2f : 1f)
+                        .setDuration(120).start();
+                button.setSelected(on);
+                if (button instanceof ImageView) {
+                    ((ImageView) button).setImageTintList(ColorStateList.valueOf(
+                            ThemeHelper.resolveColorFromAttr(getContext(), on
+                                    ? R.attr.toolbar_container_color
+                                    : android.R.attr.textColorPrimary)));
+                }
+            }
+        }
+        if (index >= 0) {
+            performHapticFeedback(android.view.HapticFeedbackConstants.CLOCK_TICK);
+        }
+    }
 
     private void endFakeDrag() {
         if (fakeDragging && pager != null) {

@@ -26,7 +26,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginBottom="10dp"
-            android:fontFamily="@font/ndot"
+            android:fontFamily="sans-serif"
             android:text="..."
             android:textSize="56sp"
             tools:ignore="HardcodedText,UnusedAttribute" />

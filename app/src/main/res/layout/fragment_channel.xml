@@ -11,7 +11,7 @@
         android:id="@+id/app_bar_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?android:attr/colorBackground"
+        android:background="#000000"
         app:elevation="0dp">
 
         <org.schabi.newpipe.views.CustomCollapsingToolbarLayout
@@ -36,7 +36,8 @@
                     android:layout_marginTop="8dp"
                     android:layout_marginEnd="16dp"
                     android:scaleType="centerCrop"
-                    android:src="@drawable/placeholder_channel_banner"
+                    android:background="#000000"
+                    android:src="@drawable/placeholder_channel_banner_black"
                     app:layout_constraintDimensionRatio="H,31:5"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
@@ -51,7 +52,7 @@
                     android:layout_height="72dp"
                     android:layout_marginStart="16dp"
                     android:layout_marginTop="16dp"
-                    android:src="@drawable/placeholder_person"
+                    android:src="@drawable/placeholder_person_black"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/channel_banner_image"
                     app:shapeAppearance="@style/CircularImageView"
@@ -174,7 +175,7 @@
             android:id="@+id/tab_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="?android:attr/colorBackground"
+            android:background="#000000"
             app:tabGravity="start"
             app:tabIndicatorColor="?android:attr/textColorPrimary"
             app:tabIndicatorFullWidth="false"
@@ -225,7 +226,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginBottom="10dp"
-                android:fontFamily="@font/ndot"
+                android:fontFamily="sans-serif"
                 android:text="..."
                 android:textSize="56sp"
                 tools:ignore="HardcodedText" />

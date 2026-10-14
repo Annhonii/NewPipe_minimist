@@ -20,7 +20,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
         android:ellipsize="end"
-        android:fontFamily="@font/geist"
+        android:fontFamily="sans-serif"
         android:importantForAccessibility="no"
         android:maxLines="1"
         android:textColor="@color/nav_pill_tab_tint"

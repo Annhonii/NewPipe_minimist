@@ -193,6 +193,53 @@ object YtInnerTube {
 
     fun homeFeed(session: YtAccountStore.Session?, continuation: String? = null): Page<Video> {
         val json = browse(session, "FEwhat_to_watch", continuation)
+        return parseVideos(json)
+    }
+
+    private const val SEARCH_PREFIX = "search:"
+    private val FALLBACK_QUERIES = listOf(
+        "trending now", "new videos today", "popular music videos", "gaming highlights",
+        "tech reviews", "movie trailers", "podcast clips", "funny moments"
+    )
+
+    /**
+     * Recommendations that work without a Google account (and as a safety net when the
+     * personalised "what to watch" feed comes back empty): popular videos from a few search
+     * queries, merged. The continuation token is prefixed with "search:" so [feed] can tell
+     * which source a continuation belongs to.
+     */
+    fun searchFeed(session: YtAccountStore.Session?, continuation: String? = null): Page<Video> {
+        val round = continuation?.removePrefix(SEARCH_PREFIX)?.toIntOrNull() ?: 0
+        val queries = FALLBACK_QUERIES.drop(round * 2).take(2)
+        if (queries.isEmpty()) return Page(emptyList(), null)
+        val seen = HashSet<String>()
+        val out = ArrayList<Video>()
+        queries.forEach { q ->
+            runCatching {
+                parseVideos(post("search", JSONObject().put("query", q), session)).items
+            }.getOrDefault(emptyList()).forEach { if (seen.add(it.id)) out.add(it) }
+        }
+        val next = if ((round + 1) * 2 < FALLBACK_QUERIES.size) SEARCH_PREFIX + (round + 1) else null
+        return Page(out, next)
+    }
+
+    /** Home feed with fallbacks: personalised when signed in, generic otherwise / on failure. */
+    fun feed(session: YtAccountStore.Session?, continuation: String? = null): Page<Video> {
+        if (continuation != null && continuation.startsWith(SEARCH_PREFIX)) {
+            return searchFeed(session, continuation)
+        }
+        val primary = runCatching { homeFeed(session, continuation) }.getOrNull()
+        if (primary != null && primary.items.isNotEmpty()) return primary
+        if (continuation != null) return primary ?: Page(emptyList(), null)
+        // signed in but empty/rejected -> try again as a guest, then fall back to search
+        if (session != null) {
+            val guest = runCatching { homeFeed(null) }.getOrNull()
+            if (guest != null && guest.items.isNotEmpty()) return guest
+        }
+        return searchFeed(session?.takeIf { primary != null })
+    }
+
+    private fun parseVideos(json: JSONObject): Page<Video> {
         val seen = HashSet<String>()
         val out = ArrayList<Video>()
 

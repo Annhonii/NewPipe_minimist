@@ -36,7 +36,7 @@ class HomeFeedInfo(name: String) : ListInfo<StreamInfoItem>(
 
 /**
  * Home tab: recommended videos from YouTube's "what to watch" feed. Personalised when a Google
- * account is signed in (Settings → Google account), generic otherwise.
+ * account is signed in (Settings → Google account), a generic popular-videos feed otherwise (no login needed).
  */
 class HomeFeedFragment : BaseListInfoFragment<StreamInfoItem, HomeFeedInfo>(UserAction.REQUESTED_KIOSK) {
 
@@ -55,7 +55,7 @@ class HomeFeedFragment : BaseListInfoFragment<StreamInfoItem, HomeFeedInfo>(User
         val app = requireContext().applicationContext
         val title = getString(R.string.yt_home_title)
         return Single.fromCallable {
-            val page = YtInnerTube.homeFeed(YtAccountStore.load(app))
+            val page = YtInnerTube.feed(YtAccountStore.load(app))
             HomeFeedInfo(title).apply {
                 relatedItems = page.items.map { toItem(it) }
                 nextPage = page.continuation?.let { Page(it) }
@@ -67,7 +67,7 @@ class HomeFeedFragment : BaseListInfoFragment<StreamInfoItem, HomeFeedInfo>(User
         val app: Context = requireContext().applicationContext
         val token = currentNextPage?.url
         return Single.fromCallable {
-            val page = YtInnerTube.homeFeed(YtAccountStore.load(app), token)
+            val page = YtInnerTube.feed(YtAccountStore.load(app), token)
             ListExtractor.InfoItemsPage(
                 page.items.map { toItem(it) },
                 page.continuation?.let { Page(it) },

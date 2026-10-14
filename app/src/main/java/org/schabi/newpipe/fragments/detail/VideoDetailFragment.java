@@ -1772,7 +1772,6 @@ public final class VideoDetailFragment
         updateTabs(info);
         loadTopCommentPreview();
 
-        animate(binding.detailThumbnailPlayButton, true, 200);
         binding.detailVideoTitleView.setText(title);
 
         binding.detailSubChannelThumbnailView.setVisibility(View.GONE);

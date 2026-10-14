@@ -14,7 +14,7 @@
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="30dp"
         android:layout_marginBottom="20dp"
-        android:fontFamily="@font/ndot"
+        android:fontFamily="sans-serif"
         android:text="@string/app_name"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:textSize="40sp" />

@@ -26,22 +26,20 @@ import org.schabi.newpipe.util.ServiceHelper;
 import org.schabi.newpipe.util.ThemeHelper;
 
 /**
- * YouTube Trending page with tabs inside it: Live, Gaming, Movies and Podcasts.
+ * YouTube Trending page with tabs inside it: Entertainment, Music, Gaming, Movies and shows, Podcasts.
  */
 public class TrendingFragment extends BaseFragment {
     private static final int[] TAB_TITLES = {
-            R.string.trending,
-            R.string.duration_live,
-            R.string.trending_music,
-            R.string.trending_gaming,
-            R.string.trending_movies,
-            R.string.trending_podcasts
+            R.string.trending_tab_entertainment,
+            R.string.trending_tab_music,
+            R.string.trending_tab_gaming,
+            R.string.trending_tab_movies_shows,
+            R.string.trending_tab_podcasts
     };
     // null = the default kiosk of the service, the others are search based
     // (YouTube retired its own Trending page in July 2025, so "trending" is a search too)
     private static final String[] TAB_QUERIES = {
             "trending now",
-            null,
             "trending music videos",
             "gaming trending",
             "new movie trailers trending",

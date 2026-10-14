@@ -995,4 +995,9 @@
     <string name="comment_edit_save">Save</string>
     <string name="comment_edit_done">Comment updated</string>
     <string name="comment_edit_failed">Could not edit comment: %1$s</string>
+    <string name="trending_tab_entertainment">Entertainment</string>
+    <string name="trending_tab_music">Music</string>
+    <string name="trending_tab_gaming">Gaming</string>
+    <string name="trending_tab_movies_shows">Movies and shows</string>
+    <string name="trending_tab_podcasts">Podcasts</string>
 </resources>

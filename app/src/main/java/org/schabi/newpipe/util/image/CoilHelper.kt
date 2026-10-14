@@ -50,6 +50,14 @@ object CoilHelper {
         loadImageDefault(target, url, R.drawable.placeholder_person)
     }
 
+    /** Channel page header avatar: black placeholder instead of the grey one. */
+    fun loadChannelAvatar(
+        target: ImageView,
+        images: List<Image>
+    ) {
+        loadImageDefault(target, images, R.drawable.placeholder_person_black)
+    }
+
     fun loadThumbnail(
         target: ImageView,
         images: List<Image>
@@ -121,7 +129,7 @@ object CoilHelper {
         target: ImageView,
         images: List<Image>
     ) {
-        loadImageDefault(target, images, R.drawable.placeholder_channel_banner)
+        loadImageDefault(target, images, R.drawable.placeholder_channel_banner_black)
     }
 
     fun loadPlaylistThumbnail(

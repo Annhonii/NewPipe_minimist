@@ -32,7 +32,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.core.content.ContextCompat;
-import androidx.core.content.res.ResourcesCompat;
 import androidx.core.graphics.ColorUtils;
 
 import org.schabi.newpipe.R;
@@ -92,6 +91,9 @@ public class MorphingNavPill extends ViewGroup {
 
         /** The finger was lifted: the pill springs to {@code target}. */
         void onScrubEnd(int target);
+
+        /** Raw finger x in this view's coordinates; may lie outside the pill (over buttons). */
+        default void onScrubRaw(final float xInPill) { }
     }
 
     private static final float FLING_VELOCITY = 800f;
@@ -480,6 +482,7 @@ public class MorphingNavPill extends ViewGroup {
         }
         if (scrubListener != null) {
             scrubListener.onScrub(position);
+            scrubListener.onScrubRaw(x);
         }
     }
 
@@ -670,14 +673,7 @@ public class MorphingNavPill extends ViewGroup {
 
             labelPaint.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 14f,
                     context.getResources().getDisplayMetrics()));
-            try {
-                final Typeface medium = ResourcesCompat.getFont(context, R.font.geist_medium);
-                if (medium != null) {
-                    labelPaint.setTypeface(medium);
-                }
-            } catch (final Exception ignored) {
-                // keep the default font
-            }
+            labelPaint.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
             naturalLabelWidth = Math.round(labelPaint.measureText(label, 0, label.length()));
             shownLabel = label;
             shownLabelWidth = naturalLabelWidth;

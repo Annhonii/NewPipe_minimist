@@ -64,8 +64,8 @@
     <style name="TextAppearance.App.ToolbarTitle"
         parent="TextAppearance.AppCompat.Widget.ActionBar.Title">
         <item name="android:textSize">26sp</item>
-        <item name="android:fontFamily">@font/ntype82</item>
-        <item name="fontFamily">@font/ntype82</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="fontFamily">sans-serif</item>
         <item name="android:textStyle">bold</item>
         <item name="android:letterSpacing">-0.01</item>
     </style>
@@ -79,25 +79,25 @@
 
     <!-- Accent text (Ndot dot-matrix) used for big headings -->
     <style name="TextAppearance.App.Accent" parent="TextAppearance.AppCompat">
-        <item name="android:fontFamily">@font/ndot</item>
-        <item name="fontFamily">@font/ndot</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="fontFamily">sans-serif</item>
         <item name="android:textAllCaps">true</item>
         <item name="android:letterSpacing">0.02</item>
     </style>
     <style name="TextAppearance.App.Headline" parent="TextAppearance.AppCompat">
-        <item name="android:fontFamily">@font/ntype82</item>
-        <item name="fontFamily">@font/ntype82</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="fontFamily">sans-serif</item>
         <item name="android:textStyle">bold</item>
     </style>
     <style name="TextAppearance.App.Mono" parent="TextAppearance.AppCompat">
-        <item name="android:fontFamily">@font/geist_mono</item>
-        <item name="fontFamily">@font/geist_mono</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="fontFamily">sans-serif</item>
     </style>
     <!-- Small muted heading above a group of rows ("Your profile", "Favorite contacts") -->
     <style name="TextAppearance.App.SectionLabel" parent="TextAppearance.AppCompat">
         <item name="android:textSize">12sp</item>
-        <item name="android:fontFamily">@font/geist</item>
-        <item name="fontFamily">@font/geist</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="fontFamily">sans-serif</item>
         <item name="android:textStyle">bold</item>
         <item name="android:letterSpacing">0.04</item>
         <item name="android:textColor">?android:attr/textColorSecondary</item>
@@ -139,8 +139,8 @@
         <item name="seekBarStyle">@style/Widget.App.SeekBar</item>
         <item name="popupMenuStyle">@style/Widget.App.PopupMenu</item>
         <item name="windowBackground">@color/light_dialog_background_color</item>
-        <item name="android:fontFamily">@font/geist</item>
-        <item name="fontFamily">@font/geist</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="fontFamily">sans-serif</item>
     </style>
     <style name="Theme.App.AlertDialog.Dark" parent="Theme.AppCompat.Dialog.Alert">
         <item name="colorPrimary">@color/nothing_red</item>
@@ -164,8 +164,8 @@
         <item name="seekBarStyle">@style/Widget.App.SeekBar</item>
         <item name="popupMenuStyle">@style/Widget.App.PopupMenu</item>
         <item name="windowBackground">@color/dark_dialog_background_color</item>
-        <item name="android:fontFamily">@font/geist</item>
-        <item name="fontFamily">@font/geist</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="fontFamily">sans-serif</item>
     </style>
     <style name="ThemeOverlay.App.AlertDialog" parent="Theme.App.AlertDialog.Light" />
 

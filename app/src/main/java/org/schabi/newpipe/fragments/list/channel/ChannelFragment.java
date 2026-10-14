@@ -20,7 +20,6 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.graphics.ColorUtils;
 import androidx.core.view.MenuProvider;
 import androidx.preference.PreferenceManager;
 
@@ -50,7 +49,6 @@ import org.schabi.newpipe.util.ExtractorHelper;
 import org.schabi.newpipe.util.Localization;
 import org.schabi.newpipe.util.NavigationHelper;
 import org.schabi.newpipe.util.StateSaver;
-import org.schabi.newpipe.util.ThemeHelper;
 import org.schabi.newpipe.util.external_communication.ShareUtils;
 import org.schabi.newpipe.util.image.CoilHelper;
 import org.schabi.newpipe.util.image.ImageStrategy;
@@ -386,16 +384,12 @@ public class ChannelFragment extends BaseStateFragment<ChannelInfo>
         final int backgroundDuration = isButtonVisible ? 300 : 0;
         final int textDuration = isButtonVisible ? 200 : 0;
 
-        // YouTube look: "Subscribed" = soft grey pill with normal text,
-        // "Subscribe" = solid pill in the text colour with page-coloured text
-        final int textColor = ThemeHelper.resolveColorFromAttr(activity,
-                android.R.attr.textColorPrimary);
-        final int pageColor = ThemeHelper.resolveColorFromAttr(activity,
-                android.R.attr.colorBackground);
-        final int subscribedBackground = ColorUtils.setAlphaComponent(textColor, 0x1F);
-        final int subscribedText = textColor;
-        final int subscribeBackground = textColor;
-        final int subscribeText = pageColor;
+        // The channel header is black: "Subscribe" = solid white pill with black text,
+        // "Subscribed" = dark translucent-white pill with white text
+        final int subscribedBackground = 0x33FFFFFF;
+        final int subscribedText = 0xFFFFFFFF;
+        final int subscribeBackground = 0xFFFFFFFF;
+        final int subscribeText = 0xFF000000;
 
         if (isSubscribed) {
             binding.channelSubscribeButton.setText(R.string.subscribed_button_title);
@@ -618,7 +612,7 @@ public class ChannelFragment extends BaseStateFragment<ChannelInfo>
                             .show());
         }
 
-        CoilHelper.INSTANCE.loadAvatar(binding.channelAvatarView, result.getAvatars());
+        CoilHelper.INSTANCE.loadChannelAvatar(binding.channelAvatarView, result.getAvatars());
         CoilHelper.INSTANCE.loadAvatar(binding.subChannelAvatarView,
                 result.getParentChannelAvatars());
 

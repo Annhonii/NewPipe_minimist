@@ -11,7 +11,7 @@ import androidx.appcompat.widget.Toolbar;
 
 /** Optional Ntype82 font for screen titles (the app otherwise uses the device font). */
 public final class FontHelper {
-    private static final String[] TITLE_FONT_FILES = {"fonts/ntype82.ttf", "fonts/ntype82.otf"};
+    private static final String[] TITLE_FONT_FILES = {"fonts/none"};
     @Nullable
     private static Typeface titleTypeface;
     private static boolean titleTypefaceLoaded = false;

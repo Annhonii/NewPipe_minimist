@@ -28,8 +28,8 @@
         <item name="actionOverflowMenuStyle">@style/Widget.App.PopupMenu.Overflow</item>
         <item name="alertDialogTheme">@style/ThemeOverlay.App.AlertDialog</item>
         <item name="android:windowAnimationStyle">@style/Animation.App.Window</item>
-        <item name="android:fontFamily">@font/geist</item>
-        <item name="fontFamily">@font/geist</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="fontFamily">sans-serif</item>
     </style>
     <style name="Base" parent="Base.V21"/>
 
@@ -144,8 +144,8 @@
         <item name="seekBarStyle">@style/Widget.App.SeekBar</item>
         <item name="popupMenuStyle">@style/Widget.App.PopupMenu</item>
         <item name="windowBackground">@color/light_dialog_background_color</item>
-        <item name="android:fontFamily">@font/geist</item>
-        <item name="fontFamily">@font/geist</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="fontFamily">sans-serif</item>
     </style>
 
     <style name="DarkDialogTheme" parent="Theme.AppCompat.DayNight.Dialog">
@@ -172,8 +172,8 @@
         <item name="seekBarStyle">@style/Widget.App.SeekBar</item>
         <item name="popupMenuStyle">@style/Widget.App.PopupMenu</item>
         <item name="windowBackground">@color/dark_dialog_background_color</item>
-        <item name="android:fontFamily">@font/geist</item>
-        <item name="fontFamily">@font/geist</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="fontFamily">sans-serif</item>
     </style>
 
     <style name="LightDialogMinWidthTheme" parent="Theme.AppCompat.DayNight.Dialog.MinWidth">
@@ -200,8 +200,8 @@
         <item name="seekBarStyle">@style/Widget.App.SeekBar</item>
         <item name="popupMenuStyle">@style/Widget.App.PopupMenu</item>
         <item name="windowBackground">@color/light_dialog_background_color</item>
-        <item name="android:fontFamily">@font/geist</item>
-        <item name="fontFamily">@font/geist</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="fontFamily">sans-serif</item>
     </style>
 
     <style name="DarkDialogMinWidthTheme" parent="Theme.AppCompat.DayNight.Dialog.MinWidth">
@@ -228,8 +228,8 @@
         <item name="seekBarStyle">@style/Widget.App.SeekBar</item>
         <item name="popupMenuStyle">@style/Widget.App.PopupMenu</item>
         <item name="windowBackground">@color/dark_dialog_background_color</item>
-        <item name="android:fontFamily">@font/geist</item>
-        <item name="fontFamily">@font/geist</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="fontFamily">sans-serif</item>
     </style>
 
 
