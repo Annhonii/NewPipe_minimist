@@ -13,7 +13,7 @@
         <item name="colorPrimaryDark">@color/accent_red</item>
         <item name="colorAccent">@color/accent_red</item>
     </style>
-    <color name="accent_blue">#3F6FD8</color>
+    <color name="accent_blue">#D71921</color>
     <style name="ThemeOverlay.Accent.Blue" parent="">
         <item name="colorPrimary">@color/accent_blue</item>
         <item name="colorPrimaryDark">@color/accent_blue</item>
@@ -37,7 +37,7 @@
         <item name="colorPrimaryDark">@color/accent_orange</item>
         <item name="colorAccent">@color/accent_orange</item>
     </style>
-    <color name="accent_teal">#1E8E87</color>
+    <color name="accent_teal">#D71921</color>
     <style name="ThemeOverlay.Accent.Teal" parent="">
         <item name="colorPrimary">@color/accent_teal</item>
         <item name="colorPrimaryDark">@color/accent_teal</item>
@@ -68,5 +68,9 @@
         <item name="android:activityOpenExitAnimation">@null</item>
         <item name="android:activityCloseEnterAnimation">@null</item>
         <item name="android:activityCloseExitAnimation">@null</item>
+        <item name="android:taskOpenEnterAnimation">@null</item>
+        <item name="android:taskOpenExitAnimation">@null</item>
+        <item name="android:taskCloseEnterAnimation">@null</item>
+        <item name="android:taskCloseExitAnimation">@null</item>
     </style>
 </resources>

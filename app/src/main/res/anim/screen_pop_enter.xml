@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Back: previous screen comes back from the left : pure slide, no alpha change, so the screen never blinks -->
+<!-- BACK: previous screen glides back from the left into place (exact reverse of screen_exit). -->
 <set xmlns:android="http://schemas.android.com/apk/res/android"
     android:shareInterpolator="false">
     <translate
-        android:duration="350"
-        android:fromXDelta="-25%p"
-        android:interpolator="@interpolator/emphasized_decelerate"
+        android:duration="380"
+        android:fromXDelta="-30%p"
+        android:interpolator="@interpolator/slide_ease"
         android:toXDelta="0%" />
 </set>

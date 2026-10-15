@@ -138,6 +138,17 @@ public class MainActivity extends AppCompatActivity {
 
     private SharedPreferences sharedPreferences;
     private SharedPreferences.Editor sharedPrefEditor;
+    /** Theme related settings this activity instance was created with. */
+    private String appliedThemeSignature = "";
+
+    private String currentThemeSignature() {
+        return sharedPreferences.getString(getString(R.string.theme_key), "")
+                + "|" + sharedPreferences.getString(getString(R.string.night_theme_key), "")
+                + "|" + sharedPreferences.getBoolean(getString(R.string.disable_animations_key),
+                        false)
+                + "|" + (getResources().getConfiguration().uiMode
+                        & android.content.res.Configuration.UI_MODE_NIGHT_MASK);
+    }
     /*//////////////////////////////////////////////////////////////////////////
     // Activity's LifeCycle
     //////////////////////////////////////////////////////////////////////////*/
@@ -169,6 +180,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         org.schabi.newpipe.util.OpaqueFragmentBackground.install(getSupportFragmentManager());
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        appliedThemeSignature = currentThemeSignature();
         sharedPrefEditor = sharedPreferences.edit();
 
         mainBinding = ActivityMainBinding.inflate(getLayoutInflater());
@@ -599,11 +611,15 @@ public class MainActivity extends AppCompatActivity {
         }
 
         if (sharedPreferences.getBoolean(Constants.KEY_THEME_CHANGE, false)) {
-            if (DEBUG) {
-                Log.d(TAG, "Theme has changed, recreating activity...");
-            }
             sharedPrefEditor.putBoolean(Constants.KEY_THEME_CHANGE, false).apply();
-            ActivityCompat.recreate(this);
+            // AppCompat may already have recreated this activity for a light <-> dark switch;
+            // only recreate again if what we were built with is really outdated.
+            if (!currentThemeSignature().equals(appliedThemeSignature)) {
+                if (DEBUG) {
+                    Log.d(TAG, "Theme has changed, recreating activity...");
+                }
+                ActivityCompat.recreate(this);
+            }
         }
 
         if (sharedPreferences.getBoolean(Constants.KEY_MAIN_PAGE_CHANGE, false)) {

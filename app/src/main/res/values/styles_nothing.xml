@@ -118,6 +118,11 @@
         <item name="android:activityOpenExitAnimation">@anim/screen_exit</item>
         <item name="android:activityCloseEnterAnimation">@anim/screen_pop_enter</item>
         <item name="android:activityCloseExitAnimation">@anim/screen_pop_exit</item>
+        <!-- same slide when the whole task comes to front / goes back -->
+        <item name="android:taskOpenEnterAnimation">@anim/screen_enter</item>
+        <item name="android:taskOpenExitAnimation">@anim/screen_exit</item>
+        <item name="android:taskCloseEnterAnimation">@anim/screen_pop_enter</item>
+        <item name="android:taskCloseExitAnimation">@anim/screen_pop_exit</item>
     </style>
 
     <!-- Default dialog theme for AlertDialog.Builder(context); light by default, dark in -night -->

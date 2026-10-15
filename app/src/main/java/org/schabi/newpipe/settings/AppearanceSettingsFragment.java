@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.app.ActivityCompat;
 import androidx.preference.Preference;
 
@@ -92,10 +93,15 @@ public class AppearanceSettingsFragment extends BasePreferenceFragment {
         defaultPreferences.edit().putBoolean(Constants.KEY_THEME_CHANGE, true).apply();
         defaultPreferences.edit().putString(themeKey, newValue.toString()).apply();
 
+        final int nightModeBefore = AppCompatDelegate.getDefaultNightMode();
         ThemeHelper.setDayNightMode(requireContext(), newValue.toString());
 
-        if (!newValue.equals(beginningThemeKey) && getActivity() != null) {
-            // if it's not the current theme
+        // AppCompat already recreates every activity by itself when the night mode really changes
+        // (light <-> dark). Recreating again here made the activities (and the video player
+        // attached to them) restart 2-3 times in a row, which is what made playback stutter.
+        // Only recreate manually when AppCompat did not (e.g. dark <-> black).
+        if (!newValue.equals(beginningThemeKey) && getActivity() != null
+                && nightModeBefore == AppCompatDelegate.getDefaultNightMode()) {
             ActivityCompat.recreate(getActivity());
         }
     }

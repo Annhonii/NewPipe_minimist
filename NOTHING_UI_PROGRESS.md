@@ -84,3 +84,21 @@ Not compiled here.
 - Switch: red track (on) / dark grey (off), 56x32, big white 24dp thumb (switch_track/switch_thumb, switchMinWidth 56dp).
 - Toolbar back circle: 36dp circle inside a 48dp touch box, toolbar start inset 20dp / 12dp with navigation.
 Not compiled here.
+
+## Pass 8 (user request): pure black / white only + theme-switch lag
+- Palette: every surface/card/pill/dialog/toolbar/border token is now exactly #000000 or #FFFFFF (light: white surfaces + black outlines,
+  dark/black: black surfaces + white outlines). No grey fills. Cards are told apart from the page by a 1dp outline (?attr/separator_color),
+  added to bg_list_card, bg_comment_card, bg_mini_player, bg_search_field, bg_toolbar_*, bg_dialog, bg_sheet_top, bg_popup_menu(_dark),
+  chips/pills, settings tiles (SegmentedPreferenceAdapter), switch off-track, seek track. Placeholders = black/white. Accent stays Nothing red #D71921.
+  Left as alpha overlays (not grey fills): ripples, scrims, video overlays.
+- Theme switch stutter: light<->dark recreated the activities 2-3x (AppCompat auto + ActivityCompat.recreate + KEY_THEME_CHANGE in MainActivity.onResume).
+  AppearanceSettingsFragment now recreates only when AppCompat didn't (dark<->black); MainActivity recreates on resume only if its
+  theme signature (theme, night theme, disable-animations, uiMode) is outdated. Not compiled here.
+
+## Pass 9 (user request): right->left open, left->right back, everywhere
+- One shared curve interpolator/slide_ease (0.22,0.85,0.2,1) for ALL four screen anims, 380ms each, so entering and leaving page stay locked
+  (before: decelerate vs accelerate mismatch opened a gap). Open: new page 100%p -> 0, old page 0 -> -30%p (parallax).
+  Back: exact reverse (previous page -30%p -> 0, current page 0 -> 100%p). Still alpha-free.
+- Same slide now also on: activity open/close + task open/close (Animation.App.Window), settings search open/close, comment replies in the info bottom sheet.
+  Already used it: NavigationHelper.defaultTransaction (every video/channel/playlist/search/etc. fragment), settings sub-pages.
+- Left as is on purpose: dialogs (M3 scale+fade), Home category tabs (fade), main tab pager, transparent Router/popup activities.

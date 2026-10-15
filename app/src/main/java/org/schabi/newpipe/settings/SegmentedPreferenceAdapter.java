@@ -138,6 +138,8 @@ final class SegmentedPreferenceAdapter extends PreferenceGroupAdapter {
         card.setColor(ThemeHelper.resolveColorFromAttr(context,
                 R.attr.card_item_background_color));
         card.setCornerRadius(radius);
+        card.setStroke(Math.max(1, dp(1)), ThemeHelper.resolveColorFromAttr(context,
+                R.attr.separator_color));
 
         final int ripple = ThemeHelper.resolveColorFromAttr(context,
                 androidx.appcompat.R.attr.colorControlHighlight);

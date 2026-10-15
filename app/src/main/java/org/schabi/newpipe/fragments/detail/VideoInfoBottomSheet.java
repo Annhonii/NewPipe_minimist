@@ -84,6 +84,8 @@ public class VideoInfoBottomSheet extends BottomSheetDialogFragment {
             titleView.setText(Localization.replyCount(requireContext(), comment.getReplyCount()));
         }
         getChildFragmentManager().beginTransaction()
+                .setCustomAnimations(R.anim.screen_enter, R.anim.screen_exit,
+                        R.anim.screen_pop_enter, R.anim.screen_pop_exit)
                 .replace(R.id.video_info_sheet_container, new CommentRepliesFragment(comment),
                         CommentRepliesFragment.TAG)
                 .addToBackStack(CommentRepliesFragment.TAG)

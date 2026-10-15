@@ -312,7 +312,9 @@ public class SettingsActivity extends AppCompatActivity implements
 
         final var keyboardController = new SoftwareKeyboardControllerCompat(searchEditText);
         if (active) {
-            final FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            final FragmentTransaction ft = getSupportFragmentManager().beginTransaction()
+                    .setCustomAnimations(R.anim.screen_enter, R.anim.screen_exit,
+                            R.anim.screen_pop_enter, R.anim.screen_pop_exit);
             final Fragment current = getSupportFragmentManager()
                     .findFragmentById(FRAGMENT_HOLDER_ID);
             if (current != null) {
@@ -338,7 +340,10 @@ public class SettingsActivity extends AppCompatActivity implements
     }
 
     private void hideSearchFragment() {
-        getSupportFragmentManager().beginTransaction().remove(searchFragment).commit();
+        getSupportFragmentManager().beginTransaction()
+                .setCustomAnimations(R.anim.screen_enter, R.anim.screen_exit,
+                        R.anim.screen_pop_enter, R.anim.screen_pop_exit)
+                .remove(searchFragment).commit();
     }
 
     private void resetSearchText() {
