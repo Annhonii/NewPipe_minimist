@@ -111,8 +111,8 @@ object YtAccountDialogs {
     }
 
     /**
-     * Copies the signed-in session as a token text that the "Sign in with token" option (and
-     * Metrolist) understands. It gives full access to the account, so it is flagged sensitive.
+     * Copies the signed-in session as a token text that the "Sign in with token" option
+     * understands. It gives full access to the account, so it is flagged sensitive.
      */
     @JvmStatic
     fun copyToken(context: Context) {
@@ -122,12 +122,12 @@ object YtAccountDialogs {
             return
         }
         val text = buildString {
-            append("***INNERTUBE COOKIE*** =").append(s.cookie).append('\n')
-            append("***VISITOR DATA*** =").append(s.visitorData).append('\n')
-            append("***DATASYNC ID*** =").append(s.dataSyncId).append('\n')
-            append("***AUTH USER*** =").append(s.authUser).append('\n')
-            append("***ACCOUNT NAME*** =").append(s.name).append('\n')
-            append("***ACCOUNT EMAIL*** =").append(s.email)
+            append("***COOKIE*** =").append(s.cookie).append('\n')
+            append("***VISITOR*** =").append(s.visitorData).append('\n')
+            append("***SYNC ID*** =").append(s.dataSyncId).append('\n')
+            append("***USER INDEX*** =").append(s.authUser).append('\n')
+            append("***NAME*** =").append(s.name).append('\n')
+            append("***EMAIL*** =").append(s.email)
         }
         val clip = ClipData.newPlainText("YouTube token", text)
         if (Build.VERSION.SDK_INT >= 33) {

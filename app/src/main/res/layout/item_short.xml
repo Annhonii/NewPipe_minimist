@@ -24,6 +24,7 @@
         android:scaleType="fitCenter" />
 
     <View
+        android:id="@+id/short_scrim"
         android:layout_width="match_parent"
         android:layout_height="240dp"
         android:layout_gravity="bottom"
@@ -70,26 +71,6 @@
             android:textColor="#FFFFFFFF"
             android:textSize="18sp"
             android:textStyle="bold" />
-
-        <ImageView
-            android:id="@+id/short_search"
-            android:layout_width="44dp"
-            android:layout_height="44dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="@string/search"
-            android:padding="10dp"
-            android:src="@drawable/ic_search"
-            app:tint="#FFFFFFFF" />
-
-        <ImageView
-            android:id="@+id/short_cast"
-            android:layout_width="44dp"
-            android:layout_height="44dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="@string/shorts_cast"
-            android:padding="10dp"
-            android:src="@drawable/ic_cast"
-            app:tint="#FFFFFFFF" />
 
         <ImageView
             android:id="@+id/short_menu"
@@ -173,7 +154,7 @@
                 android:id="@+id/short_like_count"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="14dp"
+                android:layout_marginBottom="10dp"
                 android:shadowColor="#80000000"
                 android:shadowRadius="4"
                 android:textColor="#FFFFFFFF"
@@ -192,7 +173,7 @@
                 android:id="@+id/short_dislike_count"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="14dp"
+                android:layout_marginBottom="10dp"
                 android:shadowColor="#80000000"
                 android:shadowRadius="4"
                 android:text="@string/shorts_dislike"
@@ -212,7 +193,7 @@
                 android:id="@+id/short_comments_count"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="14dp"
+                android:layout_marginBottom="10dp"
                 android:shadowColor="#80000000"
                 android:shadowRadius="4"
                 android:textColor="#FFFFFFFF"
@@ -230,21 +211,12 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="18dp"
+                android:layout_marginBottom="0dp"
                 android:shadowColor="#80000000"
                 android:shadowRadius="4"
                 android:text="@string/shorts_share"
                 android:textColor="#FFFFFFFF"
                 android:textSize="13sp" />
-
-            <ImageView
-                android:id="@+id/short_channel_square"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:background="@drawable/bg_shorts_avatar_square"
-                android:contentDescription="@null"
-                android:padding="2dp"
-                android:scaleType="centerCrop" />
         </LinearLayout>
 
         <LinearLayout
@@ -324,39 +296,6 @@
                 android:shadowRadius="4"
                 android:textColor="#FFFFFFFF"
                 android:textSize="14sp" />
-
-            <LinearLayout
-                android:id="@+id/short_audio_pill"
-                android:layout_width="wrap_content"
-                android:layout_height="28dp"
-                android:layout_marginTop="10dp"
-                android:background="@drawable/bg_shorts_audio_pill"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:paddingStart="10dp"
-                android:paddingEnd="12dp">
-
-                <ImageView
-                    android:layout_width="14dp"
-                    android:layout_height="14dp"
-                    android:contentDescription="@null"
-                    android:src="@drawable/ic_music_note"
-                    app:tint="#FFFFFFFF" />
-
-                <TextView
-                    android:id="@+id/short_audio"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="6dp"
-                    android:ellipsize="marquee"
-                    android:focusable="true"
-                    android:focusableInTouchMode="true"
-                    android:marqueeRepeatLimit="marquee_forever"
-                    android:maxWidth="190dp"
-                    android:singleLine="true"
-                    android:textColor="#FFFFFFFF"
-                    android:textSize="12sp" />
-            </LinearLayout>
         </LinearLayout>
 
         <SeekBar

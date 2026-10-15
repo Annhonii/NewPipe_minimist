@@ -38,6 +38,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.content.res.AppCompatResources;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
@@ -358,6 +361,19 @@ public final class MainPlayerUi extends VideoPlayerUi implements View.OnLayoutCh
         if (!isFullscreen) {
             binding.playbackControlRoot.setPadding(0, 0, 0, 0);
         }
+        // In the normal (non fullscreen) page the player already sits below the status bar, so
+        // the controls must not get the status bar height as extra top padding again.
+        ViewCompat.setOnApplyWindowInsetsListener(binding.playbackControlRoot, (v, insets) -> {
+            if (isFullscreen) {
+                final Insets bars = insets.getInsets(WindowInsetsCompat.Type.systemBars()
+                        | WindowInsetsCompat.Type.displayCutout());
+                v.setPadding(bars.left, bars.top, bars.right, bars.bottom);
+            } else {
+                v.setPadding(0, 0, 0, 0);
+            }
+            return insets;
+        });
+        ViewCompat.requestApplyInsets(binding.playbackControlRoot);
         binding.itemsListPanel.setPadding(0, 0, 0, 0);
         player.getFragmentListener().ifPresent(PlayerServiceEventListener::onViewCreated);
     }
@@ -926,6 +942,7 @@ public final class MainPlayerUi extends VideoPlayerUi implements View.OnLayoutCh
             // from landscape to portrait (open vertical video to reproduce)
             binding.playbackControlRoot.setPadding(0, 0, 0, 0);
         }
+        ViewCompat.requestApplyInsets(binding.playbackControlRoot);
         fragmentListener.onFullscreenStateChanged(isFullscreen);
 
         binding.metadataView.setVisibility(isFullscreen ? View.VISIBLE : View.GONE);

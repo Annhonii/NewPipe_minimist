@@ -939,13 +939,13 @@
     <string name="yt_login_web_title">Sign in with Google</string>
     <string name="yt_login_web_summary">Log in to your Google account in a browser window</string>
     <string name="yt_login_token_title">Sign in with token</string>
-    <string name="yt_login_token_summary">Paste your YouTube cookie / token (also works with a Metrolist token)</string>
+    <string name="yt_login_token_summary">Paste your YouTube cookie / token</string>
     <string name="yt_login_title">Sign in to Google</string>
     <string name="yt_login_hint">Sign in with your Google account. This window closes by itself once you are signed in to YouTube.</string>
     <string name="yt_login_action">Sign in</string>
     <string name="yt_token_message">If you don\'t have a token, log in manually first, then copy the token from Settings &gt; Google account to log in with it in the future.</string>
-    <string name="yt_token_hint">SID=...; SAPISID=...; ...</string>
-    <string name="yt_token_invalid">That token has no SAPISID cookie, so it cannot be used</string>
+    <string name="yt_token_hint">Paste your token here</string>
+    <string name="yt_token_invalid">That token is not valid, so it cannot be used</string>
     <string name="yt_sync_title">Sync subscriptions now</string>
     <string name="yt_sync_summary">Import your subscribed channels from YouTube</string>
     <string name="yt_syncing">Syncing subscriptions…</string>

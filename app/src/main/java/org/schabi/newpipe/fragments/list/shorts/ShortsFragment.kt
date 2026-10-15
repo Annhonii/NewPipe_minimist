@@ -385,6 +385,7 @@ class ShortsFragment : BaseFragment() {
         h.b.shortPlayer.player = player
         h.b.shortThumb.visibility = View.VISIBLE
         h.b.shortPauseIcon.visibility = View.GONE
+        setPausedUi(h, false, false)
     }
 
     private fun detachFromHolder(h: ShortHolder) {
@@ -460,29 +461,28 @@ class ShortsFragment : BaseFragment() {
             resources.getDimensionPixelSize(R.dimen.nav_pill_content_inset)
         }
         b.shortOverlay.setPadding(0, 0, 0, bottomInset)
-        val statusId = resources.getIdentifier("status_bar_height", "dimen", "android")
-        val statusBar = if (statusId > 0) resources.getDimensionPixelSize(statusId) else 0
         b.shortHeader.setPadding(
-            b.shortHeader.paddingLeft, statusBar + dp(4), b.shortHeader.paddingRight, b.shortHeader.paddingBottom
+            b.shortHeader.paddingLeft, dp(2), b.shortHeader.paddingRight, b.shortHeader.paddingBottom
         )
-        b.shortAudio.isSelected = true
-        b.shortSearch.setOnClickListener {
-            NavigationHelper.openSearchFragment(getFM(), ServiceList.YouTube.serviceId, "")
+        // round channel logo
+        b.shortAvatar.outlineProvider = object : android.view.ViewOutlineProvider() {
+            override fun getOutline(view: View, outline: android.graphics.Outline) {
+                outline.setOval(0, 0, view.width, view.height)
+            }
         }
-        b.shortCast.setOnClickListener { castOrOpen(id) }
+        b.shortAvatar.clipToOutline = true
+        // channel row, title and progress line only show while the short is paused
+        setPausedUi(h, false, false)
         b.shortMenu.setOnClickListener { showSettingsMenu(id, true) }
         b.shortDislike.setOnClickListener { onDislikeClicked(id, h) }
         b.shortBell.setOnClickListener { toggleNotifications(h) }
 
         setTitleText(h, entry.title.orEmpty())
-        b.shortAudio.text = ""
-        b.shortAudioPill.visibility = View.GONE
         b.shortBell.visibility = View.GONE
         b.shortChannel.text = ""
         b.shortSubscribe.visibility = View.GONE
         b.shortSeek.progress = 0
         b.shortAvatar.setImageDrawable(null)
-        b.shortChannelSquare.setImageDrawable(null)
         CoilHelper.loadThumbnail(b.shortThumb, entry.thumbnail)
         b.shortThumb.visibility = View.VISIBLE
         b.shortPauseIcon.visibility = View.GONE
@@ -559,11 +559,8 @@ class ShortsFragment : BaseFragment() {
         if (info.id != id) return
         val b = h.b
         setTitleText(h, info.name.orEmpty(), info.description?.content)
-        b.shortAudio.text = getString(R.string.shorts_original_audio, info.uploaderName.orEmpty())
-        b.shortAudioPill.visibility = View.VISIBLE
         b.shortChannel.text = info.uploaderName
         CoilHelper.loadAvatar(b.shortAvatar, info.uploaderAvatars)
-        CoilHelper.loadAvatar(b.shortChannelSquare, info.uploaderAvatars)
         val openChannel = View.OnClickListener {
             val url = info.uploaderUrl
             if (!url.isNullOrEmpty()) {
@@ -572,7 +569,6 @@ class ShortsFragment : BaseFragment() {
         }
         b.shortAvatar.setOnClickListener(openChannel)
         b.shortChannel.setOnClickListener(openChannel)
-        b.shortChannelSquare.setOnClickListener(openChannel)
 
         if (!likeCounts.containsKey(id) && info.likeCount >= 0) likeCounts[id] = info.likeCount
         applyLike(h)
@@ -588,7 +584,8 @@ class ShortsFragment : BaseFragment() {
                         commentTexts[id] = text
                         if (h.videoId == id) h.b.shortCommentsCount.text = text
                     },
-                    { }
+                    { if (h.videoId == id) h.b.shortCommentsCount.setText(R.string.comments_tab_description) },
+                    { if (h.videoId == id) h.b.shortCommentsCount.setText(R.string.comments_tab_description) }
                 )
             )
         }
@@ -638,6 +635,7 @@ class ShortsFragment : BaseFragment() {
         icon.alpha = 0.85f
         icon.scaleX = 0.8f
         icon.scaleY = 0.8f
+        setPausedUi(h, userPaused, true)
         icon.animate().alpha(0f).scaleX(1.15f).scaleY(1.15f).setStartDelay(350).setDuration(350)
             .setListener(object : AnimatorListenerAdapter() {
                 override fun onAnimationEnd(animation: Animator) {
@@ -764,6 +762,29 @@ class ShortsFragment : BaseFragment() {
 
     // ------------------------------------------------------------------ new UI pieces
 
+    /** Channel row, title and progress line are only visible while the short is paused. */
+    private fun setPausedUi(h: ShortHolder, paused: Boolean, animate: Boolean) {
+        val views = listOf(h.b.shortInfo, h.b.shortSeek, h.b.shortScrim)
+        views.forEach { v ->
+            v.animate().cancel()
+            if (paused) {
+                v.visibility = View.VISIBLE
+                if (animate) {
+                    v.alpha = 0f
+                    v.animate().alpha(1f).setDuration(200).start()
+                } else {
+                    v.alpha = 1f
+                }
+            } else if (animate) {
+                v.animate().alpha(0f).setDuration(150)
+                    .withEndAction { v.visibility = View.INVISIBLE }.start()
+            } else {
+                v.alpha = 0f
+                v.visibility = View.INVISIBLE
+            }
+        }
+    }
+
     private fun dp(v: Int) = (v * resources.displayMetrics.density).toInt()
 
     /** Title with blue bold #hashtags, "...more" when longer than two lines. */
@@ -889,11 +910,6 @@ class ShortsFragment : BaseFragment() {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({ }, { toast(R.string.subscription_change_failed) })
         )
-    }
-
-    private fun castOrOpen(id: String) {
-        val view = Intent(Intent.ACTION_VIEW, Uri.parse("https://www.youtube.com/shorts/$id"))
-        startActivity(Intent.createChooser(view, getString(R.string.shorts_cast)))
     }
 
     private fun applyCaptions(exo: ExoPlayer) {

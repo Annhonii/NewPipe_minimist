@@ -83,9 +83,8 @@ object YtAccountStore {
     }
 
     /**
-     * Accepts either a plain cookie string ("SID=..; SAPISID=..; ...") or the
-     * Metrolist token template (lines like `***INNERTUBE COOKIE*** =...`).
-     * Returns null when no usable cookie (with SAPISID) is found.
+     * Accepts either a plain cookie string or the token text produced by "copy token"
+     * (lines like `***COOKIE*** =...`). Returns null when no usable cookie is found.
      */
     fun parseTokenText(text: String): Session? {
         var cookie = ""
@@ -95,15 +94,18 @@ object YtAccountStore {
         var name = ""
         var email = ""
         var templated = false
+        fun value(line: String) = line.substringAfter("=").trim()
         text.lines().forEach { raw ->
             val line = raw.trim()
             when {
-                line.startsWith("***INNERTUBE COOKIE***") -> { cookie = line.substringAfter("=").trim(); templated = true }
-                line.startsWith("***VISITOR DATA***") -> visitor = line.substringAfter("=").trim()
-                line.startsWith("***DATASYNC ID***") -> dataSync = line.substringAfter("=").trim()
-                line.startsWith("***AUTH USER***") -> authUser = line.substringAfter("=").trim()
-                line.startsWith("***ACCOUNT NAME***") -> name = line.substringAfter("=").trim()
-                line.startsWith("***ACCOUNT EMAIL***") -> email = line.substringAfter("=").trim()
+                line.startsWith("***COOKIE***") || line.startsWith("***INNERTUBE COOKIE***") -> {
+                    cookie = value(line); templated = true
+                }
+                line.startsWith("***VISITOR***") || line.startsWith("***VISITOR DATA***") -> visitor = value(line)
+                line.startsWith("***SYNC ID***") || line.startsWith("***DATASYNC ID***") -> dataSync = value(line)
+                line.startsWith("***USER INDEX***") || line.startsWith("***AUTH USER***") -> authUser = value(line)
+                line.startsWith("***NAME***") || line.startsWith("***ACCOUNT NAME***") -> name = value(line)
+                line.startsWith("***EMAIL***") || line.startsWith("***ACCOUNT EMAIL***") -> email = value(line)
             }
         }
         if (!templated) {

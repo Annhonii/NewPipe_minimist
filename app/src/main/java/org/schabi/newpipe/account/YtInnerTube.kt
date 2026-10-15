@@ -86,7 +86,7 @@ object YtInnerTube {
             .header("X-Youtube-Client-Version", CLIENT_VERSION)
         if (session != null) {
             val sapisid = session.sapisid
-                ?: throw AuthException("Cookie has no SAPISID")
+                ?: throw AuthException("Invalid token")
             b.header("Cookie", session.cookie.replace("\n", "").replace("\r", "").trim())
             b.header("Authorization", "SAPISIDHASH ${sapisidHash(sapisid)}")
             b.header("X-Origin", ORIGIN)
