@@ -5,10 +5,16 @@
     android:layout_height="match_parent"
     android:background="#FF000000">
 
-    <androidx.viewpager2.widget.ViewPager2
-        android:id="@+id/shorts_pager"
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/shorts_refresh"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent">
+
+        <androidx.viewpager2.widget.ViewPager2
+            android:id="@+id/shorts_pager"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
     <ProgressBar
         android:id="@+id/shorts_loading"
