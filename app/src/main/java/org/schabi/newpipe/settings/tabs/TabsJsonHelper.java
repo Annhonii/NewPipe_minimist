@@ -22,7 +22,6 @@ public final class TabsJsonHelper {
 
     private static final List<Tab> FALLBACK_INITIAL_TABS_LIST = List.of(
             Tab.Type.HOME.getTab(),
-            Tab.Type.SHORTS.getTab(),
             Tab.Type.FEED.getTab(),
             Tab.Type.DOWNLOADS.getTab(),
             Tab.Type.HISTORY.getTab());

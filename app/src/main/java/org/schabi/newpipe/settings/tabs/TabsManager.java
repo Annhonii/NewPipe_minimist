@@ -12,7 +12,7 @@ import java.util.List;
 
 public final class TabsManager {
     private static final String HOME_TAB_MIGRATED_KEY = "home_tab_added_v1";
-    private static final String SHORTS_TAB_MIGRATED_KEY = "shorts_tab_added_v1";
+    private static final String SHORTS_TAB_REMOVED_KEY = "shorts_tab_removed_v1";
     private static final String TRENDING_TAB_REMOVED_KEY = "trending_tab_removed_v1";
     private final SharedPreferences sharedPreferences;
     private final String savedTabsKey;
@@ -34,10 +34,9 @@ public final class TabsManager {
         final String savedJson = sharedPreferences.getString(savedTabsKey, null);
         try {
             final List<Tab> tabs = TabsJsonHelper.getTabsFromJson(savedJson);
-            return addShortsTabOnce(
+            return removeShortsTabOnce(
                     removeTrendingTabOnce(addHomeTabOnce(tabs, savedJson != null),
-                            savedJson != null),
-                    savedJson != null);
+                            savedJson != null));
         } catch (final TabsJsonHelper.InvalidJsonException e) {
             Toast.makeText(context, R.string.saved_tabs_invalid_json, Toast.LENGTH_SHORT).show();
             return getDefaultTabs();
@@ -68,33 +67,26 @@ public final class TabsManager {
     }
 
     /**
-     * Existing installs have a saved tab list without the Shorts tab. Add it once, right after
-     * the Home tab (or first if Home is not there); after that the user is free to remove or
-     * move it in Settings.
+     * The Shorts tab is not part of the default navigation pill any more. Installs that got it
+     * from the earlier automatic migration lose it once; after that it is only there when the
+     * user adds it in Settings (Content, Main page tabs).
      */
-    private List<Tab> addShortsTabOnce(final List<Tab> tabs, final boolean hadSavedTabs) {
-        if (sharedPreferences.getBoolean(SHORTS_TAB_MIGRATED_KEY, false)) {
+    private List<Tab> removeShortsTabOnce(final List<Tab> tabs) {
+        if (sharedPreferences.getBoolean(SHORTS_TAB_REMOVED_KEY, false)) {
             return tabs;
         }
-        sharedPreferences.edit().putBoolean(SHORTS_TAB_MIGRATED_KEY, true).apply();
-        if (!hadSavedTabs) {
-            return tabs; // fresh install: the defaults already contain Shorts
-        }
+        sharedPreferences.edit().putBoolean(SHORTS_TAB_REMOVED_KEY, true).apply();
         final Tab shorts = Tab.Type.SHORTS.getTab();
-        if (tabs.contains(shorts)) {
+        if (!tabs.contains(shorts)) {
             return tabs;
         }
-        final java.util.ArrayList<Tab> withShorts = new java.util.ArrayList<>(tabs);
-        int index = 0;
-        for (int i = 0; i < withShorts.size(); i++) {
-            if (withShorts.get(i).getTabId() == Tab.HomeTab.ID) {
-                index = i + 1;
-                break;
-            }
+        final java.util.ArrayList<Tab> without = new java.util.ArrayList<>(tabs);
+        without.remove(shorts);
+        if (without.isEmpty()) {
+            return tabs;
         }
-        withShorts.add(index, shorts);
-        saveTabs(withShorts);
-        return withShorts;
+        saveTabs(without);
+        return without;
     }
 
     /**
