@@ -316,6 +316,28 @@ public final class ThemeHelper {
         }
     }
 
+    /**
+     * Context for everything drawn inside the video player (its view and its popup menus).
+     * <p>
+     * The player view is inflated ONCE with the PlayerService context and then lives across
+     * activity re-creations. That service context keeps the theme / night mode it was created
+     * with, so after a light <-> dark switch the player's popups (speed, quality, captions...)
+     * were resolved from a stale theme and misbehaved. The player is always dark anyway, so it
+     * gets a fixed dark theme + night configuration that never depends on the app theme.
+     *
+     * @param base any context (usually the service)
+     * @return a context with a fixed dark player theme
+     */
+    public static Context createDarkPlayerContext(final Context base) {
+        final Configuration config = new Configuration(base.getResources().getConfiguration());
+        config.uiMode = (config.uiMode & ~Configuration.UI_MODE_NIGHT_MASK)
+                | Configuration.UI_MODE_NIGHT_YES;
+        final androidx.appcompat.view.ContextThemeWrapper wrapper =
+                new androidx.appcompat.view.ContextThemeWrapper(base, R.style.PlayerViewTheme);
+        wrapper.applyOverrideConfiguration(config);
+        return wrapper;
+    }
+
     public static void setDayNightMode(final Context context) {
         setDayNightMode(context, ThemeHelper.getSelectedThemeKey(context));
     }

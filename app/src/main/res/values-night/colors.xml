@@ -2,5 +2,5 @@
 <resources>
     <color name="contrastColor">@color/white</color>
     <color name="defaultIconTint">@color/white</color>
-    <color name="nav_inactive">#FFFFFF</color>
+    <color name="nav_inactive">#ADADAD</color>
 </resources>

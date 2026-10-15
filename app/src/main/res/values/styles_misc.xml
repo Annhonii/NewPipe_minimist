@@ -66,6 +66,12 @@
         <item name="tint">?attr/actionColor</item>
     </style>
 
+    <!-- The player always looks dark (it sits on top of the video), whatever the app theme is. -->
+    <style name="PlayerViewTheme" parent="ThemeOverlay.AppCompat.Dark">
+        <item name="popupMenuStyle">@style/Widget.App.PopupMenu.Dark</item>
+        <item name="android:popupMenuStyle">@style/Widget.App.PopupMenu.Dark</item>
+    </style>
+
     <style name="DarkPopupMenu" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
         <!-- white item text needs a dark popup surface in light mode too -->
         <item name="popupMenuStyle">@style/Widget.App.PopupMenu.Dark</item>

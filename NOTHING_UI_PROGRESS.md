@@ -102,3 +102,13 @@ Not compiled here.
 - Same slide now also on: activity open/close + task open/close (Animation.App.Window), settings search open/close, comment replies in the info bottom sheet.
   Already used it: NavigationHelper.defaultTransaction (every video/channel/playlist/search/etc. fragment), settings sub-pages.
 - Left as is on purpose: dialogs (M3 scale+fade), Home category tabs (fade), main tab pager, transparent Router/popup activities.
+
+## Pass 10 (user request): Music-dev palette back, outlines gone, player popups after theme switch
+- Palette now taken from Music-dev (mobile/src/constants/Styles.ts + theme roles). Light: bg #F2F2F2, cards/dialog #FFFFFF, containers #EBEBEB,
+  hairline #D9D9D9, muted text #606060. Dark/Black: bg #000000, cards/dialog #1C1C1C, containers #292929, hairline #323232, muted text #ADADAD. Accent stays #D71921.
+- All outlines added in pass 8 removed (list/comment/mini player/search/toolbar/dialog/sheet/popup/chips/settings tiles/switch track/seekbar).
+  Original hairlines on nav pill, drawer service pill, icon/pill buttons are untouched.
+- Player after light<->dark switch: the player view was inflated once with the PlayerService context (old theme/night mode) and reused by the new activity,
+  so speed/quality/audio/caption popups resolved a stale theme. Now ThemeHelper.createDarkPlayerContext() (PlayerViewTheme + forced night uiMode) is used for
+  inflating the player view (Player.initUIsForCurrentPlayerType) and for ALL four popup menus (VideoPlayerUi; speed popup used the raw service context before).
+  Not compiled here.

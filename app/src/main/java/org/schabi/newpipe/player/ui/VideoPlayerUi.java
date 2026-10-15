@@ -16,6 +16,7 @@ import static org.schabi.newpipe.player.helper.PlayerHelper.getTimeString;
 import static org.schabi.newpipe.player.helper.PlayerHelper.nextResizeModeAndSaveToPrefs;
 import static org.schabi.newpipe.player.helper.PlayerHelper.retrieveSeekDurationFromPreferences;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -39,7 +40,6 @@ import android.widget.SeekBar;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.content.res.AppCompatResources;
-import androidx.appcompat.view.ContextThemeWrapper;
 import androidx.appcompat.widget.AppCompatImageButton;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.core.graphics.BitmapCompat;
@@ -81,6 +81,7 @@ import org.schabi.newpipe.player.seekbarpreview.SeekbarPreviewThumbnailHolder;
 import org.schabi.newpipe.util.DeviceUtils;
 import org.schabi.newpipe.util.Localization;
 import org.schabi.newpipe.util.NavigationHelper;
+import org.schabi.newpipe.util.ThemeHelper;
 import org.schabi.newpipe.util.external_communication.KoreUtils;
 import org.schabi.newpipe.util.external_communication.ShareUtils;
 import org.schabi.newpipe.views.player.PlayerFastSeekOverlay;
@@ -177,12 +178,12 @@ public abstract class VideoPlayerUi extends PlayerUi implements SeekBar.OnSeekBa
         binding.playbackSeekBar.getProgressDrawable()
                 .setColorFilter(new PorterDuffColorFilter(Color.RED, PorterDuff.Mode.MULTIPLY));
 
-        final ContextThemeWrapper themeWrapper = new ContextThemeWrapper(context,
-                R.style.DarkPopupMenu);
+        // fixed dark theme: independent of the app theme (see createDarkPlayerContext)
+        final Context themeWrapper = ThemeHelper.createDarkPlayerContext(context);
 
         qualityPopupMenu = new PopupMenu(themeWrapper, binding.qualityTextView);
         audioTrackPopupMenu = new PopupMenu(themeWrapper, binding.audioTrackTextView);
-        playbackSpeedPopupMenu = new PopupMenu(context, binding.playbackSpeed);
+        playbackSpeedPopupMenu = new PopupMenu(themeWrapper, binding.playbackSpeed);
         captionPopupMenu = new PopupMenu(themeWrapper, binding.captionTextView);
 
         binding.progressBarLoadingPanel.getIndeterminateDrawable()

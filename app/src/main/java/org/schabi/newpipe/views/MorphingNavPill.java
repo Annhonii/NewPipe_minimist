@@ -709,7 +709,7 @@ public class MorphingNavPill extends ViewGroup {
             final GradientDrawable mask = new GradientDrawable();
             mask.setColor(Color.WHITE);
             mask.setCornerRadius(1000f * density);
-            setBackground(new RippleDrawable(ColorStateList.valueOf(0x33D71921), null, mask));
+            setBackground(new RippleDrawable(ColorStateList.valueOf(0x22888888), null, mask));
         }
 
         void setChipColor(final int color) {

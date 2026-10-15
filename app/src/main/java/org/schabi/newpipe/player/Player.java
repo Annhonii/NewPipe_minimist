@@ -125,6 +125,7 @@ import org.schabi.newpipe.util.ListHelper;
 import org.schabi.newpipe.util.NavigationHelper;
 import org.schabi.newpipe.util.SerializedCache;
 import org.schabi.newpipe.util.StreamTypeUtil;
+import org.schabi.newpipe.util.ThemeHelper;
 import org.schabi.newpipe.util.image.CoilHelper;
 
 import java.util.List;
@@ -580,7 +581,8 @@ public final class Player implements PlaybackListener, Listener {
                     if (playerType == PlayerType.AUDIO) {
                         return null;
                     } else {
-                        return PlayerBinding.inflate(LayoutInflater.from(context));
+                        return PlayerBinding.inflate(LayoutInflater.from(
+                                ThemeHelper.createDarkPlayerContext(context)));
                     }
                 });
 
