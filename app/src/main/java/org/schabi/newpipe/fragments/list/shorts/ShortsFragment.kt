@@ -111,6 +111,7 @@ class ShortsFragment : BaseFragment() {
     private val likeStates = HashMap<String, String>()
     private val likeCounts = HashMap<String, Long>()
     private val commentTexts = HashMap<String, String>()
+    private val likeTexts = HashMap<String, String>()
     private var subscribeDisposable: Disposable? = null
     private var subscribed = false
     private var notificationsOn = false
@@ -613,15 +614,26 @@ class ShortsFragment : BaseFragment() {
         setupSubscribe(h, info)
 
         val ctx = context ?: return
-        if (!commentTexts.containsKey(id)) {
+        val likeKnown = likeCounts.containsKey(id) || likeTexts.containsKey(id)
+        if (!commentTexts.containsKey(id) || !likeKnown) {
             disposables.add(
-                YtEngagement.commentCount(id).subscribe(
-                    { text ->
-                        commentTexts[id] = text
-                        if (h.videoId == id) h.b.shortCommentsCount.text = text
+                YtEngagement.counts(id).subscribe(
+                    { c ->
+                        c.commentText?.let { commentTexts[id] = it }
+                        if (!likeKnown) {
+                            if (c.likeNumber >= 0) {
+                                likeCounts[id] = c.likeNumber
+                            } else {
+                                c.likeText?.let { likeTexts[id] = it }
+                            }
+                        }
+                        if (isAdded && h.videoId == id) {
+                            h.b.shortCommentsCount.text = commentTexts[id]
+                                ?: getString(R.string.comments_tab_description)
+                            applyLike(h)
+                        }
                     },
-                    { if (h.videoId == id) h.b.shortCommentsCount.setText(R.string.comments_tab_description) },
-                    { if (h.videoId == id) h.b.shortCommentsCount.setText(R.string.comments_tab_description) }
+                    { if (isAdded && h.videoId == id) h.b.shortCommentsCount.setText(R.string.comments_tab_description) }
                 )
             )
         }
@@ -649,7 +661,11 @@ class ShortsFragment : BaseFragment() {
             ColorStateList.valueOf(if (likeStates[id] == "DISLIKE") DISLIKED_COLOR else Color.WHITE)
         val count = likeCounts[id]
         h.b.shortLikeCount.text =
-            if (count != null && count >= 0) Localization.shortCount(ctx, count) else ""
+            if (count != null && count >= 0) {
+                Localization.shortCount(ctx, count)
+            } else {
+                likeTexts[id].orEmpty()
+            }
     }
 
     private fun togglePause(h: ShortHolder) {

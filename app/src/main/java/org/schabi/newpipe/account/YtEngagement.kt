@@ -4,6 +4,7 @@ import android.content.Context
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Maybe
+import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.schedulers.Schedulers
 
 /** Like / dislike / comment actions for the signed-in Google account (Java friendly). */
@@ -45,6 +46,12 @@ object YtEngagement {
     @JvmStatic
     fun commentCount(videoId: String): Maybe<String> =
         Maybe.fromCallable<String> { YtInnerTube.commentCountText(videoId) }
+            .subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
+
+    /** Like and comment count of a video in one request (see [YtInnerTube.Counts]). */
+    @JvmStatic
+    fun counts(videoId: String): Single<YtInnerTube.Counts> =
+        Single.fromCallable { YtInnerTube.engagementCounts(videoId) }
             .subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
 
     @JvmStatic

@@ -823,6 +823,118 @@ object YtInnerTube {
             JSONObject().put("createReplyParams", params).put("commentText", text), session))
     }
 
+    /** Like and comment count of a video as YouTube shows them. Unknown parts are -1 / null. */
+    class Counts(val likeText: String?, val likeNumber: Long, val commentText: String?)
+
+    private val COUNT_PURE_NUMBER = Regex("""^\d[\d.,\u00a0\u202f ]*$""")
+    private val COUNT_SHORT_TOKEN = Regex("""^\d+([.,]\d+)?\s?[KkMmBb]$""")
+    private val COUNT_DIGITS = Regex("""\d[\d.,\u00a0\u202f]*""")
+
+    private fun digitsToLong(s: String): Long =
+        s.filter { it.isDigit() }.takeIf { it.isNotEmpty() && it.length < 16 }?.toLong() ?: -1L
+
+    /**
+     * Picks a count out of loose strings: an exact number ("12,345", or a sentence such as
+     * "like this video along with 12,345 other people") wins over a short token ("12K").
+     * Returns (short text, exact number); the number is -1 when only the text is known.
+     */
+    private fun parseCount(strings: List<String>): Pair<String?, Long> {
+        var text: String? = null
+        var number = -1L
+        for (raw in strings) {
+            val s = raw.trim()
+            if (s.isEmpty() || s.length > 140) continue
+            when {
+                COUNT_PURE_NUMBER.matches(s) -> if (number < 0) number = digitsToLong(s)
+                COUNT_SHORT_TOKEN.matches(s) -> if (text == null) text = s
+                else -> {
+                    val run = COUNT_DIGITS.findAll(s).map { it.value }.maxByOrNull { it.length }
+                    if (run != null && number < 0) number = digitsToLong(run)
+                }
+            }
+        }
+        return text to number
+    }
+
+    private fun likesFromNext(next: JSONObject): Pair<String?, Long> {
+        val roots = collect(next, "likeButtonViewModel") +
+            collect(next, "segmentedLikeDislikeButtonRenderer") +
+            collect(next, "segmentedLikeDislikeButtonViewModel")
+        for (r in roots) {
+            val strings = allStrings(r, "accessibilityText") + allStrings(r, "label") +
+                allStrings(r, "title") + allStrings(r, "simpleText") + allStrings(r, "content")
+            val found = parseCount(strings)
+            if (found.second >= 0 || found.first != null) return found
+        }
+        return null to -1L
+    }
+
+    private fun commentsFromNext(next: JSONObject): String? {
+        collect(next, "commentsEntryPointHeaderRenderer").firstOrNull()
+            ?.optJSONObject("commentCount")?.let { text(it)?.trim() }
+            ?.takeIf { it.isNotEmpty() }?.let { return it }
+        for (p in collect(next, "engagementPanelSectionListRenderer")) {
+            if (p.optString("panelIdentifier") != "engagement-panel-comments-section") continue
+            collect(p, "contextualInfo").firstOrNull()?.let { text(it)?.trim() }
+                ?.takeIf { it.isNotEmpty() }?.let { return it }
+        }
+        collect(next, "commentsHeaderRenderer").firstOrNull()?.optJSONObject("countText")
+            ?.optJSONArray("runs")?.optJSONObject(0)?.optString("text")?.trim()
+            ?.takeIf { it.isNotEmpty() }?.let { return it }
+        return null
+    }
+
+    /** Both counts in one go. Needs no login; a part that YouTube does not give stays unknown. */
+    fun engagementCounts(videoId: String): Counts {
+        var likeText: String? = null
+        var likeNumber = -1L
+        var commentText: String? = null
+
+        runCatching {
+            val next = post("next", JSONObject().put("videoId", videoId), null)
+            val likes = likesFromNext(next)
+            likeText = likes.first
+            likeNumber = likes.second
+            commentText = commentsFromNext(next)
+        }
+
+        if ((likeText == null && likeNumber < 0) || commentText == null) {
+            // the Shorts player's own endpoint, as a second source
+            runCatching {
+                val body = JSONObject()
+                    .put("disablePlayerResponse", true)
+                    .put("playerRequest", JSONObject().put("videoId", videoId).put("params", "8AEB"))
+                    .put("params", "CAUwAg%3D%3D")
+                val reel = post("reel/reel_item_watch", body, null)
+                if (likeText == null && likeNumber < 0) {
+                    collect(reel, "likeButtonRenderer").firstOrNull()?.let { r ->
+                        val n = r.optLong("likeCount", -1L)
+                        if (n >= 0) {
+                            likeNumber = n
+                        } else {
+                            val found = parseCount(
+                                allStrings(r, "simpleText") + allStrings(r, "label") +
+                                    allStrings(r, "content")
+                            )
+                            likeText = found.first
+                            likeNumber = found.second
+                        }
+                    }
+                }
+                if (commentText == null) {
+                    collect(reel, "viewCommentsButton").firstOrNull()?.let { r ->
+                        val found = parseCount(
+                            allStrings(r, "simpleText") + allStrings(r, "content") +
+                                allStrings(r, "title")
+                        )
+                        commentText = found.first ?: found.second.takeIf { it >= 0 }?.toString()
+                    }
+                }
+            }
+        }
+        return Counts(likeText, likeNumber, commentText)
+    }
+
     /** The comment count text from the video page ("1.9K"), or null. */
     fun commentCountText(videoId: String): String? {
         val next = post("next", JSONObject().put("videoId", videoId), null)
