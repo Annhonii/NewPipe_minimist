@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:clipChildren="false">
+
+    <!-- The pages fill the whole screen: their lists scroll behind the floating nav bar. -->
+    <androidx.viewpager.widget.ViewPager
+        android:id="@+id/pager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <!-- Landscape: the bar has a fixed width and is centered. -->
+    <org.schabi.newpipe.views.FloatingNavBar
+        android:id="@+id/main_nav_bar"
+        android:layout_width="560dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginStart="@dimen/nav_pill_margin_side"
+        android:layout_marginEnd="@dimen/nav_pill_margin_side"
+        android:layout_marginBottom="@dimen/nav_pill_margin_bottom" />
+
+</RelativeLayout>

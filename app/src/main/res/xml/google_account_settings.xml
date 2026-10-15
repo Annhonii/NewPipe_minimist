@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:title="@string/yt_account_title">
+
+    <Preference
+        android:key="@string/yt_status_key"
+        android:selectable="false"
+        android:title="@string/yt_status_title"
+        app:singleLineTitle="false"
+        app:iconSpaceReserved="false" />
+
+    <Preference
+        android:key="@string/yt_login_web_key"
+        android:summary="@string/yt_login_web_summary"
+        android:title="@string/yt_login_web_title"
+        app:singleLineTitle="false"
+        app:iconSpaceReserved="false" />
+
+    <Preference
+        android:key="@string/yt_login_token_key"
+        android:summary="@string/yt_login_token_summary"
+        android:title="@string/yt_login_token_title"
+        app:singleLineTitle="false"
+        app:iconSpaceReserved="false" />
+
+    <Preference
+        android:key="@string/yt_copy_token_key"
+        android:summary="@string/yt_copy_token_summary"
+        android:title="@string/yt_copy_token_title"
+        app:singleLineTitle="false"
+        app:iconSpaceReserved="false" />
+
+    <Preference
+        android:key="@string/yt_sync_key"
+        android:summary="@string/yt_sync_summary"
+        android:title="@string/yt_sync_title"
+        app:singleLineTitle="false"
+        app:iconSpaceReserved="false" />
+
+    <Preference
+        android:key="@string/yt_logout_key"
+        android:title="@string/yt_logout_title"
+        app:singleLineTitle="false"
+        app:iconSpaceReserved="false" />
+
+</PreferenceScreen>

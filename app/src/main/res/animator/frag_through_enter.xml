@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Material 3 fade through, incoming: fades in after 90ms while scaling 92% -> 100% -->
+<set xmlns:android="http://schemas.android.com/apk/res/android"
+    android:ordering="together">
+    <objectAnimator
+        android:duration="210"
+        android:interpolator="@android:interpolator/linear"
+        android:propertyName="alpha"
+        android:startOffset="90"
+        android:valueFrom="0.0f"
+        android:valueTo="1.0f" />
+    <objectAnimator
+        android:duration="300"
+        android:interpolator="@interpolator/emphasized_decelerate"
+        android:propertyName="scaleX"
+        android:valueFrom="0.92f"
+        android:valueTo="1.0f" />
+    <objectAnimator
+        android:duration="300"
+        android:interpolator="@interpolator/emphasized_decelerate"
+        android:propertyName="scaleY"
+        android:valueFrom="0.92f"
+        android:valueTo="1.0f" />
+</set>

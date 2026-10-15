@@ -1,0 +1,1 @@
+Salabota datubāzes migrācija, kas retos gadījumos neļāva NewPipe palaisties.

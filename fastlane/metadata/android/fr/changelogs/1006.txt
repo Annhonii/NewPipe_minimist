@@ -1,0 +1,16 @@
+# Améliorations
+Conservation du lecteur en cours lorsque l'on clique sur les repères temporels
+Tentative de récupération des missions de téléchargement en attente lorsque cela est possible
+Ajout d'une option permettant de supprimer un téléchargement sans supprimer le fichier
+Autorisation de superposition : affichage d'une boîte de dialogue explicative pour Android > R
+Prise en charge de l'ouverture des liens .soundcloud
+Nombreuses petites améliorations et optimisations
+
+# Corrections
+Correction du formatage des nombres courts pour les versions d'Android antérieures à la version 7
+Correction des notifications fantômes
+Corrections concernant les fichiers de sous-titres SRT
+Correction de nombreux plantages
+
+# Développement
+Modernisation du code interne

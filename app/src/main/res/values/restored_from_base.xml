@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="accent_ice_dark">#D71921</color>
+    <color name="accent_ice_light">#D71921</color>
+
+    <!-- Modern circular loader: spinning arc that grows and shrinks, tinted with the accent -->
+    <style name="Widget.App.ProgressBar" parent="@android:style/Widget.Material.ProgressBar">
+        <item name="android:indeterminateDrawable">@drawable/progress_arc_loader</item>
+        <item name="android:indeterminateTint">?attr/colorPrimary</item>
+        <item name="android:indeterminateTintMode">src_in</item>
+        <item name="android:minWidth">40dp</item>
+        <item name="android:maxWidth">40dp</item>
+        <item name="android:minHeight">40dp</item>
+        <item name="android:maxHeight">40dp</item>
+    </style>
+    <style name="Widget.App.ProgressBar.Large">
+        <item name="android:minWidth">52dp</item>
+        <item name="android:maxWidth">52dp</item>
+        <item name="android:minHeight">52dp</item>
+        <item name="android:maxHeight">52dp</item>
+    </style>
+</resources>

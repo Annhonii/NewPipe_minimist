@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Floating, heavily rounded dialog surface (Music's detached sheet: 24dp radius, 16dp edge gap). -->
+<inset xmlns:android="http://schemas.android.com/apk/res/android"
+    android:insetLeft="16dp"
+    android:insetTop="16dp"
+    android:insetRight="16dp"
+    android:insetBottom="16dp">
+    <shape android:shape="rectangle">
+        <solid android:color="?attr/surface_bright_color" />
+        <corners android:radius="24dp" />
+    </shape>
+</inset>

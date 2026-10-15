@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <attr name="progress_horizontal_drawable" format="reference" />
+    <!-- Can't refer to colors directly in drawable's xml-->
+    <attr name="toolbar_shadow" format="reference" />
+    <attr name="selector" format="reference" />
+    <attr name="checked_selector" format="reference" />
+    <attr name="focused_selector" format="reference" />
+    <attr name="dashed_border" format="reference" />
+
+    <attr name="actionColor" format="color" />
+    <attr name="separator_color" format="color" />
+    <attr name="contrast_background_color" format="color" />
+    <attr name="windowBackground" format="color" />
+    <attr name="colorPrimary" format="color" />
+    <attr name="toolbarSearchColor" format="reference|color" />
+
+    <attr name="card_item_background_color" format="color" />
+    <attr name="card_item_contrast_color" format="color" />
+    <attr name="border_color" format="color" />
+
+    <attr name="switch_track_off_color" format="color" />
+    <attr name="surface_bright_color" format="color" />
+    <attr name="text_secondary_color" format="color" />
+
+    <!-- Material 3 tonal colours for the top bar (bar background / pill + icon buttons) -->
+    <attr name="toolbar_container_color" format="color" />
+    <attr name="toolbar_element_color" format="color" />
+</resources>

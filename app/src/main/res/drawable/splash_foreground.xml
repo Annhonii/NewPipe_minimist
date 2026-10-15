@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Nothing-style splash mark: one ice dot, nothing else. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="80dp"
+    android:height="80dp"
+    android:viewportWidth="80"
+    android:viewportHeight="80">
+    <path
+        android:fillColor="#D71921"
+        android:pathData="M40,40m-9,0a9,9 0,1 1,18 0a9,9 0,1 1,-18 0" />
+</vector>

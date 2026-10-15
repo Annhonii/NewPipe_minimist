@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="?attr/toolbar_container_color"
+    android:orientation="vertical">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:gravity="center_vertical"
+        android:minHeight="?attr/actionBarSize"
+        android:theme="@style/ContrastToolbarTheme"
+        app:contentInsetEnd="8dp"
+        app:contentInsetStart="20dp"
+        app:contentInsetStartWithNavigation="12dp"
+        app:titleMarginStart="8dp"
+        app:titleTextAppearance="@style/TextAppearance.App.ToolbarTitle">
+
+        <include
+            android:id="@+id/toolbar_search_container"
+            layout="@layout/toolbar_search_layout"
+            android:visibility="gone"
+            tools:visibility="visible" />
+
+    </androidx.appcompat.widget.Toolbar>
+
+</LinearLayout>

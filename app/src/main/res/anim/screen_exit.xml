@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- OPEN: the screen underneath drifts ~30% to the left (parallax) while the new one covers it. -->
+<set xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shareInterpolator="false">
+    <translate
+        android:duration="380"
+        android:fromXDelta="0%"
+        android:interpolator="@interpolator/slide_ease"
+        android:toXDelta="-30%p" />
+</set>

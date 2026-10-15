@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:clipChildren="false">
+
+    <!-- The pages fill the whole screen: their lists scroll behind the floating nav bar
+         (the lists get a bottom inset in MainFragment, so the last item can still be reached). -->
+    <androidx.viewpager.widget.ViewPager
+        android:id="@+id/pager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <!-- Floating bar: a capsule whose selected tab morphs into an accent chip (icon + label),
+         plus round action buttons next to it. See FloatingNavBar / MorphingNavPill. -->
+    <org.schabi.newpipe.views.FloatingNavBar
+        android:id="@+id/main_nav_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="@dimen/nav_pill_margin_side"
+        android:layout_marginEnd="@dimen/nav_pill_margin_side"
+        android:layout_marginBottom="@dimen/nav_pill_margin_bottom" />
+
+</RelativeLayout>

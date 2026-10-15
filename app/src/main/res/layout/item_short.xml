@@ -1,0 +1,316 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- One page of the Shorts pager, laid out like the YouTube Shorts player:
+     video fills the page, like / comments / share on the right, channel + Subscribe + title at
+     the bottom left, a thin red progress line at the very bottom. -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FF000000">
+
+    <com.google.android.exoplayer2.ui.PlayerView
+        android:id="@+id/short_player"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:resize_mode="fit"
+        app:surface_type="texture_view"
+        app:use_controller="false" />
+
+    <ImageView
+        android:id="@+id/short_thumb"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:contentDescription="@null"
+        android:scaleType="fitCenter" />
+
+    <View
+        android:id="@+id/short_scrim"
+        android:layout_width="match_parent"
+        android:layout_height="240dp"
+        android:layout_gravity="bottom"
+        android:background="@drawable/bg_shorts_scrim" />
+
+    <ImageView
+        android:id="@+id/short_pause_icon"
+        android:layout_width="72dp"
+        android:layout_height="72dp"
+        android:layout_gravity="center"
+        android:alpha="0.85"
+        android:contentDescription="@null"
+        android:src="@drawable/ic_play_arrow"
+        android:visibility="gone"
+        app:tint="#FFFFFFFF" />
+
+    <!-- top overlay header: sits below the status bar (padding applied in code) -->
+    <LinearLayout
+        android:id="@+id/short_header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="16dp"
+        android:paddingEnd="8dp"
+        android:paddingBottom="6dp">
+
+        <ImageView
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:contentDescription="@null"
+            android:src="@drawable/ic_shorts"
+            app:tint="#FFFFFFFF" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="6dp"
+            android:layout_weight="1"
+            android:shadowColor="#80000000"
+            android:shadowRadius="4"
+            android:text="@string/tab_shorts"
+            android:textColor="#FFFFFFFF"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <ImageView
+            android:id="@+id/short_menu"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/shorts_more_options"
+            android:padding="10dp"
+            android:src="@drawable/ic_more_vert"
+            app:tint="#FFFFFFFF" />
+    </LinearLayout>
+
+    <!-- ripple + "5 s" feedback of the edge double-tap seek -->
+    <TextView
+        android:id="@+id/short_seek_left"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:layout_gravity="center_vertical|start"
+        android:layout_marginStart="24dp"
+        android:alpha="0"
+        android:background="@drawable/bg_shorts_ripple"
+        android:gravity="center"
+        android:text="@string/shorts_seek_back"
+        android:textColor="#FFFFFFFF"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/short_seek_right"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:layout_gravity="center_vertical|end"
+        android:layout_marginEnd="24dp"
+        android:alpha="0"
+        android:background="@drawable/bg_shorts_ripple"
+        android:gravity="center"
+        android:text="@string/shorts_seek_forward"
+        android:textColor="#FFFFFFFF"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+    <!-- like burst particles are added here from code -->
+    <FrameLayout
+        android:id="@+id/short_burst_layer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipChildren="false"
+        android:clipToPadding="false" />
+
+    <!-- everything that sits at the bottom; its bottom padding keeps it above the nav pill -->
+    <FrameLayout
+        android:id="@+id/short_overlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:id="@+id/short_actions"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:layout_marginEnd="10dp"
+            android:layout_marginBottom="64dp"
+            android:background="@drawable/bg_shorts_actionbar"
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            android:paddingStart="4dp"
+            android:paddingTop="8dp"
+            android:paddingEnd="4dp"
+            android:paddingBottom="8dp">
+
+            <ImageView
+                android:id="@+id/short_like"
+                android:layout_width="48dp"
+                android:layout_height="40dp"
+                android:contentDescription="@string/shorts_like"
+                android:padding="8dp"
+                android:src="@drawable/ic_favorite"
+                app:tint="#FFFFFFFF" />
+
+            <TextView
+                android:id="@+id/short_like_count"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:shadowColor="#80000000"
+                android:shadowRadius="4"
+                android:textColor="#FFFFFFFF"
+                android:textSize="13sp" />
+
+            <ImageView
+                android:id="@+id/short_dislike"
+                android:layout_width="48dp"
+                android:layout_height="40dp"
+                android:contentDescription="@string/detail_dislikes_img_view_description"
+                android:padding="8dp"
+                android:src="@drawable/ic_thumb_down"
+                app:tint="#FFFFFFFF" />
+
+            <TextView
+                android:id="@+id/short_dislike_count"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:shadowColor="#80000000"
+                android:shadowRadius="4"
+                android:text="@string/shorts_dislike"
+                android:textColor="#FFFFFFFF"
+                android:textSize="13sp" />
+
+            <ImageView
+                android:id="@+id/short_comments"
+                android:layout_width="48dp"
+                android:layout_height="40dp"
+                android:contentDescription="@string/comments_tab_description"
+                android:padding="8dp"
+                android:src="@drawable/ic_comment"
+                app:tint="#FFFFFFFF" />
+
+            <TextView
+                android:id="@+id/short_comments_count"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:shadowColor="#80000000"
+                android:shadowRadius="4"
+                android:textColor="#FFFFFFFF"
+                android:textSize="13sp" />
+
+            <ImageView
+                android:id="@+id/short_share"
+                android:layout_width="48dp"
+                android:layout_height="40dp"
+                android:contentDescription="@string/shorts_share"
+                android:padding="8dp"
+                android:src="@drawable/ic_share"
+                app:tint="#FFFFFFFF" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="0dp"
+                android:shadowColor="#80000000"
+                android:shadowRadius="4"
+                android:text="@string/shorts_share"
+                android:textColor="#FFFFFFFF"
+                android:textSize="13sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/short_info"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:layout_marginBottom="22dp"
+            android:orientation="vertical"
+            android:paddingStart="14dp"
+            android:paddingEnd="84dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:id="@+id/short_avatar"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:contentDescription="@null"
+                    android:scaleType="centerCrop" />
+
+                <TextView
+                    android:id="@+id/short_channel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_weight="0"
+                    android:ellipsize="end"
+                    android:maxWidth="150dp"
+                    android:maxLines="1"
+                    android:shadowColor="#80000000"
+                    android:shadowRadius="4"
+                    android:textColor="#FFFFFFFF"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/short_subscribe"
+                    android:layout_width="wrap_content"
+                    android:layout_height="36dp"
+                    android:layout_marginStart="12dp"
+                    android:background="@drawable/bg_shorts_subscribe"
+                    android:gravity="center"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp"
+                    android:text="@string/subscribe_button_title"
+                    android:textColor="#FF000000"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:visibility="gone" />
+
+                <ImageView
+                    android:id="@+id/short_bell"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:layout_marginStart="6dp"
+                    android:background="@drawable/bg_shorts_subscribed"
+                    android:contentDescription="@null"
+                    android:padding="8dp"
+                    android:src="@drawable/ic_notifications"
+                    android:visibility="gone"
+                    app:tint="#FFFFFFFF" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/short_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:ellipsize="end"
+                android:maxLines="2"
+                android:shadowColor="#80000000"
+                android:shadowRadius="4"
+                android:textColor="#FFFFFFFF"
+                android:textSize="14sp" />
+        </LinearLayout>
+
+        <SeekBar
+            android:id="@+id/short_seek"
+            android:layout_width="match_parent"
+            android:layout_height="16dp"
+            android:layout_gravity="bottom"
+            android:max="1000"
+            android:maxHeight="2dp"
+            android:minHeight="2dp"
+            android:paddingStart="0dp"
+            android:paddingEnd="0dp"
+            android:progressDrawable="@drawable/shorts_seekbar_progress"
+            android:splitTrack="false"
+            android:thumb="@drawable/shorts_seekbar_thumb"
+            android:thumbOffset="0dp" />
+    </FrameLayout>
+</FrameLayout>

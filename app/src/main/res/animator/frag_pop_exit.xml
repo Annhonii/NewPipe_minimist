@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Material 3 shared axis X, back: leaving screen fades out in 90ms while moving right -->
+<set xmlns:android="http://schemas.android.com/apk/res/android"
+    android:ordering="together">
+    <objectAnimator
+        android:duration="90"
+        android:interpolator="@android:interpolator/linear"
+        android:propertyName="alpha"
+        android:startOffset="0"
+        android:valueFrom="1.0f"
+        android:valueTo="0.0f" />
+    <objectAnimator
+        android:duration="300"
+        android:interpolator="@interpolator/emphasized_accelerate"
+        android:propertyName="translationX"
+        android:valueFrom="0dp"
+        android:valueTo="30dp"
+        android:valueType="floatType" />
+</set>

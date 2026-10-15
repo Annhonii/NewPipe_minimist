@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Search field pill in the top bar (Shrinky-style tonal pill, no outline). -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="?attr/toolbar_element_color" />
+    <corners android:radius="100dp" />
+</shape>

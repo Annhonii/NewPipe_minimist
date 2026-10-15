@@ -1,0 +1,15 @@
+Förbättrat
+• Lägg till fler titlar för att förbättra tillgängligheten för blinda #2655
+• Gör språkinställningen för nedladdningsmappen mer konsekvent och mindre tvetydig 
+#2637
+
+Åtgärdat
+• Kontrollera om den sista byten i blocket laddats ner #2646
+• Åtgärdat rullning i videodetaljfragment #2672
+• Ta bort dubbelsökningsanimationer med genomskinliga rutor till en #2695
+• [SoundCloud] Åtgärda client_id-extraktion #2745
+
+Utveckling
+• Lägg till saknade beroenden som ärvts från NewPipeExtractor till NewPipe #2535
+• Migrera till AndroidX #2685
+• Uppdatering till ExoPlayer 2.10.6 #2697, #2736

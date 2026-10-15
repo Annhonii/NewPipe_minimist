@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- tag: a scrolling page view's own bottom padding, before MainFragment added its inset -->
+    <item name="main_inset_base" type="id" />
+</resources>

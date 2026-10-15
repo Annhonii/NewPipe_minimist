@@ -1,0 +1,23 @@
+<h4>Mejoras</h4>
+<ul>
+<li>Hacer que los enlaces en los comentarios sean clicables, aumentar el tamaño del texto</li>
+<li>Buscar al hacer clic en los enlaces de marca de tiempo en los comentarios</li>
+<li>Mostrar la pestaña preferida en función del estado seleccionado recientemente</li>
+<li>Añadir la lista de reproducción a la cola al hacer clic prolongadamente en «Fondo» en la ventana de la lista de reproducción</li>
+<li>Buscar texto compartido cuando no sea una URL</li>
+<li>Añadir el botón «Compartir en el momento actual» al reproductor de vídeo principal</li>
+<li>Añadir el botón Cerrar al reproductor principal cuando se termine la cola de vídeos</li>
+<li>Añadir «Reproducir directamente en segundo plano» al menú de pulsación prolongada para los elementos de la lista de vídeos</li>
+<li>mejorar las traducciones al inglés de los comandos Reproducir/Añadir a la cola</li>
+<li>pequeñas mejoras de rendimiento</li>
+<li>eliminar archivos no utilizados</li>
+<li>actualizar ExoPlayer a la versión 2.9.6</li>
+<li>añadir compatibilidad con enlaces Invidious</li>
+</ul>
+<h4>Corregido</h4>
+<ul>
+<li>Se ha corregido el desplazamiento con comentarios y transmisiones relacionadas desactivadas</li>
+<li>Se ha corregido la ejecución de CheckForNewAppVersionTask cuando no debería</li>
+<li>Se ha corregido la importación de suscripciones de YouTube: se ignoran las que tienen una URL no válida y se mantienen las que tienen el título vacío</li>
+<li>Se ha corregido la URL de YouTube no válida: el nombre de la etiqueta de firma no siempre es «signature», lo que impide que se carguen las transmisiones</li>
+</ul>

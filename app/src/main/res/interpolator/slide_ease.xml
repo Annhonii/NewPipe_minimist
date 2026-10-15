@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Shared curve for every screen slide (forward AND back, entering AND leaving page).
+     Using ONE curve for both pages keeps them locked together, so no gap opens between them.
+     Quick start, very long soft landing (iOS / Material 3 emphasized feel). -->
+<pathInterpolator xmlns:android="http://schemas.android.com/apk/res/android"
+    android:controlX1="0.22"
+    android:controlY1="0.85"
+    android:controlX2="0.2"
+    android:controlY2="1" />

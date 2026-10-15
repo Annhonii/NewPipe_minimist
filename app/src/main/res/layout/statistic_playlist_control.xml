@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- History header: the sort switch (Most played / Last played) on the left and a
+     "Clear history" button on the right, both are the same kind of pill. -->
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingTop="8dp"
+    android:paddingBottom="8dp">
+
+    <LinearLayout
+        android:stateListAnimator="@animator/press_scale"
+        android:id="@+id/sortButton"
+        android:layout_width="wrap_content"
+        android:layout_height="32dp"
+        android:layout_alignParentStart="true"
+        android:layout_centerVertical="true"
+        android:layout_marginStart="16dp"
+        android:background="@drawable/bg_feed_chip"
+        android:clickable="true"
+        android:focusable="true"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="10dp"
+        android:paddingEnd="14dp">
+
+        <ImageView
+            android:id="@+id/sortButtonIcon"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:importantForAccessibility="no"
+            android:src="@drawable/ic_filter_list"
+            android:tint="?android:attr/textColorPrimary" />
+
+        <org.schabi.newpipe.views.NewPipeTextView
+            android:id="@+id/sortButtonText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="6dp"
+            android:includeFontPadding="false"
+            android:maxLines="1"
+            android:text="@string/title_most_played"
+            android:textColor="?android:attr/textColorPrimary"
+            android:textSize="13sp" />
+    </LinearLayout>
+
+    <TextView
+        android:stateListAnimator="@animator/press_scale"
+        android:id="@+id/clearHistoryButton"
+        android:layout_width="wrap_content"
+        android:layout_height="32dp"
+        android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true"
+        android:layout_marginEnd="16dp"
+        android:background="@drawable/bg_feed_chip"
+        android:clickable="true"
+        android:contentDescription="@string/clear_views_history_title"
+        android:drawablePadding="6dp"
+        android:drawableStart="@drawable/ic_delete"
+        android:drawableTint="?android:attr/textColorPrimary"
+        android:focusable="true"
+        android:gravity="center"
+        android:includeFontPadding="false"
+        android:maxLines="1"
+        android:paddingEnd="14dp"
+        android:paddingStart="10dp"
+        android:text="@string/history_clear_button"
+        android:textColor="?android:attr/textColorPrimary"
+        android:textSize="13sp" />
+
+</RelativeLayout>

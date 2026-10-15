@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="contrastColor">@color/white</color>
+    <color name="defaultIconTint">@color/white</color>
+    <!-- unselected tab icons of the floating pill: pure white (selected tab = white chip, black icon) -->
+    <color name="nav_inactive">#FFFFFF</color>
+    <!-- no grey fills in dark mode -->
+    <color name="placeholder_background">#000000</color>
+    <color name="placeholder_foreground">#FFFFFF</color>
+    <color name="subscribed_background_color">#000000</color>
+    <color name="subscribed_text_color">#FFFFFF</color>
+    <color name="selected_background_color">#33D71921</color>
+    <color name="audio_left_to_load_color">#26D71921</color>
+    <color name="audio_already_load_color">#59D71921</color>
+    <color name="subtitle_left_to_load_color">#26D71921</color>
+    <color name="subtitle_already_load_color">#59D71921</color>
+</resources>

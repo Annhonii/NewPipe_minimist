@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Round tonal icon button used as a top bar action (icon is set in code).
+     The outer frame carries a 4dp gutter per side, so neighbouring buttons are 8dp apart. -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="match_parent"
+    android:paddingStart="4dp"
+    android:paddingEnd="4dp">
+
+    <ImageButton
+        android:id="@+id/menu_action_button"
+        android:stateListAnimator="@animator/press_scale"
+        android:layout_width="44dp"
+        android:layout_height="44dp"
+        android:layout_gravity="center"
+        android:background="@drawable/bg_toolbar_icon_button"
+        android:contentDescription="@null"
+        android:padding="11dp"
+        android:scaleType="centerInside" />
+</FrameLayout>

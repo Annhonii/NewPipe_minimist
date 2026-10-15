@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Nothing-style switch thumb: big white 24dp disc (on) inside a 32dp box, slightly smaller grey disc when off. -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:enterFadeDuration="120"
+    android:exitFadeDuration="120">
+    <item android:state_checked="true">
+        <inset
+            android:insetLeft="4dp"
+            android:insetTop="4dp"
+            android:insetRight="4dp"
+            android:insetBottom="4dp">
+            <shape android:shape="oval">
+                <solid android:color="@color/white" />
+                <size android:width="24dp" android:height="24dp" />
+            </shape>
+        </inset>
+    </item>
+    <item>
+        <inset
+            android:insetLeft="6dp"
+            android:insetTop="6dp"
+            android:insetRight="6dp"
+            android:insetBottom="6dp">
+            <shape android:shape="oval">
+                <solid android:color="?android:attr/textColorSecondary" />
+                <size android:width="20dp" android:height="20dp" />
+            </shape>
+        </inset>
+    </item>
+</selector>

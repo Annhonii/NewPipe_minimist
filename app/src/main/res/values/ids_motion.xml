@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Tags used by ListMotion (staggered list entrance) -->
+    <item name="list_motion_alpha" type="id" />
+    <item name="list_motion_observed_adapter" type="id" />
+    <item name="list_motion_state" type="id" />
+</resources>

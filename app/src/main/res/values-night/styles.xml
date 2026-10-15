@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Opening Theme -->
+    <style name="Base.OpeningTheme" parent="Base.V21.OpeningTheme">
+        <item name="android:navigationBarColor">@color/ic_launcher_background</item>
+    </style>
+
+    <!-- Dark AlertDialog theme in night mode -->
+    <style name="ThemeOverlay.App.AlertDialog" parent="Theme.App.AlertDialog.Dark" />
+
+</resources>

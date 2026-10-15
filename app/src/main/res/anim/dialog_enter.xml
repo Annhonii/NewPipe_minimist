@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Material 3 dialog enter: fade in (150ms) with a scale from 80% -->
+<set xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shareInterpolator="false">
+    <alpha
+        android:duration="150"
+        android:fromAlpha="0"
+        android:interpolator="@interpolator/standard_decelerate"
+        android:toAlpha="1" />
+    <scale
+        android:duration="250"
+        android:fromXScale="0.8"
+        android:fromYScale="0.8"
+        android:interpolator="@interpolator/emphasized_decelerate"
+        android:pivotX="50%"
+        android:pivotY="50%"
+        android:toXScale="1"
+        android:toYScale="1" />
+</set>

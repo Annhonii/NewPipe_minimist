@@ -1,0 +1,280 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- Opening Theme -->
+    <style name="Base.V21.OpeningTheme" parent="Theme.AppCompat.DayNight.NoActionBar">
+        <item name="colorPrimary">@android:color/transparent</item>
+        <item name="colorPrimaryDark">@android:color/transparent</item>
+        <item name="colorAccent">@android:color/transparent</item>
+
+        <item name="android:windowBackground">@drawable/splash_background</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+
+        <!-- Android 12+ system splash: mistpipe mark on dark background -->
+        <item name="android:windowSplashScreenBackground" tools:targetApi="31">@color/ic_launcher_background</item>
+        <item name="android:windowSplashScreenAnimatedIcon" tools:targetApi="31">@drawable/ic_splash_mark</item>
+    </style>
+    <style name="Base.OpeningTheme" parent="Base.V21.OpeningTheme">
+        <item name="android:navigationBarColor">@color/ic_launcher_background</item>
+    </style>
+    <style name="OpeningTheme" parent="Base.OpeningTheme" />
+
+    <!-- Base Theme -->
+    <style name="Base.V21" parent="Theme.AppCompat.DayNight.NoActionBar">
+        <item name="actionColor">@color/white</item>
+        <item name="floatingActionButtonStyle">@style/FloatingActionButtonTheme</item>
+        <item name="toolbarSearchColor">@color/white</item>
+        <item name="colorControlActivated">?attr/colorPrimary</item>
+
+        <!-- Nothing / Music component styles (see styles_nothing.xml) -->
+        <item name="switchStyle">@style/Widget.App.Switch</item>
+        <item name="android:progressBarStyle">@style/Widget.App.ProgressBar</item>
+        <item name="android:progressBarStyleLarge">@style/Widget.App.ProgressBar.Large</item>
+        <item name="android:progressBarStyleLargeInverse">@style/Widget.App.ProgressBar.Large</item>
+        <item name="seekBarStyle">@style/Widget.App.SeekBar</item>
+        <item name="popupMenuStyle">@style/Widget.App.PopupMenu</item>
+        <item name="actionOverflowMenuStyle">@style/Widget.App.PopupMenu.Overflow</item>
+        <item name="alertDialogTheme">@style/ThemeOverlay.App.AlertDialog</item>
+        <item name="android:windowAnimationStyle">@style/Animation.App.Window</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="fontFamily">sans-serif</item>
+    </style>
+    <style name="Base" parent="Base.V21"/>
+
+    <!-- Light Theme -->
+    <style name="Base.V21.LightTheme" parent="Base">
+        <item name="toolbar_container_color">@color/m3_toolbar_container_light</item>
+        <item name="toolbar_element_color">@color/m3_toolbar_element_light</item>
+        <item name="colorPrimary">@color/light_youtube_primary_color</item>
+        <item name="colorPrimaryDark">@color/light_youtube_primary_color</item>
+        <item name="colorAccent">@color/light_youtube_accent_color</item>
+        <item name="android:windowBackground">@color/light_background_color</item>
+        <item name="windowBackground">@color/light_background_color</item>
+        <item name="android:statusBarColor">@color/light_background_color</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:textColorPrimary">@color/text_primary_light</item>
+        <item name="android:textColorSecondary">@color/text_secondary_light</item>
+        <item name="android:textColorHint">@color/on_surface_variant_light</item>
+        <item name="switch_track_off_color">@color/switch_track_off_light</item>
+        <item name="surface_bright_color">@color/light_dialog_background_color</item>
+
+        <item name="separator_color">@color/light_separator_color</item>
+        <item name="contrast_background_color">@color/light_contrast_background_color</item>
+        <item name="checked_selector">@drawable/selector_checked_light</item>
+        <item name="focused_selector">@drawable/selector_focused_light</item>
+        <item name="toolbar_shadow">@drawable/toolbar_shadow_light</item>
+        <item name="selector">@drawable/selector_light</item>
+        <item name="colorControlHighlight">@color/light_ripple_color</item>
+        <item name="progress_horizontal_drawable">@drawable/progress_youtube_horizontal_light</item>
+        <item name="card_item_background_color">@color/light_card_item_background_color</item>
+        <item name="card_item_contrast_color">@color/light_card_item_contrast_color</item>
+        <item name="border_color">@color/light_border_color</item>
+        <item name="dashed_border">@drawable/dashed_border_light</item>
+    </style>
+    <style name="Base.LightTheme" parent="Base.V21.LightTheme" />
+    <style name="LightTheme" parent="Base.LightTheme"/>
+
+    <!-- Dark Theme -->
+    <style name="Base.V21.DarkTheme" parent="Base">
+        <item name="toolbar_container_color">@color/m3_toolbar_container_dark</item>
+        <item name="toolbar_element_color">@color/m3_toolbar_element_dark</item>
+        <item name="colorPrimary">@color/dark_youtube_primary_color</item>
+        <item name="colorPrimaryDark">@color/dark_youtube_primary_color</item>
+        <item name="colorAccent">@color/dark_youtube_accent_color</item>
+        <item name="android:windowBackground">@color/dark_background_color</item>
+        <item name="windowBackground">@color/dark_background_color</item>
+        <item name="android:statusBarColor">@color/dark_background_color</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:textColorPrimary">@color/text_primary_dark</item>
+        <item name="android:textColorSecondary">@color/text_secondary_dark</item>
+        <item name="android:textColorHint">@color/on_surface_variant_dark</item>
+        <item name="switch_track_off_color">@color/switch_track_off_dark</item>
+        <item name="surface_bright_color">@color/dark_dialog_background_color</item>
+
+        <item name="separator_color">@color/dark_separator_color</item>
+        <item name="contrast_background_color">@color/dark_contrast_background_color</item>
+        <item name="checked_selector">@drawable/selector_checked_dark</item>
+        <item name="focused_selector">@drawable/selector_focused_dark</item>
+        <item name="toolbar_shadow">@drawable/toolbar_shadow_dark</item>
+        <item name="selector">@drawable/selector_dark</item>
+        <item name="colorControlHighlight">@color/dark_ripple_color</item>
+        <item name="progress_horizontal_drawable">@drawable/progress_youtube_horizontal_dark</item>
+        <item name="card_item_background_color">@color/dark_card_item_background_color</item>
+        <item name="card_item_contrast_color">@color/dark_card_item_contrast_color</item>
+        <item name="border_color">@color/dark_border_color</item>
+        <item name="dashed_border">@drawable/dashed_border_dark</item>
+    </style>
+    <style name="Base.DarkTheme" parent="Base.V21.DarkTheme" />
+    <style name="DarkTheme" parent="Base.DarkTheme"/>
+
+    <!-- Black Theme -->
+    <style name="Base.V21.BlackTheme" parent="DarkTheme">
+        <item name="toolbar_container_color">@color/m3_toolbar_container_black</item>
+        <item name="toolbar_element_color">@color/m3_toolbar_element_black</item>
+        <item name="android:windowBackground">@color/black_background_color</item>
+        <item name="windowBackground">@color/black_background_color</item>
+        <item name="android:statusBarColor">@color/black_background_color</item>
+        <item name="switch_track_off_color">@color/switch_track_off_black</item>
+
+        <item name="separator_color">@color/black_separator_color</item>
+        <item name="contrast_background_color">@color/black_contrast_background_color</item>
+
+        <item name="card_item_background_color">@color/black_card_item_background_color</item>
+        <item name="card_item_contrast_color">@color/black_card_item_contrast_color</item>
+        <item name="border_color">@color/black_border_color</item>
+        <item name="dashed_border">@drawable/dashed_border_black</item>
+    </style>
+    <style name="Base.BlackTheme" parent="Base.V21.BlackTheme" />
+    <style name="BlackTheme" parent="Base.BlackTheme"/>
+
+    <!-- Dialogs: floating rounded surfaces with accent text buttons -->
+    <style name="LightDialogTheme" parent="Theme.AppCompat.DayNight.Dialog">
+        <item name="toolbar_container_color">@color/light_dialog_background_color</item>
+        <item name="toolbar_element_color">@color/light_card_item_background_color</item>
+        <item name="colorPrimary">@color/nothing_red</item>
+        <item name="colorPrimaryDark">@color/nothing_red</item>
+        <item name="colorAccent">@color/nothing_red</item>
+        <item name="android:windowBackground">@drawable/bg_dialog</item>
+        <item name="android:windowAnimationStyle">@style/Animation.App.Dialog</item>
+        <item name="android:textColorPrimary">@color/text_primary_light</item>
+        <item name="android:textColorSecondary">@color/text_secondary_light</item>
+        <item name="android:textColorHint">@color/on_surface_variant_light</item>
+        <item name="android:textColorAlertDialogListItem">@color/text_primary_light</item>
+        <item name="surface_bright_color">@color/light_dialog_background_color</item>
+        <item name="switch_track_off_color">@color/switch_track_off_light</item>
+        <item name="card_item_background_color">@color/light_card_item_background_color</item>
+        <item name="card_item_contrast_color">@color/light_card_item_contrast_color</item>
+        <item name="separator_color">@color/light_separator_color</item>
+        <item name="contrast_background_color">@color/light_contrast_background_color</item>
+        <item name="colorControlHighlight">@color/light_ripple_color</item>
+        <item name="buttonBarButtonStyle">@style/Widget.App.DialogButton</item>
+        <item name="switchStyle">@style/Widget.App.Switch</item>
+        <item name="seekBarStyle">@style/Widget.App.SeekBar</item>
+        <item name="popupMenuStyle">@style/Widget.App.PopupMenu</item>
+        <item name="windowBackground">@color/light_dialog_background_color</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="fontFamily">sans-serif</item>
+    </style>
+
+    <style name="DarkDialogTheme" parent="Theme.AppCompat.DayNight.Dialog">
+        <item name="toolbar_container_color">@color/dark_dialog_background_color</item>
+        <item name="toolbar_element_color">@color/dark_card_item_background_color</item>
+        <item name="colorPrimary">@color/nothing_red</item>
+        <item name="colorPrimaryDark">@color/nothing_red</item>
+        <item name="colorAccent">@color/nothing_red</item>
+        <item name="android:windowBackground">@drawable/bg_dialog</item>
+        <item name="android:windowAnimationStyle">@style/Animation.App.Dialog</item>
+        <item name="android:textColorPrimary">@color/text_primary_dark</item>
+        <item name="android:textColorSecondary">@color/text_secondary_dark</item>
+        <item name="android:textColorHint">@color/on_surface_variant_dark</item>
+        <item name="android:textColorAlertDialogListItem">@color/text_primary_dark</item>
+        <item name="surface_bright_color">@color/dark_dialog_background_color</item>
+        <item name="switch_track_off_color">@color/switch_track_off_dark</item>
+        <item name="card_item_background_color">@color/dark_card_item_background_color</item>
+        <item name="card_item_contrast_color">@color/dark_card_item_contrast_color</item>
+        <item name="separator_color">@color/dark_separator_color</item>
+        <item name="contrast_background_color">@color/dark_contrast_background_color</item>
+        <item name="colorControlHighlight">@color/dark_ripple_color</item>
+        <item name="buttonBarButtonStyle">@style/Widget.App.DialogButton</item>
+        <item name="switchStyle">@style/Widget.App.Switch</item>
+        <item name="seekBarStyle">@style/Widget.App.SeekBar</item>
+        <item name="popupMenuStyle">@style/Widget.App.PopupMenu</item>
+        <item name="windowBackground">@color/dark_dialog_background_color</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="fontFamily">sans-serif</item>
+    </style>
+
+    <style name="LightDialogMinWidthTheme" parent="Theme.AppCompat.DayNight.Dialog.MinWidth">
+        <item name="toolbar_container_color">@color/light_dialog_background_color</item>
+        <item name="toolbar_element_color">@color/light_card_item_background_color</item>
+        <item name="colorPrimary">@color/nothing_red</item>
+        <item name="colorPrimaryDark">@color/nothing_red</item>
+        <item name="colorAccent">@color/nothing_red</item>
+        <item name="android:windowBackground">@drawable/bg_dialog</item>
+        <item name="android:windowAnimationStyle">@style/Animation.App.Dialog</item>
+        <item name="android:textColorPrimary">@color/text_primary_light</item>
+        <item name="android:textColorSecondary">@color/text_secondary_light</item>
+        <item name="android:textColorHint">@color/on_surface_variant_light</item>
+        <item name="android:textColorAlertDialogListItem">@color/text_primary_light</item>
+        <item name="surface_bright_color">@color/light_dialog_background_color</item>
+        <item name="switch_track_off_color">@color/switch_track_off_light</item>
+        <item name="card_item_background_color">@color/light_card_item_background_color</item>
+        <item name="card_item_contrast_color">@color/light_card_item_contrast_color</item>
+        <item name="separator_color">@color/light_separator_color</item>
+        <item name="contrast_background_color">@color/light_contrast_background_color</item>
+        <item name="colorControlHighlight">@color/light_ripple_color</item>
+        <item name="buttonBarButtonStyle">@style/Widget.App.DialogButton</item>
+        <item name="switchStyle">@style/Widget.App.Switch</item>
+        <item name="seekBarStyle">@style/Widget.App.SeekBar</item>
+        <item name="popupMenuStyle">@style/Widget.App.PopupMenu</item>
+        <item name="windowBackground">@color/light_dialog_background_color</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="fontFamily">sans-serif</item>
+    </style>
+
+    <style name="DarkDialogMinWidthTheme" parent="Theme.AppCompat.DayNight.Dialog.MinWidth">
+        <item name="toolbar_container_color">@color/dark_dialog_background_color</item>
+        <item name="toolbar_element_color">@color/dark_card_item_background_color</item>
+        <item name="colorPrimary">@color/nothing_red</item>
+        <item name="colorPrimaryDark">@color/nothing_red</item>
+        <item name="colorAccent">@color/nothing_red</item>
+        <item name="android:windowBackground">@drawable/bg_dialog</item>
+        <item name="android:windowAnimationStyle">@style/Animation.App.Dialog</item>
+        <item name="android:textColorPrimary">@color/text_primary_dark</item>
+        <item name="android:textColorSecondary">@color/text_secondary_dark</item>
+        <item name="android:textColorHint">@color/on_surface_variant_dark</item>
+        <item name="android:textColorAlertDialogListItem">@color/text_primary_dark</item>
+        <item name="surface_bright_color">@color/dark_dialog_background_color</item>
+        <item name="switch_track_off_color">@color/switch_track_off_dark</item>
+        <item name="card_item_background_color">@color/dark_card_item_background_color</item>
+        <item name="card_item_contrast_color">@color/dark_card_item_contrast_color</item>
+        <item name="separator_color">@color/dark_separator_color</item>
+        <item name="contrast_background_color">@color/dark_contrast_background_color</item>
+        <item name="colorControlHighlight">@color/dark_ripple_color</item>
+        <item name="buttonBarButtonStyle">@style/Widget.App.DialogButton</item>
+        <item name="switchStyle">@style/Widget.App.Switch</item>
+        <item name="seekBarStyle">@style/Widget.App.SeekBar</item>
+        <item name="popupMenuStyle">@style/Widget.App.PopupMenu</item>
+        <item name="windowBackground">@color/dark_dialog_background_color</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="fontFamily">sans-serif</item>
+    </style>
+
+
+    <!-- Settings -->
+    <style name="LightSettingsTheme" parent="LightTheme">
+        <item name="colorAccent">@color/light_settings_accent_color</item>
+    </style>
+
+    <style name="DarkSettingsTheme" parent="DarkTheme">
+        <item name="colorAccent">@color/dark_settings_accent_color</item>
+    </style>
+
+    <style name="BlackSettingsTheme" parent="BlackTheme">
+        <item name="colorAccent">@color/black_settings_accent_color</item>
+    </style>
+
+    <!-- Router Activity -->
+    <style name="Base.RouterActivityThemeLight" parent="LightTheme">
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:colorBackgroundCacheHint">@null</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowAnimationStyle">@null</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+    </style>
+
+    <style name="RouterActivityThemeLight" parent="Base.RouterActivityThemeLight" />
+
+    <style name="Base.RouterActivityThemeDark" parent="DarkTheme">
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:colorBackgroundCacheHint">@null</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowAnimationStyle">@null</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+    </style>
+
+    <style name="RouterActivityThemeDark" parent="Base.RouterActivityThemeDark" />
+
+
+</resources>

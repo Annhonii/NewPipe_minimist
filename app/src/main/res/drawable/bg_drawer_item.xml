@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Drawer row: selected = tonal pill, pressed = ripple inside the same pill shape. -->
+<inset xmlns:android="http://schemas.android.com/apk/res/android"
+    android:insetLeft="12dp"
+    android:insetRight="12dp"
+    android:insetTop="2dp"
+    android:insetBottom="2dp">
+<ripple
+        android:color="?attr/colorControlHighlight">
+    <item>
+        <selector>
+            <item android:state_checked="true">
+                <shape android:shape="rectangle">
+                    <solid android:color="?attr/card_item_contrast_color" />
+                    <corners android:radius="100dp" />
+                </shape>
+            </item>
+            <item>
+                <shape android:shape="rectangle">
+                    <solid android:color="@android:color/transparent" />
+                    <corners android:radius="100dp" />
+                </shape>
+            </item>
+        </selector>
+    </item>
+    <item android:id="@android:id/mask">
+        <shape android:shape="rectangle">
+            <solid android:color="#FF000000" />
+            <corners android:radius="100dp" />
+        </shape>
+    </item>
+</ripple>
+</inset>
