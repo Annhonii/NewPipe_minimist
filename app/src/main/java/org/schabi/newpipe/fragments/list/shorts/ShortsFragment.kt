@@ -1,6 +1,21 @@
 package org.schabi.newpipe.fragments.list.shorts
 
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
 import android.annotation.SuppressLint
+import android.net.Uri
+import android.text.SpannableStringBuilder
+import android.text.Spanned
+import android.text.method.LinkMovementMethod
+import android.text.style.ForegroundColorSpan
+import android.text.style.StyleSpan
+import android.graphics.Typeface
+import android.view.HapticFeedbackConstants
+import android.widget.FrameLayout
+import android.widget.ImageView
+import androidx.appcompat.app.AlertDialog
+import org.schabi.newpipe.database.subscription.NotificationMode
+import kotlin.random.Random
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.graphics.Color
@@ -98,6 +113,12 @@ class ShortsFragment : BaseFragment() {
     private val commentTexts = HashMap<String, String>()
     private var subscribeDisposable: Disposable? = null
     private var subscribed = false
+    private var notificationsOn = false
+    private val dislikeCounts = HashMap<String, String>()
+    private val expandedTitles = HashSet<String>()
+    private var playbackSpeed = 1f
+    private var captionsOn = false
+    private var chosenQuality: String? = null
 
     private val standalone: Boolean get() = seedId != null
 
@@ -258,6 +279,8 @@ class ShortsFragment : BaseFragment() {
             )
             .build()
         exo.repeatMode = Player.REPEAT_MODE_ONE
+        exo.setPlaybackSpeed(playbackSpeed)
+        applyCaptions(exo)
         exo.addListener(playerListener)
         player = exo
         resolver = VideoPlaybackResolver(
@@ -271,7 +294,11 @@ class ShortsFragment : BaseFragment() {
                 override fun getOverrideResolutionIndex(
                     sortedVideos: MutableList<org.schabi.newpipe.extractor.stream.VideoStream>,
                     playbackQuality: String?
-                ): Int = ListHelper.getDefaultResolutionIndex(ctx, sortedVideos)
+                ): Int {
+                    val wanted = chosenQuality
+                    val idx = if (wanted == null) -1 else sortedVideos.indexOfFirst { it.getResolution() == wanted }
+                    return if (idx >= 0) idx else ListHelper.getDefaultResolutionIndex(ctx, sortedVideos)
+                }
             }
         )
     }
@@ -389,6 +416,8 @@ class ShortsFragment : BaseFragment() {
             return
         }
         exo.setMediaSource(source)
+        exo.setPlaybackSpeed(playbackSpeed)
+        applyCaptions(exo)
         exo.prepare()
         exo.playWhenReady = isResumed && !userPaused
     }
@@ -431,8 +460,24 @@ class ShortsFragment : BaseFragment() {
             resources.getDimensionPixelSize(R.dimen.nav_pill_content_inset)
         }
         b.shortOverlay.setPadding(0, 0, 0, bottomInset)
+        val statusId = resources.getIdentifier("status_bar_height", "dimen", "android")
+        val statusBar = if (statusId > 0) resources.getDimensionPixelSize(statusId) else 0
+        b.shortHeader.setPadding(
+            b.shortHeader.paddingLeft, statusBar + dp(4), b.shortHeader.paddingRight, b.shortHeader.paddingBottom
+        )
+        b.shortAudio.isSelected = true
+        b.shortSearch.setOnClickListener {
+            NavigationHelper.openSearchFragment(getFM(), ServiceList.YouTube.serviceId, "")
+        }
+        b.shortCast.setOnClickListener { castOrOpen(id) }
+        b.shortMenu.setOnClickListener { showSettingsMenu(id, true) }
+        b.shortDislike.setOnClickListener { onDislikeClicked(id, h) }
+        b.shortBell.setOnClickListener { toggleNotifications(h) }
 
-        b.shortTitle.text = entry.title.orEmpty()
+        setTitleText(h, entry.title.orEmpty())
+        b.shortAudio.text = ""
+        b.shortAudioPill.visibility = View.GONE
+        b.shortBell.visibility = View.GONE
         b.shortChannel.text = ""
         b.shortSubscribe.visibility = View.GONE
         b.shortSeek.progress = 0
@@ -444,7 +489,15 @@ class ShortsFragment : BaseFragment() {
         applyLike(h)
         b.shortCommentsCount.text = commentTexts[id].orEmpty()
 
-        b.shortLike.setOnClickListener { onLikeClicked(id, h) }
+        b.shortLike.setOnClickListener {
+            val wasLiked = likeStates[id] == "LIKE"
+            onLikeClicked(id, h)
+            if (!wasLiked) {
+                val cx = b.shortActions.x + b.shortLike.x + b.shortLike.width / 2f
+                val cy = b.shortActions.y + b.shortLike.y + b.shortLike.height / 2f
+                burst(h, cx, cy)
+            }
+        }
         b.shortComments.setOnClickListener { showComments(id) }
         b.shortCommentsCount.setOnClickListener { showComments(id) }
         b.shortShare.setOnClickListener { share(id) }
@@ -460,8 +513,21 @@ class ShortsFragment : BaseFragment() {
                 }
 
                 override fun onDoubleTap(e: MotionEvent): Boolean {
-                    if (likeStates[id] != "LIKE") onLikeClicked(id, h)
+                    val w = b.root.width.coerceAtLeast(1)
+                    when {
+                        e.x < w * 0.33f -> seekBy(h, -SEEK_STEP_MS)
+                        e.x > w * 0.67f -> seekBy(h, SEEK_STEP_MS)
+                        else -> {
+                            if (likeStates[id] != "LIKE") onLikeClicked(id, h)
+                            burst(h, e.x, e.y)
+                        }
+                    }
                     return true
+                }
+
+                override fun onLongPress(e: MotionEvent) {
+                    b.root.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
+                    showSettingsMenu(id, false)
                 }
             }
         )
@@ -492,7 +558,9 @@ class ShortsFragment : BaseFragment() {
         val id = h.videoId ?: return
         if (info.id != id) return
         val b = h.b
-        b.shortTitle.text = info.name
+        setTitleText(h, info.name.orEmpty(), info.description?.content)
+        b.shortAudio.text = getString(R.string.shorts_original_audio, info.uploaderName.orEmpty())
+        b.shortAudioPill.visibility = View.VISIBLE
         b.shortChannel.text = info.uploaderName
         CoilHelper.loadAvatar(b.shortAvatar, info.uploaderAvatars)
         CoilHelper.loadAvatar(b.shortChannelSquare, info.uploaderAvatars)
@@ -544,6 +612,8 @@ class ShortsFragment : BaseFragment() {
         // never pass null here: it wipes the vector's own tint
         h.b.shortLike.imageTintList =
             ColorStateList.valueOf(if (liked) LIKED_COLOR else Color.WHITE)
+        h.b.shortDislike.imageTintList =
+            ColorStateList.valueOf(if (likeStates[id] == "DISLIKE") DISLIKED_COLOR else Color.WHITE)
         val count = likeCounts[id]
         h.b.shortLikeCount.text =
             if (count != null && count >= 0) Localization.shortCount(ctx, count) else ""
@@ -552,15 +622,29 @@ class ShortsFragment : BaseFragment() {
     private fun togglePause(h: ShortHolder) {
         val p = player ?: return
         if (h.pagePosition != currentPosition) return
+        val icon = h.b.shortPauseIcon
+        icon.animate().cancel()
         if (p.playWhenReady) {
             p.playWhenReady = false
             userPaused = true
-            h.b.shortPauseIcon.visibility = View.VISIBLE
+            icon.setImageResource(R.drawable.ic_play_arrow)
         } else {
             p.playWhenReady = true
             userPaused = false
-            h.b.shortPauseIcon.visibility = View.GONE
+            icon.setImageResource(R.drawable.ic_pause)
         }
+        // subtle central overlay that fades away again
+        icon.visibility = View.VISIBLE
+        icon.alpha = 0.85f
+        icon.scaleX = 0.8f
+        icon.scaleY = 0.8f
+        icon.animate().alpha(0f).scaleX(1.15f).scaleY(1.15f).setStartDelay(350).setDuration(350)
+            .setListener(object : AnimatorListenerAdapter() {
+                override fun onAnimationEnd(animation: Animator) {
+                    icon.visibility = View.GONE
+                    icon.animate().setListener(null)
+                }
+            }).start()
     }
 
     // ------------------------------------------------------------------ actions
@@ -633,7 +717,10 @@ class ShortsFragment : BaseFragment() {
             .subscribe(
                 { list ->
                     subscribed = list.isNotEmpty()
+                    notificationsOn = list.firstOrNull()?.notificationMode == NotificationMode.ENABLED
                     styleSubscribe(button, subscribed)
+                    h.b.shortBell.visibility = if (subscribed) View.VISIBLE else View.GONE
+                    h.b.shortBell.alpha = if (notificationsOn) 1f else 0.6f
                 },
                 { }
             )
@@ -675,11 +762,238 @@ class ShortsFragment : BaseFragment() {
         context?.let { Toast.makeText(it, res, Toast.LENGTH_SHORT).show() }
     }
 
+    // ------------------------------------------------------------------ new UI pieces
+
+    private fun dp(v: Int) = (v * resources.displayMetrics.density).toInt()
+
+    /** Title with blue bold #hashtags, "...more" when longer than two lines. */
+    private fun setTitleText(h: ShortHolder, title: String, description: String? = null) {
+        val id = h.videoId ?: return
+        val tv = h.b.shortTitle
+        val expanded = expandedTitles.contains(id)
+        val full = if (expanded && !description.isNullOrBlank() && description != title) {
+            "$title\n\n$description"
+        } else {
+            title
+        }
+        val sb = SpannableStringBuilder(full)
+        Regex("#[\\p{L}\\p{N}_]+").findAll(full).forEach { m ->
+            sb.setSpan(StyleSpan(Typeface.BOLD), m.range.first, m.range.last + 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+            sb.setSpan(ForegroundColorSpan(HASHTAG_COLOR), m.range.first, m.range.last + 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        }
+        tv.movementMethod = LinkMovementMethod.getInstance()
+        tv.maxLines = if (expanded) 12 else 2
+        tv.text = sb
+        tv.setOnClickListener {
+            if (expandedTitles.add(id)) {
+                setTitleText(h, title, infoCache[id]?.description?.content)
+            } else {
+                expandedTitles.remove(id)
+                setTitleText(h, title, null)
+            }
+        }
+        if (!expanded) {
+            tv.post {
+                val layout = tv.layout ?: return@post
+                if (layout.lineCount > 2 || (layout.lineCount > 0 && layout.getEllipsisCount(layout.lineCount - 1) > 0)) {
+                    val end = layout.getLineEnd(1).coerceAtMost(sb.length)
+                    val cut = SpannableStringBuilder(sb.subSequence(0, (end - 8).coerceAtLeast(0)).toString().trimEnd())
+                    // re-apply hashtag spans on the shortened text
+                    Regex("#[\\p{L}\\p{N}_]+").findAll(cut).forEach { m ->
+                        cut.setSpan(StyleSpan(Typeface.BOLD), m.range.first, m.range.last + 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                        cut.setSpan(ForegroundColorSpan(HASHTAG_COLOR), m.range.first, m.range.last + 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                    }
+                    val start = cut.length
+                    cut.append("… ").append(getString(R.string.shorts_more))
+                    cut.setSpan(StyleSpan(Typeface.BOLD), start, cut.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                    tv.text = cut
+                }
+            }
+        }
+    }
+
+    private fun seekBy(h: ShortHolder, deltaMs: Long) {
+        val p = player ?: return
+        if (h.pagePosition != currentPosition) return
+        val duration = if (p.duration == C.TIME_UNSET) Long.MAX_VALUE else p.duration
+        p.seekTo((p.currentPosition + deltaMs).coerceIn(0L, duration))
+        val view = if (deltaMs < 0) h.b.shortSeekLeft else h.b.shortSeekRight
+        view.animate().cancel()
+        view.alpha = 0.9f
+        view.scaleX = 0.6f
+        view.scaleY = 0.6f
+        view.animate().scaleX(1f).scaleY(1f).alpha(0f).setDuration(500).start()
+    }
+
+    /** Floating hearts rising from the touch / button position. */
+    private fun burst(h: ShortHolder, x: Float, y: Float) {
+        val layer: FrameLayout = h.b.shortBurstLayer
+        repeat(7) {
+            val heart = ImageView(layer.context)
+            val size = dp(Random.nextInt(24, 44))
+            heart.layoutParams = FrameLayout.LayoutParams(size, size)
+            heart.setImageResource(R.drawable.ic_favorite)
+            heart.imageTintList = ColorStateList.valueOf(LIKED_COLOR)
+            heart.x = x - size / 2f
+            heart.y = y - size / 2f
+            heart.alpha = 0f
+            layer.addView(heart)
+            heart.animate()
+                .alpha(1f).setDuration(120)
+                .withEndAction {
+                    heart.animate()
+                        .translationXBy(Random.nextInt(-dp(60), dp(60)).toFloat())
+                        .translationYBy(-Random.nextInt(dp(120), dp(260)).toFloat())
+                        .scaleX(1.4f).scaleY(1.4f).alpha(0f)
+                        .setDuration(Random.nextLong(600, 1000))
+                        .withEndAction { layer.removeView(heart) }
+                        .start()
+                }.start()
+        }
+    }
+
+    private fun onDislikeClicked(id: String, h: ShortHolder) {
+        val ctx = context ?: return
+        if (!YtEngagement.isLoggedIn(ctx)) {
+            Toast.makeText(ctx, R.string.yt_sign_in_required, Toast.LENGTH_LONG).show()
+            return
+        }
+        val previous = likeStates[id] ?: "INDIFFERENT"
+        val previousLikes = likeCounts[id]
+        val undo = previous == "DISLIKE"
+        likeStates[id] = if (undo) "INDIFFERENT" else "DISLIKE"
+        if (previous == "LIKE") previousLikes?.let { likeCounts[id] = (it - 1).coerceAtLeast(0) }
+        applyLike(h)
+        disposables.add(
+            YtEngagement.rate(ctx, id, if (undo) "removelike" else "dislike").subscribe(
+                { },
+                { e ->
+                    likeStates[id] = previous
+                    if (previousLikes != null) likeCounts[id] = previousLikes
+                    if (h.videoId == id) applyLike(h)
+                    context?.let {
+                        Toast.makeText(it, getString(R.string.yt_rate_failed, e.message), Toast.LENGTH_LONG).show()
+                    }
+                }
+            )
+        )
+    }
+
+    private fun toggleNotifications(h: ShortHolder) {
+        val ctx = context ?: return
+        val info = h.videoId?.let { infoCache[it] } ?: return
+        val url = info.uploaderUrl ?: return
+        val mode = if (notificationsOn) NotificationMode.DISABLED else NotificationMode.ENABLED
+        disposables.add(
+            SubscriptionManager(ctx).updateNotificationMode(info.serviceId, url, mode)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({ }, { toast(R.string.subscription_change_failed) })
+        )
+    }
+
+    private fun castOrOpen(id: String) {
+        val view = Intent(Intent.ACTION_VIEW, Uri.parse("https://www.youtube.com/shorts/$id"))
+        startActivity(Intent.createChooser(view, getString(R.string.shorts_cast)))
+    }
+
+    private fun applyCaptions(exo: ExoPlayer) {
+        exo.trackSelectionParameters = exo.trackSelectionParameters.buildUpon()
+            .setTrackTypeDisabled(C.TRACK_TYPE_TEXT, !captionsOn)
+            .build()
+    }
+
+    /** Settings menu: [full] = three-dot menu (everything), otherwise the long-press quick menu. */
+    private fun showSettingsMenu(id: String, full: Boolean) {
+        val ctx = context ?: return
+        val labels = ArrayList<String>()
+        val actions = ArrayList<() -> Unit>()
+        labels.add(getString(R.string.shorts_playback_speed) + " (" + speedLabel(playbackSpeed) + ")")
+        actions.add { showSpeedDialog() }
+        labels.add(getString(R.string.shorts_quality) + " (" + (chosenQuality ?: getString(R.string.shorts_auto)) + ")")
+        actions.add { showQualityDialog(id) }
+        labels.add(getString(R.string.caption_setting_title) + ": " +
+            getString(if (captionsOn) R.string.shorts_on else R.string.shorts_off))
+        actions.add { toggleCaptions(id) }
+        if (full) {
+            labels.add(getString(R.string.shorts_description))
+            actions.add {
+                infoCache[id]?.let {
+                    VideoInfoBottomSheet.showDescription(
+                        childFragmentManager, it, (resources.displayMetrics.heightPixels * 0.40f).toInt()
+                    )
+                }
+            }
+            labels.add(getString(R.string.shorts_audio_source))
+            actions.add {
+                val info = infoCache[id]
+                val text = getString(R.string.shorts_original_audio, info?.uploaderName.orEmpty())
+                Toast.makeText(ctx, text, Toast.LENGTH_LONG).show()
+            }
+        }
+        labels.add(getString(R.string.shorts_report))
+        actions.add {
+            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://www.youtube.com/shorts/$id")))
+        }
+        AlertDialog.Builder(ctx)
+            .setItems(labels.toTypedArray()) { _, which -> actions[which]() }
+            .show()
+    }
+
+    private fun speedLabel(v: Float) = (if (v == v.toInt().toFloat()) v.toInt().toString() else v.toString()) + "x"
+
+    private fun showSpeedDialog() {
+        val ctx = context ?: return
+        val speeds = floatArrayOf(0.25f, 0.5f, 0.75f, 1f, 1.25f, 1.5f, 2f)
+        AlertDialog.Builder(ctx)
+            .setTitle(R.string.shorts_playback_speed)
+            .setSingleChoiceItems(
+                speeds.map { speedLabel(it) }.toTypedArray(), speeds.indexOf(playbackSpeed)
+            ) { d, which ->
+                playbackSpeed = speeds[which]
+                player?.setPlaybackSpeed(playbackSpeed)
+                d.dismiss()
+            }.show()
+    }
+
+    private fun showQualityDialog(id: String) {
+        val ctx = context ?: return
+        val info = infoCache[id] ?: return
+        val options = ArrayList<String>()
+        info.videoStreams.orEmpty().map { it.getResolution() }
+            .distinct().filter { it.isNotEmpty() }.forEach { options.add(it) }
+        val labels = (listOf(getString(R.string.shorts_auto)) + options).toTypedArray()
+        val checked = chosenQuality?.let { options.indexOf(it) + 1 }?.coerceAtLeast(0) ?: 0
+        AlertDialog.Builder(ctx)
+            .setTitle(R.string.shorts_quality)
+            .setSingleChoiceItems(labels, checked) { d, which ->
+                chosenQuality = if (which == 0) null else options[which - 1]
+                d.dismiss()
+                val exo = player ?: return@setSingleChoiceItems
+                val position = exo.currentPosition
+                val source = try { resolver?.resolve(info) } catch (e: Exception) { null }
+                if (source != null) {
+                    exo.setMediaSource(source, position)
+                    exo.prepare()
+                    exo.playWhenReady = isResumed && !userPaused
+                }
+            }.show()
+    }
+
+    private fun toggleCaptions(id: String) {
+        captionsOn = !captionsOn
+        player?.let { applyCaptions(it) }
+        val hasSubs = infoCache[id]?.subtitles.orEmpty().isNotEmpty()
+        if (captionsOn && !hasSubs) toast(R.string.caption_none)
+    }
+
     private fun watchUrl(id: String) = "https://www.youtube.com/watch?v=$id"
 
     companion object {
         private const val ARG_SEED = "shorts_seed_id"
         private val LIKED_COLOR = Color.parseColor("#FFD71921")
+        private val DISLIKED_COLOR = Color.parseColor("#FF8AB4F8")
+        private val HASHTAG_COLOR = Color.parseColor("#FF5AA9FF")
+        private const val SEEK_STEP_MS = 5000L
 
         /** Shorts player that starts with the given short, then continues with YouTube's picks. */
         @JvmStatic
