@@ -1541,6 +1541,7 @@
     <string name="accent_color_key" translatable="false">accent_color</string>
     <string name="dynamic_color_key" translatable="false">dynamic_color</string>
     <string name="disable_animations_key" translatable="false">disable_animations</string>
+    <string name="use_poppins_font_key" translatable="false">use_poppins_font</string>
     <string name="default_accent_color_value" translatable="false">sage</string>
     <string-array name="accent_color_values" translatable="false">
         <item>sage</item>

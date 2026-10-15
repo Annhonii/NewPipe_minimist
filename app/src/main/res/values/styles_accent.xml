@@ -58,6 +58,12 @@
     </style>
 
     <!-- Disable window / screen transition animations -->
+    <!-- Poppins font overlay (applied when "Poppins font" is enabled in Appearance settings) -->
+    <style name="ThemeOverlay.App.Poppins" parent="">
+        <item name="android:fontFamily">@font/poppins</item>
+        <item name="fontFamily">@font/poppins</item>
+    </style>
+
     <style name="ThemeOverlay.App.NoAnimations" parent="">
         <item name="android:windowAnimationStyle">@style/Animation.App.None</item>
     </style>

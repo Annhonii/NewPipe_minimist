@@ -36,7 +36,8 @@ public class AppearanceSettingsFragment extends BasePreferenceFragment {
         });
 
         final String[] recreateKeys = {
-                getString(R.string.disable_animations_key)
+                getString(R.string.disable_animations_key),
+                getString(R.string.use_poppins_font_key)
         };
         for (final String key : recreateKeys) {
             final Preference pref = findPreference(key);

@@ -980,6 +980,8 @@
     <string name="dynamic_color_summary">Use your wallpaper colors as the accent (Android 12+)</string>
     <string name="disable_animations_title">Disable animations</string>
     <string name="disable_animations_summary">Turn off screen transition animations</string>
+    <string name="use_poppins_font_title">Poppins font</string>
+    <string name="use_poppins_font_summary">Use Poppins instead of the system font</string>
     <string name="tabs_limit_reached">The navigation bar holds at most %1$d tabs. Remove one first.</string>
     <string name="yt_copy_token_title">Copy token</string>
     <string name="yt_copy_token_summary">Copy your session token to sign in on another device</string>

@@ -27,5 +27,10 @@ public final class AppearanceHelper {
         if (prefs.getBoolean(context.getString(R.string.disable_animations_key), false)) {
             context.getTheme().applyStyle(R.style.ThemeOverlay_App_NoAnimations, true);
         }
+
+        // Poppins font (off = system font)
+        if (prefs.getBoolean(context.getString(R.string.use_poppins_font_key), false)) {
+            context.getTheme().applyStyle(R.style.ThemeOverlay_App_Poppins, true);
+        }
     }
 }
