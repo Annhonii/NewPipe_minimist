@@ -146,6 +146,8 @@ public class MainActivity extends AppCompatActivity {
                 + "|" + sharedPreferences.getString(getString(R.string.night_theme_key), "")
                 + "|" + sharedPreferences.getBoolean(getString(R.string.disable_animations_key),
                         false)
+                + "|" + sharedPreferences.getBoolean(getString(R.string.use_poppins_font_key),
+                        false)
                 + "|" + (getResources().getConfiguration().uiMode
                         & android.content.res.Configuration.UI_MODE_NIGHT_MASK);
     }
