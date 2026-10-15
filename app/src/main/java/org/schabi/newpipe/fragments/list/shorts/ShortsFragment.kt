@@ -47,6 +47,7 @@ import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.schedulers.Schedulers
 import org.schabi.newpipe.BaseFragment
+import org.schabi.newpipe.fragments.Refreshable
 import org.schabi.newpipe.R
 import org.schabi.newpipe.account.YtAccountStore
 import org.schabi.newpipe.account.YtEngagement
@@ -77,7 +78,15 @@ import org.schabi.newpipe.util.image.ImageStrategy
  *
  * One ExoPlayer is shared by all pages and moved to the page that is on screen.
  */
-class ShortsFragment : BaseFragment() {
+class ShortsFragment : BaseFragment(), Refreshable {
+
+    /** Double tap on the Shorts tab of the navigation pill: load a new feed. */
+    override fun refreshFromNavBar() {
+        if (standalone) return
+        binding?.shortsRefresh?.isRefreshing = true
+        refreshFeed()
+    }
+
 
     private class ShortHolder(val b: ItemShortBinding) : RecyclerView.ViewHolder(b.root) {
         var pagePosition = -1
@@ -92,7 +101,10 @@ class ShortsFragment : BaseFragment() {
     private val entries = ArrayList<YtInnerTube.ShortItem>()
     private val knownIds = HashSet<String>()
     private var nextToken: String? = null
-    private var exhausted = false
+    // the feed never ends: when a load brings nothing new, it is retried with another seed
+    private var emptyLoads = 0
+    private var reseeds = 0
+    private var allowRepeats = false
     private var loading = false
     private var seedId: String? = null
     // shorts shown before the last pull-to-refresh: not recommended again right after it
@@ -152,6 +164,15 @@ class ShortsFragment : BaseFragment() {
         b.shortsPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
                 activate(position)
+            }
+
+            override fun onPageScrollStateChanged(state: Int) {
+                // swiping at the end of the list: make sure more is on its way
+                if (state == ViewPager2.SCROLL_STATE_DRAGGING &&
+                    b.shortsPager.currentItem >= entries.size - 2
+                ) {
+                    loadFeed()
+                }
             }
         })
         b.shortsRetry.setOnClickListener { loadFeed() }
@@ -234,7 +255,9 @@ class ShortsFragment : BaseFragment() {
         knownIds.clear()
         infoSingles.clear()
         nextToken = null
-        exhausted = false
+        emptyLoads = 0
+        reseeds = 0
+        allowRepeats = false
         currentPosition = -1
         userPaused = false
         adapter?.notifyDataSetChanged()
@@ -243,7 +266,7 @@ class ShortsFragment : BaseFragment() {
 
     private fun loadFeed(pulled: Boolean = false) {
         val b = binding ?: return
-        if (loading || exhausted) return
+        if (loading) return
         loading = true
         val first = entries.isEmpty()
         if (first) {
@@ -257,13 +280,14 @@ class ShortsFragment : BaseFragment() {
         val seed = when {
             token != null -> null
             first -> seedId
-            else -> entries.lastOrNull()?.id
+            else -> nextReseed()
         }
         // the short that was opened explicitly stays, everything else skips watched shorts
         val keepId = if (token == null && first) seedId else null
         val avoid = avoidIds
+        val repeats = allowRepeats
         disposables.add(
-            Single.fromCallable { fetchFresh(app, token, seed, keepId, avoid) }
+            Single.fromCallable { fetchFresh(app, token, seed, keepId, avoid, repeats) }
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
@@ -291,7 +315,8 @@ class ShortsFragment : BaseFragment() {
         token: String?,
         seed: String?,
         keepId: String?,
-        avoid: Set<String>
+        avoid: Set<String>,
+        allowRepeats: Boolean
     ): YtInnerTube.Page<YtInnerTube.ShortItem> {
         val session = YtAccountStore.load(app)
         val watched = WatchedVideos.ids(app)
@@ -307,9 +332,22 @@ class ShortsFragment : BaseFragment() {
             return YtInnerTube.Page(items, page.continuation)
         }
 
+        // nothing new could be found for a while: watched shorts are better than a feed that ends
+        if (allowRepeats) return fetch(emptySet())
+
         val result = fetch(watched + avoid)
         // everything was shown before the refresh: better to repeat those than to show nothing
         return if (result.items.isEmpty() && avoid.isNotEmpty()) fetch(watched) else result
+    }
+
+    /**
+     * Seed for the next batch when the feed has no continuation token: alternately YouTube's own
+     * Shorts picks (not tied to the last short, so it is not stuck in one channel) and one of the
+     * last shorts watched (related to what the user is looking at).
+     */
+    private fun nextReseed(): String? {
+        reseeds++
+        return if (reseeds % 2 == 1) null else entries.takeLast(RECENT_WINDOW).randomOrNull()?.id
     }
 
     /** Puts a short into the app's watch history (like the normal player does for videos). */
@@ -325,9 +363,20 @@ class ShortsFragment : BaseFragment() {
         val b = binding ?: return
         b.shortsLoading.visibility = View.GONE
         nextToken = page.continuation
-        val fresh = page.items.filter { knownIds.add(it.id) }
-        if (fresh.isEmpty() && page.continuation == null) {
-            exhausted = true
+        val recent = entries.takeLast(RECENT_WINDOW).mapTo(HashSet()) { it.id }
+        val fresh = if (allowRepeats) {
+            page.items.filter { it.id !in recent }.also { list -> list.forEach { knownIds.add(it.id) } }
+        } else {
+            page.items.filter { knownIds.add(it.id) }
+        }
+        if (fresh.isEmpty() && entries.isNotEmpty()) {
+            // nothing new: try again with another seed, allowing repeats after a few misses
+            emptyLoads++
+            if (emptyLoads >= MISSES_BEFORE_REPEATS) allowRepeats = true
+            if (emptyLoads <= MAX_RESEED_TRIES) b.shortsPager.post { loadFeed() }
+        } else if (fresh.isNotEmpty()) {
+            emptyLoads = 0
+            allowRepeats = false
         }
         if (fresh.isNotEmpty()) {
             val start = entries.size
@@ -1115,6 +1164,9 @@ class ShortsFragment : BaseFragment() {
         private val HASHTAG_COLOR = Color.parseColor("#FF5AA9FF")
         private const val SEEK_STEP_MS = 5000L
         private const val MAX_FILTER_PAGES = 4
+        private const val RECENT_WINDOW = 10
+        private const val MISSES_BEFORE_REPEATS = 3
+        private const val MAX_RESEED_TRIES = 8
 
         /** Shorts player that starts with the given short, then continues with YouTube's picks. */
         @JvmStatic
