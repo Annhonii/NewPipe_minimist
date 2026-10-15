@@ -150,6 +150,13 @@ class ShortsFragment : BaseFragment() {
         })
         b.shortsRetry.setOnClickListener { loadFeed() }
 
+        // pull down on the first short = refresh the feed (not for a single opened short)
+        b.shortsRefresh.isEnabled = !standalone
+        b.shortsRefresh.setColorSchemeColors(0xFFFFFFFF.toInt())
+        b.shortsRefresh.setProgressBackgroundColorSchemeColor(0xFF2A2A2A.toInt())
+        b.shortsRefresh.setOnChildScrollUpCallback { _, _ -> b.shortsPager.currentItem > 0 }
+        b.shortsRefresh.setOnRefreshListener { refreshFeed() }
+
         if (entries.isEmpty()) {
             loadFeed()
         } else {
@@ -205,14 +212,36 @@ class ShortsFragment : BaseFragment() {
 
     // ------------------------------------------------------------------ feed
 
-    private fun loadFeed() {
+    /** Pull-to-refresh: forget the current feed and load a fresh one. */
+    private fun refreshFeed() {
+        if (loading) {
+            binding?.shortsRefresh?.isRefreshing = false
+            return
+        }
+        subscribeDisposable?.dispose()
+        subscribeDisposable = null
+        holders.values.forEach { detachFromHolder(it) }
+        player?.stop()
+        player?.clearMediaItems()
+        entries.clear()
+        knownIds.clear()
+        infoSingles.clear()
+        nextToken = null
+        exhausted = false
+        currentPosition = -1
+        userPaused = false
+        adapter?.notifyDataSetChanged()
+        loadFeed(pulled = true)
+    }
+
+    private fun loadFeed(pulled: Boolean = false) {
         val b = binding ?: return
         if (loading || exhausted) return
         loading = true
         val first = entries.isEmpty()
         if (first) {
             b.shortsEmpty.visibility = View.GONE
-            b.shortsLoading.visibility = View.VISIBLE
+            if (!pulled) b.shortsLoading.visibility = View.VISIBLE
         }
         val app = requireContext().applicationContext
         val token = nextToken
@@ -230,10 +259,12 @@ class ShortsFragment : BaseFragment() {
                 .subscribe(
                     { page ->
                         loading = false
+                        binding?.shortsRefresh?.isRefreshing = false
                         onFeed(page)
                     },
                     {
                         loading = false
+                        binding?.shortsRefresh?.isRefreshing = false
                         binding?.shortsLoading?.visibility = View.GONE
                         if (entries.isEmpty()) binding?.shortsEmpty?.visibility = View.VISIBLE
                     }
@@ -469,9 +500,6 @@ class ShortsFragment : BaseFragment() {
             resources.getDimensionPixelSize(R.dimen.nav_pill_content_inset)
         }
         b.shortOverlay.setPadding(0, 0, 0, bottomInset)
-        b.shortHeader.setPadding(
-            b.shortHeader.paddingLeft, dp(2), b.shortHeader.paddingRight, b.shortHeader.paddingBottom
-        )
         // round channel logo
         b.shortAvatar.outlineProvider = object : android.view.ViewOutlineProvider() {
             override fun getOutline(view: View, outline: android.graphics.Outline) {
