@@ -332,10 +332,11 @@ public final class ThemeHelper {
         final Configuration config = new Configuration(base.getResources().getConfiguration());
         config.uiMode = (config.uiMode & ~Configuration.UI_MODE_NIGHT_MASK)
                 | Configuration.UI_MODE_NIGHT_YES;
-        final androidx.appcompat.view.ContextThemeWrapper wrapper =
-                new androidx.appcompat.view.ContextThemeWrapper(base, R.style.PlayerViewTheme);
-        wrapper.applyOverrideConfiguration(config);
-        return wrapper;
+        // Fresh configuration context + complete theme on top of it. (Do NOT copy the base theme
+        // into a wrapper with an overridden configuration: its attributes then resolve to 0 and
+        // inflating the player crashes with "Drawable resource ID #0x0".)
+        return new androidx.appcompat.view.ContextThemeWrapper(
+                base.createConfigurationContext(config), R.style.PlayerViewTheme);
     }
 
     public static void setDayNightMode(final Context context) {

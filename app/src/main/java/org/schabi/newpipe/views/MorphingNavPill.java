@@ -179,17 +179,10 @@ public class MorphingNavPill extends ViewGroup {
     }
 
     private static int resolveAccent(@NonNull final Context context) {
-        // light theme: the selected chip is plain black (white icon + label on it)
+        // light theme: the selected chip is plain black (white icon + label on it);
+        // dark theme: plain white (black icon + label on it)
         final int page = ThemeHelper.resolveColorFromAttr(context, android.R.attr.colorBackground);
-        if (ColorUtils.calculateLuminance(page) > 0.5) {
-            return 0xFF000000;
-        }
-        final int accent = ThemeHelper.resolveColorFromAttr(context,
-                androidx.appcompat.R.attr.colorAccent);
-        if (Color.alpha(accent) == 0) {
-            return ThemeHelper.resolveColorFromAttr(context, R.attr.card_item_contrast_color);
-        }
-        return accent;
+        return ColorUtils.calculateLuminance(page) > 0.5 ? 0xFF000000 : 0xFFFFFFFF;
     }
 
     /*//////////////////////////////////////////////////////////////////////////
@@ -714,7 +707,7 @@ public class MorphingNavPill extends ViewGroup {
 
         void setChipColor(final int color) {
             chipColor = color;
-            onChipColor = ColorUtils.calculateLuminance(color) > 0.5 ? 0xFF111111 : Color.WHITE;
+            onChipColor = ColorUtils.calculateLuminance(color) > 0.5 ? 0xFF000000 : Color.WHITE;
             invalidate();
         }
 

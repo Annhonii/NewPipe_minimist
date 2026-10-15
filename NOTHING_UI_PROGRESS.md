@@ -112,3 +112,13 @@ Not compiled here.
   so speed/quality/audio/caption popups resolved a stale theme. Now ThemeHelper.createDarkPlayerContext() (PlayerViewTheme + forced night uiMode) is used for
   inflating the player view (Player.initUIsForCurrentPlayerType) and for ALL four popup menus (VideoPlayerUi; speed popup used the raw service context before).
   Not compiled here.
+
+## Pass 11 (user request): player crash, white pill, AMOLED black
+- CRASH FIX (PlayerService -> InflateException "Drawable resource ID #0x0", player.xml AppCompatImageButton): pass 10 inflated the player with a
+  ContextThemeWrapper(overlay theme) + applyOverrideConfiguration, so ?attr/selectableItemBackground(Borderless) resolved to 0.
+  Now ThemeHelper.createDarkPlayerContext = base.createConfigurationContext(night) + a COMPLETE theme (PlayerViewTheme, parent Theme.AppCompat.NoActionBar).
+- Floating pill: selected chip is white in dark (black icon/label), black in light. Unselected icons in dark = white.
+- Dark + Black theme: bg, cards, dialogs, containers, toolbar, separators/borders, switch off-track, license bg, player popup, comment input = #000000.
+  values-night overrides: placeholders (black/white glyph), subscribed chip, selection highlight + download progress tints (red alpha instead of grey alpha),
+  avatar fallback palette (red/black only). Left grey on purpose: muted secondary TEXT (#ADADAD), ripples (translucent white press flash), video-overlay scrims.
+  Hairlines/outlines in dark are now black too, so they are invisible on black.

@@ -67,9 +67,19 @@
     </style>
 
     <!-- The player always looks dark (it sits on top of the video), whatever the app theme is. -->
-    <style name="PlayerViewTheme" parent="ThemeOverlay.AppCompat.Dark">
+    <!-- A COMPLETE theme (not an overlay): the player view is inflated from the PlayerService, so it
+         must not depend on any attribute that only the activity themes define. -->
+    <style name="PlayerViewTheme" parent="Theme.AppCompat.NoActionBar">
+        <item name="colorPrimary">@color/nothing_red</item>
+        <item name="colorPrimaryDark">@color/nothing_red</item>
+        <item name="colorAccent">@color/nothing_red</item>
         <item name="popupMenuStyle">@style/Widget.App.PopupMenu.Dark</item>
         <item name="android:popupMenuStyle">@style/Widget.App.PopupMenu.Dark</item>
+        <item name="android:progressBarStyle">@style/Widget.App.ProgressBar</item>
+        <item name="android:progressBarStyleLarge">@style/Widget.App.ProgressBar.Large</item>
+        <item name="android:progressBarStyleLargeInverse">@style/Widget.App.ProgressBar.Large</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="fontFamily">sans-serif</item>
     </style>
 
     <style name="DarkPopupMenu" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
