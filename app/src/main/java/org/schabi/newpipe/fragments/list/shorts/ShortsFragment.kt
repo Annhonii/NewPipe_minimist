@@ -943,7 +943,7 @@ class ShortsFragment : BaseFragment() {
 
     private fun showSpeedDialog() {
         val ctx = context ?: return
-        val speeds = floatArrayOf(0.25f, 0.5f, 0.75f, 1f, 1.25f, 1.5f, 2f)
+        val speeds = listOf(0.25f, 0.5f, 0.75f, 1f, 1.25f, 1.5f, 2f)
         AlertDialog.Builder(ctx)
             .setTitle(R.string.shorts_playback_speed)
             .setSingleChoiceItems(
