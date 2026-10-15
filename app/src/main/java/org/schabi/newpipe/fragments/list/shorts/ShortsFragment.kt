@@ -470,6 +470,9 @@ class ShortsFragment : BaseFragment() {
     }
 
     private fun attachToHolder(h: ShortHolder) {
+        // shorts are portrait: fill the page from the first moment, a wide video switches to FIT
+        // once its size is known (onVideoSizeChanged)
+        h.b.shortPlayer.resizeMode = AspectRatioFrameLayout.RESIZE_MODE_ZOOM
         h.b.shortPlayer.player = player
         h.b.shortThumb.visibility = View.VISIBLE
         h.b.shortPauseIcon.visibility = View.GONE
