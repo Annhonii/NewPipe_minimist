@@ -15,7 +15,9 @@ import org.schabi.newpipe.BaseFragment
 import org.schabi.newpipe.R
 import org.schabi.newpipe.databinding.FragmentHomeBinding
 import org.schabi.newpipe.extractor.ServiceList
+import org.schabi.newpipe.fragments.BaseStateFragment
 import org.schabi.newpipe.fragments.BlankFragment
+import org.schabi.newpipe.fragments.Refreshable
 import org.schabi.newpipe.fragments.list.kiosk.KioskFragment
 import org.schabi.newpipe.fragments.list.kiosk.TrendingSearchFragment
 import org.schabi.newpipe.util.DeviceUtils
@@ -26,7 +28,17 @@ import org.schabi.newpipe.util.ThemeHelper
  * "All" shows the recommended home feed, every other pill opens the trending videos of that
  * category. This replaces the separate "Trending" tab of the bottom bar.
  */
-class HomeFragment : BaseFragment() {
+class HomeFragment : BaseFragment(), Refreshable {
+
+    /** Double tap on the Home tab of the navigation pill: reload the page that is shown. */
+    override fun refreshFromNavBar() {
+        when (val page = childFragmentManager.findFragmentById(R.id.home_content)) {
+            is HomeFeedFragment -> page.refreshFromNavBar()
+            is BaseStateFragment<*> -> page.reloadContent()
+            else -> Unit
+        }
+    }
+
 
     /** One pill. [query] is null for "All" (home feed) and for "Live" (the default kiosk). */
     private class Category(val titleRes: Int, val query: String?, val isLive: Boolean = false)

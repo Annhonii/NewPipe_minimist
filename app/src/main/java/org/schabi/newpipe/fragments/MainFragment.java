@@ -56,6 +56,10 @@ public class MainFragment extends BaseFragment
     private final List<Tab> tabsList = new ArrayList<>();
     private TabsManager tabsManager;
 
+    private static final long DOUBLE_TAP_MS = 400;
+    private long lastReselectTime = 0;
+    private int lastReselectPosition = -1;
+
     private static final int MAX_TABS_FOR_TWO_ACTIONS = 4;
 
     private boolean hasTabsChanged = false;
@@ -461,6 +465,33 @@ public class MainFragment extends BaseFragment
             Log.d(TAG, "onItemReselected() called with: position = [" + position + "]");
         }
         updateTitleForTab(position);
+
+        // tapping the selected tab twice in a row refreshes it (Home, Shorts)
+        final long now = android.os.SystemClock.uptimeMillis();
+        if (position == lastReselectPosition && now - lastReselectTime <= DOUBLE_TAP_MS) {
+            lastReselectTime = 0;
+            lastReselectPosition = -1;
+            refreshCurrentTab();
+        } else {
+            lastReselectTime = now;
+            lastReselectPosition = position;
+        }
+    }
+
+    private void refreshCurrentTab() {
+        if (!isAdded()) {
+            return;
+        }
+        // only the tab on screen is resumed (BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT)
+        for (final Fragment fragment : getChildFragmentManager().getFragments()) {
+            if (fragment instanceof Refreshable && fragment.isResumed()) {
+                if (binding != null) {
+                    binding.mainNavBar.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
+                }
+                ((Refreshable) fragment).refreshFromNavBar();
+                return;
+            }
+        }
     }
 
     public static final class SelectedTabsPagerAdapter

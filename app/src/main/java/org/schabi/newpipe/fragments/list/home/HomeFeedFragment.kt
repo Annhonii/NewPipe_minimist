@@ -67,6 +67,13 @@ class HomeFeedFragment : BaseListInfoFragment<StreamInfoItem, HomeFeedInfo>(User
         }
     }
 
+    /** Same as pulling down: back to the top and new recommendations. */
+    fun refreshFromNavBar() {
+        itemsList?.scrollToPosition(0)
+        refreshLayout?.isRefreshing = true
+        reloadContent()
+    }
+
     /** While the user pulled to refresh, the pull spinner is the loading indicator. */
     override fun showLoading() {
         if (refreshLayout?.isRefreshing == true) {
