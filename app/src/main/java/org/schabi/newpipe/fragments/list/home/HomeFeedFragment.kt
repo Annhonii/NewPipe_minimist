@@ -22,6 +22,8 @@ import org.schabi.newpipe.fragments.list.BaseListInfoFragment
 import org.schabi.newpipe.info_list.dialog.InfoItemDialog
 import org.schabi.newpipe.info_list.dialog.StreamDialogDefaultEntry
 import android.widget.Toast
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import org.schabi.newpipe.util.WatchedVideos
 
 /** Info holder so the standard list-fragment machinery can show the home feed. */
 class HomeFeedInfo(name: String) : ListInfo<StreamInfoItem>(
@@ -53,7 +55,36 @@ class HomeFeedFragment : BaseListInfoFragment<StreamInfoItem, HomeFeedInfo>(User
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? = inflater.inflate(R.layout.fragment_kiosk, container, false)
+    ): View? = inflater.inflate(R.layout.fragment_home_feed, container, false)
+
+    private var refreshLayout: SwipeRefreshLayout? = null
+
+    override fun initViews(rootView: View, savedInstanceState: Bundle?) {
+        super.initViews(rootView, savedInstanceState)
+        // pull down = new recommendations (videos that were watched or shown before are skipped)
+        refreshLayout = rootView.findViewById<SwipeRefreshLayout>(R.id.home_feed_refresh)?.also {
+            it.setOnRefreshListener { reloadContent() }
+        }
+    }
+
+    /** While the user pulled to refresh, the pull spinner is the loading indicator. */
+    override fun showLoading() {
+        if (refreshLayout?.isRefreshing == true) {
+            hideErrorPanel()
+            return
+        }
+        super.showLoading()
+    }
+
+    override fun hideLoading() {
+        super.hideLoading()
+        refreshLayout?.isRefreshing = false
+    }
+
+    override fun handleError() {
+        super.handleError()
+        refreshLayout?.isRefreshing = false
+    }
 
     override fun loadResult(forceLoad: Boolean): Single<HomeFeedInfo> {
         val app = requireContext().applicationContext
@@ -70,10 +101,11 @@ class HomeFeedFragment : BaseListInfoFragment<StreamInfoItem, HomeFeedInfo>(User
         }
 
         return Single.fromCallable {
-            val page = YtInnerTube.feed(YtAccountStore.load(app))
+            // a refresh must not bring back what was on screen before
+            val (videos, next) = freshVideos(app, null, avoidShown = forceLoad)
             HomeFeedInfo(title).apply {
-                relatedItems = page.items.map { toItem(it) }
-                nextPage = page.continuation?.let { Page(it) }
+                relatedItems = videos.map { toItem(it) }
+                nextPage = next?.let { Page(it) }
             }
         }.doOnSuccess {
             cache = it
@@ -86,17 +118,73 @@ class HomeFeedFragment : BaseListInfoFragment<StreamInfoItem, HomeFeedInfo>(User
         val app: Context = requireContext().applicationContext
         val token = currentNextPage?.url
         return Single.fromCallable {
-            val page = YtInnerTube.feed(YtAccountStore.load(app), token)
+            val (videos, next) = freshVideos(app, token, avoidShown = true)
             ListExtractor.InfoItemsPage(
-                page.items.map { toItem(it) },
-                page.continuation?.let { Page(it) },
+                videos.map { toItem(it) },
+                next?.let { Page(it) },
                 emptyList<Throwable>()
             )
         }
     }
 
+    /**
+     * One page of recommendations without videos that are already in the watch history and
+     * (when [avoidShown]) without videos shown earlier. Reads further pages when too little is
+     * left after filtering. Blocking: call from a background thread.
+     */
+    private fun freshVideos(
+        app: Context,
+        token: String?,
+        avoidShown: Boolean
+    ): Pair<List<YtInnerTube.Video>, String?> {
+        val session = YtAccountStore.load(app)
+        val watched = WatchedVideos.ids(app)
+        val shown = if (avoidShown) seenSnapshot() else emptySet()
+
+        fun collect(exclude: Set<String>): Pair<List<YtInnerTube.Video>, String?> {
+            val taken = HashSet<String>()
+            var page = YtInnerTube.feed(session, token)
+            val out = ArrayList<YtInnerTube.Video>()
+            fun take(videos: List<YtInnerTube.Video>) {
+                videos.forEach { if (it.id !in exclude && taken.add(it.id)) out.add(it) }
+            }
+            take(page.items)
+            var next = page.continuation
+            var guard = 0
+            while (out.size < MIN_ITEMS && next != null && guard++ < MAX_FILTER_PAGES) {
+                page = YtInnerTube.feed(session, next)
+                take(page.items)
+                next = page.continuation
+            }
+            return out to next
+        }
+
+        var result = collect(watched + shown)
+        // everything was shown before: repeat those rather than show an empty home page
+        if (result.first.isEmpty() && shown.isNotEmpty()) result = collect(watched)
+        markSeen(result.first.map { it.id })
+        return result
+    }
+
     companion object {
         private const val CACHE_MAX_AGE_MS = 30 * 60 * 1000L
+        private const val MIN_ITEMS = 8
+        private const val MAX_FILTER_PAGES = 4
+        private const val MAX_SEEN = 600
+
+        /** Ids of the videos the Home feed already showed (oldest dropped first). */
+        private val seenIds = LinkedHashSet<String>()
+
+        private fun seenSnapshot(): Set<String> = synchronized(seenIds) { HashSet(seenIds) }
+
+        private fun markSeen(ids: Collection<String>) = synchronized(seenIds) {
+            seenIds.addAll(ids)
+            while (seenIds.size > MAX_SEEN) {
+                val oldest = seenIds.iterator()
+                oldest.next()
+                oldest.remove()
+            }
+        }
 
         @Volatile private var cache: HomeFeedInfo? = null
         @Volatile private var cacheKey = 0
@@ -106,6 +194,7 @@ class HomeFeedFragment : BaseListInfoFragment<StreamInfoItem, HomeFeedInfo>(User
     private val feedbackDisposables = io.reactivex.rxjava3.disposables.CompositeDisposable()
 
     override fun onDestroyView() {
+        refreshLayout = null
         feedbackDisposables.clear()
         super.onDestroyView()
     }

@@ -469,7 +469,8 @@ object YtInnerTube {
     fun shortsFeed(
         session: YtAccountStore.Session?,
         continuation: String? = null,
-        seedId: String? = null
+        seedId: String? = null,
+        exclude: Set<String> = emptySet()
     ): Page<ShortItem> {
         if (continuation != null) {
             val json = post(
@@ -484,7 +485,7 @@ object YtInnerTube {
         if (seedId != null) {
             candidates.add(ShortItem(seedId, null, "https://i.ytimg.com/vi/$seedId/hqdefault.jpg"))
         } else {
-            candidates.addAll(shortsSeedCandidates(session))
+            candidates.addAll(shortsSeedCandidates(session, exclude))
         }
         val seed = candidates.firstOrNull() ?: return Page(emptyList(), null)
 
@@ -517,17 +518,24 @@ object YtInnerTube {
     }
 
     /** Shorts that YouTube itself puts in front of the user: Shorts page, home shelf, search. */
-    private fun shortsSeedCandidates(session: YtAccountStore.Session?): List<ShortItem> {
+    private fun shortsSeedCandidates(
+        session: YtAccountStore.Session?,
+        exclude: Set<String> = emptySet()
+    ): List<ShortItem> {
         val sources = listOf<() -> JSONObject>(
             { browse(session, "FEshorts", null) },
             { browse(session, "FEwhat_to_watch", null) },
             { post("search", JSONObject().put("query", "#shorts"), session) }
         )
+        // prefer a seed that was not watched / shown yet; fall back to any short we found
+        var fallback: List<ShortItem> = emptyList()
         for (source in sources) {
             val found = runCatching { parseShorts(source()) }.getOrDefault(emptyList())
-            if (found.isNotEmpty()) return found
+            val fresh = found.filter { it.id !in exclude }
+            if (fresh.isNotEmpty()) return fresh
+            if (fallback.isEmpty()) fallback = found
         }
-        return emptyList()
+        return fallback
     }
 
     private fun reelContinuation(json: JSONObject): String? {

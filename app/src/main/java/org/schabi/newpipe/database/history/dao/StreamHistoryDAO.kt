@@ -37,6 +37,10 @@ abstract class StreamHistoryDAO : BasicDAO<StreamHistoryEntity> {
     @Query("SELECT * FROM stream_history WHERE stream_id = :streamId ORDER BY access_date DESC LIMIT 1")
     abstract fun getLatestEntry(streamId: Long): StreamHistoryEntity?
 
+    /** Urls of every stream of the service that is in the watch history (blocking, call off the main thread). */
+    @Query("SELECT DISTINCT url FROM streams INNER JOIN stream_history ON uid = stream_id WHERE service_id = :serviceId")
+    abstract fun getWatchedUrls(serviceId: Int): List<String>
+
     @Query("DELETE FROM stream_history WHERE stream_id = :streamId")
     abstract fun deleteStreamHistory(streamId: Long): Int
 

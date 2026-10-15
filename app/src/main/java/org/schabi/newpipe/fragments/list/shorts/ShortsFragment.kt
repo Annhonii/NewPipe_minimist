@@ -57,6 +57,8 @@ import org.schabi.newpipe.databinding.ItemShortBinding
 import org.schabi.newpipe.extractor.ServiceList
 import org.schabi.newpipe.extractor.stream.StreamInfo
 import org.schabi.newpipe.fragments.detail.VideoInfoBottomSheet
+import org.schabi.newpipe.local.history.HistoryRecordManager
+import org.schabi.newpipe.util.WatchedVideos
 import org.schabi.newpipe.local.subscription.SubscriptionManager
 import org.schabi.newpipe.player.helper.PlayerDataSource
 import org.schabi.newpipe.player.resolver.VideoPlaybackResolver
@@ -93,6 +95,9 @@ class ShortsFragment : BaseFragment() {
     private var exhausted = false
     private var loading = false
     private var seedId: String? = null
+    // shorts shown before the last pull-to-refresh: not recommended again right after it
+    private var avoidIds: Set<String> = emptySet()
+    private var lastRecordedId: String? = null
 
     // pages
     private val holders = HashMap<Int, ShortHolder>()
@@ -224,6 +229,7 @@ class ShortsFragment : BaseFragment() {
         holders.values.forEach { detachFromHolder(it) }
         player?.stop()
         player?.clearMediaItems()
+        avoidIds = avoidIds + knownIds
         entries.clear()
         knownIds.clear()
         infoSingles.clear()
@@ -253,8 +259,11 @@ class ShortsFragment : BaseFragment() {
             first -> seedId
             else -> entries.lastOrNull()?.id
         }
+        // the short that was opened explicitly stays, everything else skips watched shorts
+        val keepId = if (token == null && first) seedId else null
+        val avoid = avoidIds
         disposables.add(
-            Single.fromCallable { YtInnerTube.shortsFeed(YtAccountStore.load(app), token, seed) }
+            Single.fromCallable { fetchFresh(app, token, seed, keepId, avoid) }
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
@@ -271,6 +280,45 @@ class ShortsFragment : BaseFragment() {
                     }
                 )
         )
+    }
+
+    /**
+     * One page of the feed without shorts that are already in the watch history (or were shown
+     * before the last refresh). Reads more pages when a whole page was filtered away. Blocking.
+     */
+    private fun fetchFresh(
+        app: android.content.Context,
+        token: String?,
+        seed: String?,
+        keepId: String?,
+        avoid: Set<String>
+    ): YtInnerTube.Page<YtInnerTube.ShortItem> {
+        val session = YtAccountStore.load(app)
+        val watched = WatchedVideos.ids(app)
+
+        fun fetch(exclude: Set<String>): YtInnerTube.Page<YtInnerTube.ShortItem> {
+            var page = YtInnerTube.shortsFeed(session, token, seed, exclude)
+            var items = page.items.filter { it.id == keepId || it.id !in exclude }
+            var guard = 0
+            while (items.isEmpty() && page.continuation != null && guard++ < MAX_FILTER_PAGES) {
+                page = YtInnerTube.shortsFeed(session, page.continuation, null, exclude)
+                items = page.items.filter { it.id !in exclude }
+            }
+            return YtInnerTube.Page(items, page.continuation)
+        }
+
+        val result = fetch(watched + avoid)
+        // everything was shown before the refresh: better to repeat those than to show nothing
+        return if (result.items.isEmpty() && avoid.isNotEmpty()) fetch(watched) else result
+    }
+
+    /** Puts a short into the app's watch history (like the normal player does for videos). */
+    private fun recordHistory(info: StreamInfo) {
+        if (lastRecordedId == info.id) return
+        lastRecordedId = info.id
+        val app = context?.applicationContext ?: return
+        // not tied to the view's disposables: the entry must still be written if the user leaves
+        HistoryRecordManager(app).onViewed(info).subscribe({ }, { })
     }
 
     private fun onFeed(page: YtInnerTube.Page<YtInnerTube.ShortItem>) {
@@ -445,6 +493,7 @@ class ShortsFragment : BaseFragment() {
     }
 
     private fun onInfoReady(position: Int, info: StreamInfo) {
+        recordHistory(info)
         holders[position]?.let { applyInfo(it, info, true) }
         val exo = player ?: return
         val source = try {
@@ -1062,6 +1111,7 @@ class ShortsFragment : BaseFragment() {
         private val DISLIKED_COLOR = Color.parseColor("#FF8AB4F8")
         private val HASHTAG_COLOR = Color.parseColor("#FF5AA9FF")
         private const val SEEK_STEP_MS = 5000L
+        private const val MAX_FILTER_PAGES = 4
 
         /** Shorts player that starts with the given short, then continues with YouTube's picks. */
         @JvmStatic
