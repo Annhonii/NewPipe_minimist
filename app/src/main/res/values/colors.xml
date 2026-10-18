@@ -14,7 +14,7 @@
     <!-- Light Theme -->
     <color name="light_background_color">#F2F2F2</color>
     <color name="light_dialog_background_color">#FFFFFF</color>
-    <color name="light_settings_accent_color">#D71921</color>
+    <color name="light_settings_accent_color">#2F4A5C</color>
     <color name="light_separator_color">#D9D9D9</color>
     <color name="light_ripple_color">#1F000000</color>
     <color name="light_selected_color">#1F000000</color>
@@ -29,18 +29,18 @@
     <!-- Dark Theme -->
     <color name="dark_background_color">#000000</color>
     <color name="dark_dialog_background_color">#000000</color>
-    <color name="dark_settings_accent_color">#D71921</color>
-    <color name="dark_separator_color">#000000</color>
+    <color name="dark_settings_accent_color">#CFE8F5</color>
+    <color name="dark_separator_color">#252525</color>
     <color name="dark_ripple_color">#29FFFFFF</color>
     <color name="dark_selected_color">#29FFFFFF</color>
-    <color name="dark_contrast_background_color">#000000</color>
+    <color name="dark_contrast_background_color">#171717</color>
     <color name="dark_shadow_start_color">#82000000</color>
     <color name="dark_license_background_color">#000000</color>
     <color name="dark_license_text_color">#FFFFFF</color>
     <color name="dark_queue_background_color">#af000000</color>
-    <color name="dark_card_item_background_color">#000000</color>
-    <color name="dark_card_item_contrast_color">#000000</color>
-    <color name="dark_border_color">#000000</color>
+    <color name="dark_card_item_background_color">#1C1C1C</color>
+    <color name="dark_card_item_contrast_color">#242424</color>
+    <color name="dark_border_color">#303030</color>
 
     <!-- Black Theme -->
     <color name="black_background_color">#000000</color>
@@ -56,31 +56,31 @@
          Change these 6 values to recolour the whole top bar. -->
     <color name="m3_toolbar_container_light">#F2F2F2</color>
     <color name="m3_toolbar_element_light">#EBEBEB</color>
-    <color name="m3_toolbar_container_dark">#000000</color>
-    <color name="m3_toolbar_element_dark">#000000</color>
+    <color name="m3_toolbar_container_dark">#101010</color>
+    <color name="m3_toolbar_element_dark">#222222</color>
     <color name="m3_toolbar_container_black">#000000</color>
     <color name="m3_toolbar_element_black">#000000</color>
 
     <!-- Nothing/Music design tokens -->
-    <color name="nothing_red">#D71921</color>
-    <color name="nothing_red_dim">#AE141B</color>
-    <color name="nothing_yellow">#D71921</color>
+    <color name="nothing_red">#CFE8F5</color>
+    <color name="nothing_red_dim">#8FAFBE</color>
+    <color name="nothing_yellow">#E7E9B0</color>
     <color name="on_surface_light">#000000</color>
     <color name="on_surface_variant_light">#606060</color>
     <color name="on_surface_dark">#FFFFFF</color>
     <color name="on_surface_variant_dark">#ADADAD</color>
     <color name="outline_light">#D9D9D9</color>
-    <color name="outline_dark">#000000</color>
+    <color name="outline_dark">#303030</color>
     <color name="scrim_dim">#99000000</color>
     <color name="switch_track_off_light">#D9D9D9</color>
-    <color name="switch_track_off_dark">#000000</color>
+    <color name="switch_track_off_dark">#303030</color>
     <color name="switch_track_off_black">#000000</color>
 
     <!-- Miscellaneous -->
     <color name="queue_background_color">@color/dark_queue_background_color</color>
     <color name="drawer_header_font_color">#F2FFFFFF</color>
     <color name="duration_background_color">#aa000000</color>
-    <color name="live_duration_background_color">#c8D71921</color>
+    <color name="live_duration_background_color">#C8CFE8F5</color>
     <color name="playlist_stream_count_background_color">#e6000000</color>
     <color name="duration_text_color">#EEFFFFFF</color>
     <color name="video_overlay_color">#64000000</color>
@@ -93,13 +93,13 @@
     <color name="selected_background_color">#96717171</color>
 
     <!-- GigaGet theme -->
-    <color name="bluegray">#D71921</color>
+    <color name="bluegray">#CFE8F5</color>
 
     <!-- GigaGet download Theme colors -->
     <color name="audio_left_to_load_color">#1F808080</color>
     <color name="audio_already_load_color">#4D808080</color>
-    <color name="video_left_to_load_color">#26D71921</color>
-    <color name="video_already_load_color">#59D71921</color>
+    <color name="video_left_to_load_color">#26CFE8F5</color>
+    <color name="video_already_load_color">#59CFE8F5</color>
     <color name="subtitle_left_to_load_color">#1F808080</color>
     <color name="subtitle_already_load_color">#4D808080</color>
 
